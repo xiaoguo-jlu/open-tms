@@ -12,13 +12,8 @@
     <description>Open Treasury Management System</description>
 
     <modules>
-        <module>basedata</module>
-        <module>cashpool</module>
-        <module>dealing</module>
-        <module>workflow</module>
-        <module>admin</module>
-        <module>gateway</module>
         <module>common</module>
+        <module>basedata</module>
     </modules>
 
     <parent>
@@ -98,6 +93,13 @@
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>42.7.1</version>
+            </dependency>
+            
+            <!-- H2 Database -->
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>1.4.200</version>
             </dependency>
             
             <!-- Lombok -->

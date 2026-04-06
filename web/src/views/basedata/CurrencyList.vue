@@ -88,7 +88,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import axios from 'axios'
 
-const API_URL = 'http://localhost:8081/api/currency'
+const API_URL = '/api/currency'
 
 const loading = ref(false)
 const dialogVisible = ref(false)
