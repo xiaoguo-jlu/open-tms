@@ -26,3 +26,11 @@ Thumbs.db
 # Test files
 test-page.js
 setup-maven.ps1
+
+# Temp files
+*.tmp
+*.bak
+
+# Root temp files
+/package.json
+/web/node_modules/
