@@ -1,14 +1,13 @@
 <template>
-  <div class="currency-list">
+  <div class="holiday-list">
     <el-card class="filter-card">
       <el-form :inline="true" :model="queryForm">
-        <el-form-item label="关键字">
-          <el-input v-model="queryForm.keyword" placeholder="币种代码/名称" clearable @keyup.enter="handleQuery" />
+        <el-form-item label="年份">
+          <el-date-picker v-model="queryForm.year" type="year" placeholder="选择年份" value-format="YYYY" />
         </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="queryForm.status" placeholder="请选择" clearable>
-            <el-option label="启用" value="1" />
-            <el-option label="停用" value="0" />
+        <el-form-item label="国家">
+          <el-select v-model="queryForm.countryCode" placeholder="请选择" clearable>
+            <el-option v-for="item in countryList" :key="item.code" :label="item.name" :value="item.code" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -23,17 +22,18 @@
       <el-table :data="tableData" v-loading="loading" stripe>
         <el-table-column type="selection" width="50" align="center" />
         <el-table-column type="index" label="序号" width="60" align="center" />
-        <el-table-column prop="currencyCode" label="币种代码" width="120" />
-        <el-table-column prop="currencyName" label="币种名称" width="150" />
-        <el-table-column prop="currencySymbol" label="符号" width="80" />
-        <el-table-column prop="decimalPlaces" label="小数位数" width="100" align="center" />
-        <el-table-column prop="status" label="状态" width="80" align="center">
+        <el-table-column prop="holidayDate" label="日期" width="120" />
+        <el-table-column prop="holidayName" label="节假日名称" min-width="150" />
+        <el-table-column prop="countryCode" label="国家代码" width="120" />
+        <el-table-column prop="countryName" label="国家名称" width="120" />
+        <el-table-column prop="isAdjustment" label="是否调休" width="100" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.status === '1' ? 'success' : 'danger'">
-              {{ row.status === '1' ? '启用' : '停用' }}
+            <el-tag :type="row.isAdjustment === '1' ? 'warning' : 'info'">
+              {{ row.isAdjustment === '1' ? '是' : '否' }}
             </el-tag>
           </template>
         </el-table-column>
+        <el-table-column prop="remark" label="备注" min-width="200" />
         <el-table-column prop="createdAt" label="创建时间" width="180" />
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
@@ -57,23 +57,25 @@
 
     <el-drawer v-model="drawerVisible" :title="drawerTitle" direction="rtl" size="480px">
       <el-form ref="formRef" :model="formData" :rules="rules" label-width="100px">
-        <el-form-item label="币种代码" prop="currencyCode">
-          <el-input v-model="formData.currencyCode" placeholder="如: CNY, USD" :disabled="isEdit" />
+        <el-form-item label="日期" prop="holidayDate">
+          <el-date-picker v-model="formData.holidayDate" type="date" placeholder="选择日期" value-format="YYYY-MM-DD" style="width: 100%;" />
         </el-form-item>
-        <el-form-item label="币种名称" prop="currencyName">
-          <el-input v-model="formData.currencyName" placeholder="如: 人民币, 美元" />
+        <el-form-item label="节假日名称" prop="holidayName">
+          <el-input v-model="formData.holidayName" placeholder="如: 春节, 元旦" />
         </el-form-item>
-        <el-form-item label="币种符号" prop="currencySymbol">
-          <el-input v-model="formData.currencySymbol" placeholder="如: ¥, $" />
+        <el-form-item label="国家" prop="countryCode">
+          <el-select v-model="formData.countryCode" placeholder="请选择" style="width: 100%;">
+            <el-option v-for="item in countryList" :key="item.code" :label="item.name" :value="item.code" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="小数位数" prop="decimalPlaces">
-          <el-input-number v-model="formData.decimalPlaces" :min="0" :max="10" />
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="formData.status">
-            <el-radio value="1">启用</el-radio>
-            <el-radio value="0">停用</el-radio>
+        <el-form-item label="是否调休" prop="isAdjustment">
+          <el-radio-group v-model="formData.isAdjustment">
+            <el-radio value="1">是</el-radio>
+            <el-radio value="0">否</el-radio>
           </el-radio-group>
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="formData.remark" type="textarea" :rows="3" placeholder="请输入备注" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -89,45 +91,57 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { listCurrency, saveCurrency, updateCurrency, deleteCurrency } from '@/api/basedata'
+import { listHoliday, saveHoliday, updateHoliday, deleteHoliday, listCountry } from '@/api/basedata'
 
 const loading = ref(false)
 const drawerVisible = ref(false)
 const submitLoading = ref(false)
 const formRef = ref(null)
 const tableData = ref([])
+const countryList = ref([])
 
-const queryForm = reactive({ keyword: '', status: '' })
+const currentYear = new Date().getFullYear().toString()
+const queryForm = reactive({ year: currentYear, countryCode: '' })
 const pagination = reactive({ pageNum: 1, pageSize: 10, total: 0 })
 
 const formData = reactive({
   id: null,
-  currencyCode: '',
-  currencyName: '',
-  currencySymbol: '',
-  decimalPlaces: 2,
-  status: '1'
+  holidayDate: '',
+  holidayName: '',
+  countryCode: '',
+  isAdjustment: '0',
+  remark: ''
 })
 
 const rules = {
-  currencyCode: [{ required: true, message: '请输入币种代码', trigger: 'blur' }],
-  currencyName: [{ required: true, message: '请输入币种名称', trigger: 'blur' }],
-  decimalPlaces: [{ required: true, message: '请输入小数位数', trigger: 'blur' }]
+  holidayDate: [{ required: true, message: '请选择日期', trigger: 'change' }],
+  holidayName: [{ required: true, message: '请输入节假日名称', trigger: 'blur' }],
+  countryCode: [{ required: true, message: '请选择国家', trigger: 'change' }],
+  isAdjustment: [{ required: true, message: '请选择是否调休', trigger: 'change' }]
 }
 
-const drawerTitle = computed(() => (formData.id ? '编辑币种' : '新增币种'))
+const drawerTitle = computed(() => (formData.id ? '编辑节假日' : '新增节假日'))
 const isEdit = computed(() => !!formData.id)
+
+const fetchCountryList = async () => {
+  try {
+    const res = await listCountry({ pageSize: 1000 })
+    countryList.value = res.data.list || []
+  } catch (error) {
+    console.error('Failed to fetch countries:', error)
+  }
+}
 
 const fetchData = async () => {
   loading.value = true
   try {
     const params = {
-      keyword: queryForm.keyword,
-      status: queryForm.status,
+      year: queryForm.year,
+      countryCode: queryForm.countryCode,
       pageNum: pagination.pageNum,
       pageSize: pagination.pageSize
     }
-    const res = await listCurrency(params)
+    const res = await listHoliday(params)
     tableData.value = res.data.list || []
     pagination.total = res.data.total || 0
   } catch (error) {
@@ -143,14 +157,14 @@ const handleQuery = () => {
 }
 
 const handleReset = () => {
-  queryForm.keyword = ''
-  queryForm.status = ''
+  queryForm.year = currentYear
+  queryForm.countryCode = ''
   handleQuery()
 }
 
 const handleAdd = () => {
   Object.assign(formData, {
-    id: null, currencyCode: '', currencyName: '', currencySymbol: '', decimalPlaces: 2, status: '1'
+    id: null, holidayDate: '', holidayName: '', countryCode: '', isAdjustment: '0', remark: ''
   })
   formRef.value?.resetFields()
   drawerVisible.value = true
@@ -163,8 +177,8 @@ const handleEdit = (row) => {
 
 const handleDelete = async (row) => {
   try {
-    await ElMessageBox.confirm('确定要删除该币种吗?', '提示', { type: 'warning' })
-    await deleteCurrency(row.id)
+    await ElMessageBox.confirm('确定要删除该节假日吗?', '提示', { type: 'warning' })
+    await deleteHoliday(row.id)
     ElMessage.success('删除成功')
     fetchData()
   } catch (error) {
@@ -181,10 +195,10 @@ const handleSubmit = async () => {
       submitLoading.value = true
       try {
         if (formData.id) {
-          await updateCurrency(formData)
+          await updateHoliday(formData)
           ElMessage.success('更新成功')
         } else {
-          await saveCurrency(formData)
+          await saveHoliday(formData)
           ElMessage.success('新增成功')
         }
         drawerVisible.value = false
@@ -199,12 +213,13 @@ const handleSubmit = async () => {
 }
 
 onMounted(() => {
+  fetchCountryList()
   fetchData()
 })
 </script>
 
 <style scoped>
-.currency-list { }
+.holiday-list { }
 .filter-card { margin-bottom: 16px; }
 .table-card { }
 </style>

@@ -4,8 +4,15 @@
       <div class="logo">Open-TMS</div>
       <el-menu :default-active="activeMenu" router class="menu">
         <el-sub-menu index="basedata">
-          <template #title><span>基础数据</span></template>
+          <template #title><el-icon><Grid /></el-icon><span>基础数据</span></template>
+          <el-menu-item index="/basedata/business-unit">业务单元管理</el-menu-item>
+          <el-menu-item index="/basedata/trader">交易员管理</el-menu-item>
           <el-menu-item index="/basedata/currency">币种管理</el-menu-item>
+          <el-menu-item index="/basedata/country">国家/地区管理</el-menu-item>
+          <el-menu-item index="/basedata/holiday">节假日管理</el-menu-item>
+          <el-menu-item index="/basedata/bank">银行信息管理</el-menu-item>
+          <el-menu-item index="/basedata/counterparty">交易对手管理</el-menu-item>
+          <el-menu-item index="/basedata/counterparty-account">对手方银行账户</el-menu-item>
         </el-sub-menu>
       </el-menu>
     </el-aside>
@@ -35,6 +42,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { Grid } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const activeMenu = computed(() => route.path)

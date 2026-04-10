@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open-TMS - 对手方银行账户管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { DEFAULT: '#1E40AF', hover: '#1E3A8A' },
+                        error: '#EF4444',
+                        slate: { 50: '#F8FAFC', 100: '#F1F5F9', 200: '#E2E8F0', 500: '#64748B', 700: '#334155', 800: '#1E293B', 900: '#0F172A' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>body { font-family: 'Inter', -apple-system, system-ui, sans-serif; }</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+    <header class="fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 z-50">
+        <div class="flex items-center justify-between h-full px-6">
+            <div class="flex items-center gap-2"><div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center"><span class="text-white font-bold text-sm">TMS</span></div><span class="font-semibold text-slate-800">Open-TMS</span></div>
+            <div class="flex items-center gap-3">
+                <input type="text" placeholder="搜索菜单... (Ctrl+K)" class="w-64 h-9 pl-9 pr-4 bg-slate-100 border-0 rounded-lg text-sm">
+                <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center"><span class="text-white text-sm font-medium">U</span></div>
+            </div>
+        </div>
+    </header>
+
+    <aside class="fixed left-0 top-16 bottom-0 w-16 bg-slate-900 flex flex-col items-center py-4 z-40">
+        <button class="w-11 h-11 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-800 hover:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    </aside>
+
+    <main class="ml-16 mt-16 p-6">
+        <div class="flex items-center gap-2 text-sm text-slate-500 mb-4">
+            <a href="#" class="hover:text-slate-700">基础数据</a>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            <span class="text-slate-700 font-medium">对手方银行账户管理</span>
+        </div>
+
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-semibold text-slate-800">对手方银行账户管理</h1>
+            <button onclick="openDrawer('add')" class="flex items-center gap-2 px-4 h-10 bg-primary text-white rounded-lg hover:bg-primary-hover">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                <span class="text-sm font-medium">新增</span>
+            </button>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-4 mb-4">
+            <div class="flex items-center gap-4">
+                <div class="flex-1"><div class="relative"><input type="text" placeholder="搜索账户编号/账户名称..." class="w-full h-10 pl-10 pr-4 border border-slate-200 rounded-lg text-sm"><svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></div></div>
+                <select class="h-10 px-4 border border-slate-200 rounded-lg text-sm"><option value="">全部对手方</option><option value="CP001">中国石化集团</option><option value="CP002">中金公司</option></select>
+                <select class="h-10 px-4 border border-slate-200 rounded-lg text-sm"><option value="">全部银行</option><option value="ICBC">中国工商银行</option><option value="BOC">中国银行</option></select>
+                <select class="h-10 px-4 border border-slate-200 rounded-lg text-sm"><option value="">全部类型</option><option value="基本户">基本户</option><option value="一般户">一般户</option></select>
+                <button class="h-10 px-4 bg-primary text-white rounded-lg text-sm font-medium">查询</button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                        <th class="w-10 px-4 py-3 text-left"><input type="checkbox" class="w-4 h-4 rounded"></th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500">操作</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500">账户编号</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500">对手方</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500">开户银行</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500">账户名称</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500">账号</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500">币种</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500">账户类型</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500">状态</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-4 py-3"><input type="checkbox" class="w-4 h-4 rounded"></td>
+                        <td class="px-4 py-3"><div class="flex items-center gap-1"><button onclick="openDrawer('edit')" class="p-1.5 text-slate-400 hover:text-primary rounded"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button><button onclick="confirmDelete()" class="p-1.5 text-slate-400 hover:text-error rounded"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3"/></svg></button></div></td>
+                        <td class="px-4 py-3 text-sm text-slate-700 font-mono font-semibold">ACC001</td>
+                        <td class="px-4 py-3 text-sm text-slate-700">中国石化集团</td>
+                        <td class="px-4 py-3 text-sm text-slate-500">中国工商银行</td>
+                        <td class="px-4 py-3 text-sm text-slate-700">中国石化集团总部</td>
+                        <td class="px-4 py-3 text-sm text-slate-500 font-mono">6222021234567890123</td>
+                        <td class="px-4 py-3 text-sm text-slate-500">CNY</td>
+                        <td class="px-4 py-3 text-sm text-slate-500">基本户</td>
+                        <td class="px-4 py-3"><span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">启用</span></td>
+                    </tr>
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-4 py-3"><input type="checkbox" class="w-4 h-4 rounded"></td>
+                        <td class="px-4 py-3"><div class="flex items-center gap-1"><button onclick="openDrawer('edit')" class="p-1.5 text-slate-400 hover:text-primary rounded"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button><button onclick="confirmDelete()" class="p-1.5 text-slate-400 hover:text-error rounded"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3"/></svg></button></div></td>
+                        <td class="px-4 py-3 text-sm text-slate-700 font-mono font-semibold">ACC002</td>
+                        <td class="px-4 py-3 text-sm text-slate-700">中金公司</td>
+                        <td class="px-4 py-3 text-sm text-slate-500">中国银行</td>
+                        <td class="px-4 py-3 text-sm text-slate-700">中金公司营业部</td>
+                        <td class="px-4 py-3 text-sm text-slate-500 font-mono">6217002345678901234</td>
+                        <td class="px-4 py-3 text-sm text-slate-500">CNY</td>
+                        <td class="px-4 py-3 text-sm text-slate-500">一般户</td>
+                        <td class="px-4 py-3"><span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">启用</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="flex items-center justify-between mt-4">
+            <span class="text-sm text-slate-500">显示 1-10 条，共 45 条</span>
+            <div class="flex items-center gap-2">
+                <button class="w-8 h-8 flex items-center justify-center rounded border border-slate-200 text-slate-500 disabled:opacity-50" disabled><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+                <button class="w-8 h-8 flex items-center justify-center rounded bg-primary text-white text-sm">1</button>
+                <button class="w-8 h-8 flex items-center justify-center rounded border border-slate-200 text-slate-600 text-sm">2</button>
+                <button class="w-8 h-8 flex items-center justify-center rounded border border-slate-200 text-slate-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
+            </div>
+        </div>
+    </main>
+
+    <div id="drawer" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50" onclick="closeDrawer()"></div>
+        <div id="drawerContent" class="absolute right-0 top-0 bottom-0 w-[480px] bg-white shadow-xl transform translate-x-full transition-transform duration-200">
+            <div class="flex flex-col h-full">
+                <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+                    <h2 id="drawerTitle" class="text-lg font-semibold text-slate-800">新增对手方账户</h2>
+                    <button onclick="closeDrawer()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                </div>
+                <div class="flex-1 overflow-y-auto p-6">
+                    <form class="space-y-4">
+                        <div><label class="block text-sm font-medium text-slate-700 mb-1">账户编号 <span class="text-error">*</span></label><input type="text" placeholder="请输入账户编号" class="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm"></div>
+                        <div><label class="block text-sm font-medium text-slate-700 mb-1">对手方 <span class="text-error">*</span></label><select class="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm"><option>请选择对手方</option><option>中国石化集团</option><option>中金公司</option></select></div>
+                        <div><label class="block text-sm font-medium text-slate-700 mb-1">开户银行 <span class="text-error">*</span></label><select class="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm"><option>请选择银行</option><option>中国工商银行</option><option>中国银行</option></select></div>
+                        <div><label class="block text-sm font-medium text-slate-700 mb-1">账户名称 <span class="text-error">*</span></label><input type="text" placeholder="请输入账户名称（户名）" class="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm"></div>
+                        <div><label class="block text-sm font-medium text-slate-700 mb-1">账号 <span class="text-error">*</span></label><input type="text" placeholder="请输入银行账号" class="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm font-mono"></div>
+                        <div><label class="block text-sm font-medium text-slate-700 mb-1">币种 <span class="text-error">*</span></label><select class="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm"><option>人民币 (CNY)</option><option>美元 (USD)</option><option>欧元 (EUR)</option></select></div>
+                        <div><label class="block text-sm font-medium text-slate-700 mb-1">账户类型 <span class="text-error">*</span></label><select class="w-full h-10 px-3 border border-slate-200 rounded-lg text-sm"><option value="">请选择</option><option value="基本户">基本户</option><option value="一般户">一般户</option></select></div>
+                        <div><label class="block text-sm font-medium text-slate-700 mb-2">状态</label><div class="flex items-center gap-6"><label class="flex items-center gap-2"><input type="radio" name="status" value="1" checked class="w-4 h-4 text-primary"><span class="text-sm text-slate-700">启用</span></label><label class="flex items-center gap-2"><input type="radio" name="status" value="0" class="w-4 h-4 text-primary"><span class="text-sm text-slate-700">停用</span></label></div></div>
+                    </form>
+                </div>
+                <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 bg-slate-50">
+                    <button onclick="closeDrawer()" class="h-10 px-4 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium">取消</button>
+                    <button onclick="closeDrawer()" class="h-10 px-6 bg-primary text-white rounded-lg text-sm font-medium">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50" onclick="closeDeleteModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] bg-white rounded-xl shadow-xl">
+            <div class="p-6">
+                <div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center"><svg class="w-5 h-5 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg></div><div><h3 class="text-lg font-semibold">确认删除</h3></div></div>
+                <p class="text-sm text-slate-600 mb-6">确定要删除该对手方银行账户吗？</p>
+                <div class="flex justify-end gap-3"><button onclick="closeDeleteModal()" class="h-10 px-4 border border-slate-300 text-slate-700 rounded-lg">取消</button><button onclick="closeDeleteModal()" class="h-10 px-4 bg-error text-white rounded-lg">确定删除</button></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openDrawer(mode) { document.getElementById('drawerTitle').textContent = mode === 'add' ? '新增对手方账户' : '编辑对手方账户'; document.getElementById('drawer').classList.remove('hidden'); setTimeout(() => document.getElementById('drawerContent').classList.remove('translate-x-full'), 10); }
+        function closeDrawer() { document.getElementById('drawerContent').classList.add('translate-x-full'); setTimeout(() => document.getElementById('drawer').classList.add('hidden'), 200); }
+        function confirmDelete() { document.getElementById('deleteModal').classList.remove('hidden'); }
+        function closeDeleteModal() { document.getElementById('deleteModal').classList.add('hidden'); }
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDrawer(); closeDeleteModal(); } });
+    </script>
+</body>
+</html>

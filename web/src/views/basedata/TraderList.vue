@@ -1,9 +1,9 @@
 <template>
-  <div class="currency-list">
+  <div class="trader-list">
     <el-card class="filter-card">
       <el-form :inline="true" :model="queryForm">
         <el-form-item label="关键字">
-          <el-input v-model="queryForm.keyword" placeholder="币种代码/名称" clearable @keyup.enter="handleQuery" />
+          <el-input v-model="queryForm.keyword" placeholder="编号/姓名" clearable @keyup.enter="handleQuery" />
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="queryForm.status" placeholder="请选择" clearable>
@@ -23,10 +23,12 @@
       <el-table :data="tableData" v-loading="loading" stripe>
         <el-table-column type="selection" width="50" align="center" />
         <el-table-column type="index" label="序号" width="60" align="center" />
-        <el-table-column prop="currencyCode" label="币种代码" width="120" />
-        <el-table-column prop="currencyName" label="币种名称" width="150" />
-        <el-table-column prop="currencySymbol" label="符号" width="80" />
-        <el-table-column prop="decimalPlaces" label="小数位数" width="100" align="center" />
+        <el-table-column prop="code" label="交易员编号" width="120" />
+        <el-table-column prop="name" label="交易员姓名" width="100" />
+        <el-table-column prop="enName" label="英文名" width="120" />
+        <el-table-column prop="department" label="所属部门" width="150" />
+        <el-table-column prop="phone" label="联系电话" width="130" />
+        <el-table-column prop="email" label="邮箱" min-width="180" />
         <el-table-column prop="status" label="状态" width="80" align="center">
           <template #default="{ row }">
             <el-tag :type="row.status === '1' ? 'success' : 'danger'">
@@ -57,17 +59,23 @@
 
     <el-drawer v-model="drawerVisible" :title="drawerTitle" direction="rtl" size="480px">
       <el-form ref="formRef" :model="formData" :rules="rules" label-width="100px">
-        <el-form-item label="币种代码" prop="currencyCode">
-          <el-input v-model="formData.currencyCode" placeholder="如: CNY, USD" :disabled="isEdit" />
+        <el-form-item label="交易员编号" prop="code">
+          <el-input v-model="formData.code" placeholder="唯一编号" :disabled="isEdit" />
         </el-form-item>
-        <el-form-item label="币种名称" prop="currencyName">
-          <el-input v-model="formData.currencyName" placeholder="如: 人民币, 美元" />
+        <el-form-item label="交易员姓名" prop="name">
+          <el-input v-model="formData.name" placeholder="请输入交易员姓名" />
         </el-form-item>
-        <el-form-item label="币种符号" prop="currencySymbol">
-          <el-input v-model="formData.currencySymbol" placeholder="如: ¥, $" />
+        <el-form-item label="英文名" prop="enName">
+          <el-input v-model="formData.enName" placeholder="English Name" />
         </el-form-item>
-        <el-form-item label="小数位数" prop="decimalPlaces">
-          <el-input-number v-model="formData.decimalPlaces" :min="0" :max="10" />
+        <el-form-item label="所属部门" prop="department">
+          <el-input v-model="formData.department" placeholder="请输入所属部门" />
+        </el-form-item>
+        <el-form-item label="联系电话" prop="phone">
+          <el-input v-model="formData.phone" placeholder="请输入联系电话" />
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="formData.email" placeholder="请输入邮箱" />
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="formData.status">
@@ -89,7 +97,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { listCurrency, saveCurrency, updateCurrency, deleteCurrency } from '@/api/basedata'
+import { listTrader, saveTrader, updateTrader, deleteTrader } from '@/api/basedata'
 
 const loading = ref(false)
 const drawerVisible = ref(false)
@@ -102,20 +110,23 @@ const pagination = reactive({ pageNum: 1, pageSize: 10, total: 0 })
 
 const formData = reactive({
   id: null,
-  currencyCode: '',
-  currencyName: '',
-  currencySymbol: '',
-  decimalPlaces: 2,
+  code: '',
+  name: '',
+  enName: '',
+  department: '',
+  phone: '',
+  email: '',
   status: '1'
 })
 
 const rules = {
-  currencyCode: [{ required: true, message: '请输入币种代码', trigger: 'blur' }],
-  currencyName: [{ required: true, message: '请输入币种名称', trigger: 'blur' }],
-  decimalPlaces: [{ required: true, message: '请输入小数位数', trigger: 'blur' }]
+  code: [{ required: true, message: '请输入交易员编号', trigger: 'blur' }],
+  name: [{ required: true, message: '请输入交易员姓名', trigger: 'blur' }],
+  email: [{ type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }],
+  status: [{ required: true, message: '请选择状态', trigger: 'change' }]
 }
 
-const drawerTitle = computed(() => (formData.id ? '编辑币种' : '新增币种'))
+const drawerTitle = computed(() => (formData.id ? '编辑交易员' : '新增交易员'))
 const isEdit = computed(() => !!formData.id)
 
 const fetchData = async () => {
@@ -127,7 +138,7 @@ const fetchData = async () => {
       pageNum: pagination.pageNum,
       pageSize: pagination.pageSize
     }
-    const res = await listCurrency(params)
+    const res = await listTrader(params)
     tableData.value = res.data.list || []
     pagination.total = res.data.total || 0
   } catch (error) {
@@ -150,7 +161,7 @@ const handleReset = () => {
 
 const handleAdd = () => {
   Object.assign(formData, {
-    id: null, currencyCode: '', currencyName: '', currencySymbol: '', decimalPlaces: 2, status: '1'
+    id: null, code: '', name: '', enName: '', department: '', phone: '', email: '', status: '1'
   })
   formRef.value?.resetFields()
   drawerVisible.value = true
@@ -163,8 +174,8 @@ const handleEdit = (row) => {
 
 const handleDelete = async (row) => {
   try {
-    await ElMessageBox.confirm('确定要删除该币种吗?', '提示', { type: 'warning' })
-    await deleteCurrency(row.id)
+    await ElMessageBox.confirm('确定要删除该交易员吗?', '提示', { type: 'warning' })
+    await deleteTrader(row.id)
     ElMessage.success('删除成功')
     fetchData()
   } catch (error) {
@@ -181,10 +192,10 @@ const handleSubmit = async () => {
       submitLoading.value = true
       try {
         if (formData.id) {
-          await updateCurrency(formData)
+          await updateTrader(formData)
           ElMessage.success('更新成功')
         } else {
-          await saveCurrency(formData)
+          await saveTrader(formData)
           ElMessage.success('新增成功')
         }
         drawerVisible.value = false
@@ -204,7 +215,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.currency-list { }
+.trader-list { }
 .filter-card { margin-bottom: 16px; }
 .table-card { }
 </style>
