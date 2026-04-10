@@ -1,6 +1,7 @@
 package com.opentms.basedata.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.opentms.common.model.BaseEntity;
 import lombok.Data;
@@ -13,16 +14,16 @@ import java.time.LocalDate;
 @TableName("trm_holiday_t")
 public class Holiday extends BaseEntity {
 
-    @TableField("holiday_date")
+    @TableId(type = IdType.AUTO)
+    private Long id;
+
     private LocalDate holidayDate;
 
-    private String name;
+    private String holidayName;
 
-    @TableField("country_code")
     private String countryCode;
 
-    @TableField("is_adjust")
-    private String isAdjust;
+    private String isAdjustment;
 
     private String remark;
 }

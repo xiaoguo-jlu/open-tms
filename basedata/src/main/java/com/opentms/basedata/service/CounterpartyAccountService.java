@@ -1,26 +1,19 @@
 package com.opentms.basedata.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.opentms.basedata.dto.CounterpartyAccountDTO;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.opentms.basedata.entity.CounterpartyAccount;
-import com.opentms.basedata.vo.CounterpartyAccountVO;
-import com.baomidou.mybatisplus.extension.service.IService;
 
-import java.util.List;
+public interface CounterpartyAccountService {
 
-public interface CounterpartyAccountService extends IService<CounterpartyAccount> {
+    Page<CounterpartyAccount> queryPage(Long counterpartyId, String keyword, String status, int pageNum, int pageSize);
 
-    IPage<CounterpartyAccountVO> queryPage(Long counterpartyId, String currency, String accountType, String status, int pageNo, int pageSize);
+    CounterpartyAccount getCounterpartyAccountById(Long id);
 
-    CounterpartyAccountVO getById(Long id);
+    boolean saveCounterpartyAccount(CounterpartyAccount account);
 
-    boolean save(CounterpartyAccountDTO dto);
+    boolean updateCounterpartyAccount(CounterpartyAccount account);
 
-    boolean update(CounterpartyAccountDTO dto);
+    boolean deleteCounterpartyAccount(Long id);
 
-    boolean delete(Long id);
-
-    boolean batchDelete(List<Long> ids);
-
-    List<CounterpartyAccountVO> listAll();
+    boolean checkCodeExists(String code, Long excludeId);
 }

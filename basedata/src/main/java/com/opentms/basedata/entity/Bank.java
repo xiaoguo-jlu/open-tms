@@ -1,28 +1,33 @@
 package com.opentms.basedata.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.opentms.common.model.BaseCodeEntity;
+import com.opentms.common.model.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("trm_bank_t")
-public class Bank extends BaseCodeEntity {
+public class Bank extends BaseEntity {
 
-    @TableField("en_name")
-    private String enName;
+    @TableId(type = IdType.AUTO)
+    private Long id;
 
-    @TableField("swift_code")
+    private String bankCode;
+
+    private String bankName;
+
+    private String bankNameEn;
+
     private String swiftCode;
 
-    @TableField("bank_no")
-    private String bankNo;
+    private String bankLineCode;
 
-    @TableField("country_code")
     private String countryCode;
 
-    @TableField("bank_type")
     private String bankType;
+
+    private String status;
 }

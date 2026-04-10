@@ -1,65 +1,52 @@
 package com.opentms.basedata.controller;
 
-import com.opentms.basedata.dto.BankDTO;
 import com.opentms.basedata.entity.Bank;
 import com.opentms.basedata.service.BankService;
-import com.opentms.basedata.vo.BankVO;
 import com.opentms.common.model.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/v1/banks")
+@RequestMapping("/api/bank")
 @RequiredArgsConstructor
 public class BankController {
 
     private final BankService bankService;
 
     @GetMapping("/page")
-    public Result<com.baomidou.mybatisplus.core.metadata.IPage<BankVO>> page(
+    public Result<com.baomidou.mybatisplus.extension.plugins.pagination.Page<Bank>> page(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String countryCode,
-            @RequestParam(required = false) String bankType,
             @RequestParam(required = false) String status,
-            @RequestParam(defaultValue = "1") int pageNo,
-            @RequestParam(defaultValue = "20") int pageSize) {
-        return Result.success(bankService.queryPage(keyword, countryCode, bankType, status, pageNo, pageSize));
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        return Result.success(bankService.queryPage(keyword, countryCode, status, pageNum, pageSize));
     }
 
     @GetMapping("/{id}")
-    public Result<BankVO> getById(@PathVariable Long id) {
-        BankVO vo = bankService.getById(id);
-        return vo == null ? Result.notFound("Not found") : Result.success(vo);
+    public Result<Bank> getById(@PathVariable Long id) {
+        Bank bank = bankService.getBankById(id);
+        if (bank == null) {
+            return Result.notFound("Bank not found");
+        }
+        return Result.success(bank);
     }
 
     @PostMapping
-    public Result<Void> save(@RequestBody BankDTO dto) {
-        boolean success = bankService.save(dto);
-        return success ? Result.success() : Result.error("Save failed");
+    public Result<Void> save(@RequestBody Bank bank) {
+        bankService.saveBank(bank);
+        return Result.success();
     }
 
     @PutMapping
-    public Result<Void> update(@RequestBody BankDTO dto) {
-        boolean success = bankService.update(dto);
-        return success ? Result.success() : Result.error("Update failed");
+    public Result<Void> update(@RequestBody Bank bank) {
+        bankService.updateBank(bank);
+        return Result.success();
     }
 
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
-        boolean success = bankService.delete(id);
-        return success ? Result.success() : Result.error("Delete failed");
-    }
-
-    @PostMapping("/batch-delete")
-    public Result<Void> batchDelete(@RequestBody List<Long> ids) {
-        boolean success = bankService.batchDelete(ids);
-        return success ? Result.success() : Result.error("Delete failed");
-    }
-
-    @GetMapping("/list")
-    public Result<List<BankVO>> list() {
-        return Result.success(bankService.listAll());
+        bankService.deleteBank(id);
+        return Result.success();
     }
 }

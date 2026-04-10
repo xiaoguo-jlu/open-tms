@@ -1,22 +1,23 @@
 package com.opentms.basedata.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.opentms.basedata.dto.HolidayDTO;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.opentms.basedata.entity.Holiday;
-import com.opentms.basedata.vo.HolidayVO;
-import com.baomidou.mybatisplus.extension.service.IService;
 
-import java.util.List;
+import java.time.LocalDate;
 
-public interface HolidayService extends IService<Holiday> {
+public interface HolidayService {
 
-    IPage<HolidayVO> queryPage(Integer year, String countryCode, int pageNo, int pageSize);
+    Page<Holiday> queryPage(String countryCode, Integer year, int pageNum, int pageSize);
 
-    HolidayVO getById(Long id);
+    Holiday getHolidayById(Long id);
 
-    boolean save(HolidayDTO dto);
+    boolean saveHoliday(Holiday holiday);
 
-    boolean delete(Long id);
+    boolean updateHoliday(Holiday holiday);
 
-    boolean batchDelete(List<Long> ids);
+    boolean deleteHoliday(Long id);
+
+    boolean checkDateExists(LocalDate date, String countryCode, Long excludeId);
+
+    boolean isHoliday(LocalDate date, String countryCode);
 }

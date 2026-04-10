@@ -1,81 +1,84 @@
 package com.opentms.basedata.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.opentms.basedata.dto.HolidayDTO;
 import com.opentms.basedata.entity.Holiday;
 import com.opentms.basedata.mapper.HolidayMapper;
 import com.opentms.basedata.service.HolidayService;
-import com.opentms.basedata.vo.HolidayVO;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class HolidayServiceImpl extends ServiceImpl<HolidayMapper, Holiday> implements HolidayService {
 
     @Override
-    public IPage<HolidayVO> queryPage(Integer year, String countryCode, int pageNo, int pageSize) {
+    public Page<Holiday> queryPage(String countryCode, Integer year, int pageNum, int pageSize) {
         LambdaQueryWrapper<Holiday> wrapper = new LambdaQueryWrapper<>();
-        
-        if (year != null) {
-            LocalDate start = LocalDate.of(year, 1, 1);
-            LocalDate end = LocalDate.of(year, 12, 31);
-            wrapper.ge(Holiday::getHolidayDate, start).le(Holiday::getHolidayDate, end);
-        }
-        
-        if (countryCode != null && !countryCode.isEmpty()) {
+
+        if (StringUtils.hasText(countryCode)) {
             wrapper.eq(Holiday::getCountryCode, countryCode);
         }
-        
+
+        if (year != null) {
+            wrapper.apply("YEAR(holiday_date) = {0}", year);
+        }
+
         wrapper.orderByAsc(Holiday::getHolidayDate);
-        
-        Page<Holiday> page = new Page<>(pageNo, pageSize);
-        IPage<Holiday> result = this.page(page, wrapper);
-        
-        return result.convert(this::convertToVO);
+
+        return page(new Page<>(pageNum, pageSize), wrapper);
     }
 
     @Override
-    public HolidayVO getById(Long id) {
-        Holiday entity = super.getById(id);
-        return entity == null ? null : convertToVO(entity);
+    public Holiday getHolidayById(Long id) {
+        return getById(id);
     }
 
     @Override
-    public boolean save(HolidayDTO dto) {
-        Holiday entity = new Holiday();
-        BeanUtils.copyProperties(dto, entity);
-        return this.save(entity);
+    public boolean saveHoliday(Holiday holiday) {
+        if (checkDateExists(holiday.getHolidayDate(), holiday.getCountryCode(), null)) {
+            throw new RuntimeException("Holiday date already exists for this country");
+        }
+        return save(holiday);
     }
 
     @Override
-    public boolean delete(Long id) {
-        return this.removeById(id);
+    public boolean updateHoliday(Holiday holiday) {
+        if (checkDateExists(holiday.getHolidayDate(), holiday.getCountryCode(), holiday.getId())) {
+            throw new RuntimeException("Holiday date already exists for this country");
+        }
+        return updateById(holiday);
     }
 
     @Override
-    public boolean batchDelete(List<Long> ids) {
-        return this.removeByIds(ids);
+    public boolean deleteHoliday(Long id) {
+        return removeById(id);
     }
 
-    private HolidayVO convertToVO(Holiday entity) {
-        HolidayVO vo = new HolidayVO();
-        vo.setId(entity.getId());
-        vo.setHolidayDate(entity.getHolidayDate());
-        vo.setName(entity.getName());
-        vo.setCountryCode(entity.getCountryCode());
-        vo.setIsAdjust(entity.getIsAdjust());
-        vo.setRemark(entity.getRemark());
-        vo.setCreatedBy(entity.getCreatedBy());
-        vo.setCreatedAt(entity.getCreatedAt());
-        vo.setUpdatedBy(entity.getUpdatedBy());
-        vo.setUpdatedAt(entity.getUpdatedAt());
-        return vo;
+    @Override
+    public boolean checkDateExists(LocalDate date, String countryCode, Long excludeId) {
+        if (date == null || !StringUtils.hasText(countryCode)) {
+            return false;
+        }
+        LambdaQueryWrapper<Holiday> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Holiday::getHolidayDate, date)
+               .eq(Holiday::getCountryCode, countryCode);
+        if (excludeId != null) {
+            wrapper.ne(Holiday::getId, excludeId);
+        }
+        return count(wrapper) > 0;
+    }
+
+    @Override
+    public boolean isHoliday(LocalDate date, String countryCode) {
+        if (date == null || !StringUtils.hasText(countryCode)) {
+            return false;
+        }
+        LambdaQueryWrapper<Holiday> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Holiday::getHolidayDate, date)
+               .eq(Holiday::getCountryCode, countryCode);
+        return count(wrapper) > 0;
     }
 }

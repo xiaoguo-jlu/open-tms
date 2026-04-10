@@ -1,0 +1,427 @@
+# Open-TMS 基础数据模块 API 文档
+
+**版本**: v1.0  
+**日期**: 2026-04-10
+
+---
+
+## 1. 业务单元管理 (Business Unit)
+
+### 1.1 分页查询
+
+**GET** `/api/business-unit/page`
+
+**Query Parameters**:
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| keyword | String | N | 搜索编码/名称 |
+| status | String | N | 状态 (0-停用, 1-启用) |
+| pageNum | int | N | 页码，默认1 |
+| pageSize | int | N | 每页条数，默认10 |
+
+**Response**:
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "records": [...],
+    "total": 100,
+    "size": 10,
+    "current": 1
+  }
+}
+```
+
+### 1.2 获取详情
+
+**GET** `/api/business-unit/{id}`
+
+**Response**:
+```json
+{
+  "code": 200,
+  "data": {
+    "id": 1,
+    "unitCode": "BU001",
+    "unitName": "北京分公司",
+    "unitNameEn": "Beijing Branch",
+    "legalRepresentative": "张三",
+    "registeredAddress": "北京市朝阳区xxx",
+    "taxNumber": "91110000xxx",
+    "status": "1",
+    "createdBy": "admin",
+    "createdAt": "2026-04-10T10:00:00",
+    "updatedBy": "admin",
+    "updatedAt": "2026-04-10T10:00:00"
+  }
+}
+```
+
+### 1.3 新增
+
+**POST** `/api/business-unit`
+
+**Request Body**:
+```json
+{
+  "unitCode": "BU001",
+  "unitName": "北京分公司",
+  "unitNameEn": "Beijing Branch",
+  "legalRepresentative": "张三",
+  "registeredAddress": "北京市朝阳区xxx",
+  "taxNumber": "91110000xxx",
+  "status": "1"
+}
+```
+
+### 1.4 更新
+
+**PUT** `/api/business-unit`
+
+**Request Body**: 同新增，需包含id
+
+### 1.5 删除
+
+**DELETE** `/api/business-unit/{id}`
+
+---
+
+## 2. 交易员管理 (Trader)
+
+### 2.1 分页查询
+
+**GET** `/api/trader/page`
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| keyword | String | N | 搜索编号/姓名 |
+| status | String | N | 状态 |
+| pageNum | int | N | 页码 |
+| pageSize | int | N | 每页条数 |
+
+### 2.2 获取详情
+
+**GET** `/api/trader/{id}`
+
+### 2.3 新增
+
+**POST** `/api/trader`
+
+```json
+{
+  "traderCode": "T001",
+  "traderName": "李四",
+  "traderNameEn": "Li Si",
+  "department": "资金部",
+  "phone": "13800138000",
+  "email": "lisi@company.com",
+  "status": "1"
+}
+```
+
+### 2.4 更新
+
+**PUT** `/api/trader`
+
+### 2.5 删除
+
+**DELETE** `/api/trader/{id}`
+
+---
+
+## 3. 币种管理 (Currency)
+
+### 3.1 分页查询
+
+**GET** `/api/currency/page`
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| keyword | String | N | 搜索代码/名称 |
+| status | String | N | 状态 |
+| pageNum | int | N | 页码 |
+| pageSize | int | N | 每页条数 |
+
+### 3.2 获取详情
+
+**GET** `/api/currency/{id}`
+
+### 3.3 新增
+
+**POST** `/api/currency`
+
+```json
+{
+  "currencyCode": "CNY",
+  "currencyName": "人民币",
+  "currencySymbol": "¥",
+  "decimalPlaces": 2,
+  "status": "1"
+}
+```
+
+### 3.4 更新
+
+**PUT** `/api/currency`
+
+### 3.5 删除
+
+**DELETE** `/api/currency/{id}`
+
+---
+
+## 4. 国家/地区管理 (Country)
+
+### 4.1 分页查询
+
+**GET** `/api/country/page`
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| keyword | String | N | 搜索代码/名称 |
+| status | String | N | 状态 |
+| pageNum | int | N | 页码 |
+| pageSize | int | N | 每页条数 |
+
+### 4.2 获取详情
+
+**GET** `/api/country/{id}`
+
+### 4.3 新增
+
+**POST** `/api/country`
+
+```json
+{
+  "countryCode": "CN",
+  "countryName": "中国",
+  "countryNameEn": "China",
+  "timezone": "Asia/Shanghai",
+  "countryCodePhone": "+86",
+  "status": "1"
+}
+```
+
+### 4.4 更新
+
+**PUT** `/api/country`
+
+### 4.5 删除
+
+**DELETE** `/api/country/{id}`
+
+---
+
+## 5. 银行信息管理 (Bank)
+
+### 5.1 分页查询
+
+**GET** `/api/bank/page`
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| keyword | String | N | 搜索代码/名称 |
+| countryCode | String | N | 国家代码 |
+| status | String | N | 状态 |
+| pageNum | int | N | 页码 |
+| pageSize | int | N | 每页条数 |
+
+### 5.2 获取详情
+
+**GET** `/api/bank/{id}`
+
+### 5.3 新增
+
+**POST** `/api/bank`
+
+```json
+{
+  "bankCode": "B001",
+  "bankName": "中国工商银行",
+  "bankNameEn": "ICBC",
+  "swiftCode": "ICBKCNBJ",
+  "bankLineCode": "102100000000",
+  "countryCode": "CN",
+  "bankType": "商行",
+  "status": "1"
+}
+```
+
+### 5.4 更新
+
+**PUT** `/api/bank`
+
+### 5.5 删除
+
+**DELETE** `/api/bank/{id}`
+
+---
+
+## 6. 交易对手管理 (Counterparty)
+
+### 6.1 分页查询
+
+**GET** `/api/counterparty/page`
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| keyword | String | N | 搜索编号/名称 |
+| counterpartyType | String | N | 对手方类型 |
+| countryCode | String | N | 国家代码 |
+| status | String | N | 状态 |
+| pageNum | int | N | 页码 |
+| pageSize | int | N | 每页条数 |
+
+### 6.2 获取详情
+
+**GET** `/api/counterparty/{id}`
+
+### 6.3 新增
+
+**POST** `/api/counterparty`
+
+```json
+{
+  "counterpartyCode": "C001",
+  "counterpartyName": "某公司",
+  "counterpartyNameEn": "Some Company",
+  "counterpartyType": "企业",
+  "countryCode": "CN",
+  "creditRating": "AAA",
+  "externalRating": "Aa2",
+  "address": "北京市xxx",
+  "phone": "010-12345678",
+  "status": "1"
+}
+```
+
+### 6.4 更新
+
+**PUT** `/api/counterparty`
+
+### 6.5 删除
+
+**DELETE** `/api/counterparty/{id}`
+
+---
+
+## 7. 对手方银行账户 (Counterparty Account)
+
+### 7.1 分页查询
+
+**GET** `/api/counterparty-account/page`
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| counterpartyId | Long | N | 对手方ID |
+| keyword | String | N | 搜索编号/名称 |
+| status | String | N | 状态 |
+| pageNum | int | N | 页码 |
+| pageSize | int | N | 每页条数 |
+
+### 7.2 获取详情
+
+**GET** `/api/counterparty-account/{id}`
+
+### 7.3 新增
+
+**POST** `/api/counterparty-account`
+
+```json
+{
+  "accountCode": "A001",
+  "counterpartyId": 1,
+  "bankId": 1,
+  "accountName": "某公司基本户",
+  "accountNumber": "6222021234567890",
+  "currencyCode": "CNY",
+  "accountType": "基本户",
+  "status": "1"
+}
+```
+
+### 7.4 更新
+
+**PUT** `/api/counterparty-account`
+
+### 7.5 删除
+
+**DELETE** `/api/counterparty-account/{id}`
+
+---
+
+## 8. 节假日管理 (Holiday)
+
+### 8.1 分页查询
+
+**GET** `/api/holiday/page`
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| countryCode | String | N | 国家代码 |
+| year | Integer | N | 年份 |
+| pageNum | int | N | 页码 |
+| pageSize | int | N | 每页条数 |
+
+### 8.2 获取详情
+
+**GET** `/api/holiday/{id}`
+
+### 8.3 新增
+
+**POST** `/api/holiday`
+
+```json
+{
+  "holidayDate": "2026-01-01",
+  "holidayName": "元旦",
+  "countryCode": "CN",
+  "isAdjustment": "0",
+  "remark": "假期第一天"
+}
+```
+
+### 8.4 更新
+
+**PUT** `/api/holiday`
+
+### 8.5 删除
+
+**DELETE** `/api/holiday/{id}`
+
+---
+
+## 通用响应格式
+
+### 成功响应
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {...}
+}
+```
+
+### 错误响应
+```json
+{
+  "code": 400,
+  "message": "error message",
+  "data": null
+}
+```
+
+### 未找到
+```json
+{
+  "code": 404,
+  "message": "not found",
+  "data": null
+}
+```
+
+---
+
+*API文档 - v1.0*

@@ -1,26 +1,19 @@
 package com.opentms.basedata.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.opentms.basedata.dto.BusinessUnitDTO;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.opentms.basedata.entity.BusinessUnit;
-import com.opentms.basedata.vo.BusinessUnitVO;
-import com.baomidou.mybatisplus.extension.service.IService;
 
-import java.util.List;
+public interface BusinessUnitService {
 
-public interface BusinessUnitService extends IService<BusinessUnit> {
+    Page<BusinessUnit> queryPage(String keyword, String status, int pageNum, int pageSize);
 
-    IPage<BusinessUnitVO> queryPage(String keyword, String status, int pageNo, int pageSize);
+    BusinessUnit getBusinessUnitById(Long id);
 
-    BusinessUnitVO getById(Long id);
+    boolean saveBusinessUnit(BusinessUnit businessUnit);
 
-    boolean save(BusinessUnitDTO dto);
+    boolean updateBusinessUnit(BusinessUnit businessUnit);
 
-    boolean update(BusinessUnitDTO dto);
+    boolean deleteBusinessUnit(Long id);
 
-    boolean delete(Long id);
-
-    boolean batchDelete(List<Long> ids);
-
-    List<BusinessUnitVO> listAll();
+    boolean checkCodeExists(String code, Long excludeId);
 }

@@ -1,63 +1,51 @@
 package com.opentms.basedata.controller;
 
-import com.opentms.basedata.dto.BusinessUnitDTO;
 import com.opentms.basedata.entity.BusinessUnit;
 import com.opentms.basedata.service.BusinessUnitService;
-import com.opentms.basedata.vo.BusinessUnitVO;
 import com.opentms.common.model.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/v1/business-units")
+@RequestMapping("/api/business-unit")
 @RequiredArgsConstructor
 public class BusinessUnitController {
 
     private final BusinessUnitService businessUnitService;
 
     @GetMapping("/page")
-    public Result<com.baomidou.mybatisplus.core.metadata.IPage<BusinessUnitVO>> page(
+    public Result<com.baomidou.mybatisplus.extension.plugins.pagination.Page<BusinessUnit>> page(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String status,
-            @RequestParam(defaultValue = "1") int pageNo,
-            @RequestParam(defaultValue = "20") int pageSize) {
-        return Result.success(businessUnitService.queryPage(keyword, status, pageNo, pageSize));
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        return Result.success(businessUnitService.queryPage(keyword, status, pageNum, pageSize));
     }
 
     @GetMapping("/{id}")
-    public Result<BusinessUnitVO> getById(@PathVariable Long id) {
-        BusinessUnitVO vo = businessUnitService.getById(id);
-        return vo == null ? Result.notFound("Not found") : Result.success(vo);
+    public Result<BusinessUnit> getById(@PathVariable Long id) {
+        BusinessUnit businessUnit = businessUnitService.getBusinessUnitById(id);
+        if (businessUnit == null) {
+            return Result.notFound("Business unit not found");
+        }
+        return Result.success(businessUnit);
     }
 
     @PostMapping
-    public Result<Void> save(@RequestBody BusinessUnitDTO dto) {
-        boolean success = businessUnitService.save(dto);
-        return success ? Result.success() : Result.error("Save failed");
+    public Result<Void> save(@RequestBody BusinessUnit businessUnit) {
+        businessUnitService.saveBusinessUnit(businessUnit);
+        return Result.success();
     }
 
     @PutMapping
-    public Result<Void> update(@RequestBody BusinessUnitDTO dto) {
-        boolean success = businessUnitService.update(dto);
-        return success ? Result.success() : Result.error("Update failed");
+    public Result<Void> update(@RequestBody BusinessUnit businessUnit) {
+        businessUnitService.updateBusinessUnit(businessUnit);
+        return Result.success();
     }
 
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
-        boolean success = businessUnitService.delete(id);
-        return success ? Result.success() : Result.error("Delete failed");
-    }
-
-    @PostMapping("/batch-delete")
-    public Result<Void> batchDelete(@RequestBody List<Long> ids) {
-        boolean success = businessUnitService.batchDelete(ids);
-        return success ? Result.success() : Result.error("Delete failed");
-    }
-
-    @GetMapping("/list")
-    public Result<List<BusinessUnitVO>> list() {
-        return Result.success(businessUnitService.listAll());
+        businessUnitService.deleteBusinessUnit(id);
+        return Result.success();
     }
 }

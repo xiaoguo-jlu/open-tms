@@ -1,51 +1,51 @@
 package com.opentms.basedata.controller;
 
-import com.opentms.basedata.dto.HolidayDTO;
+import com.opentms.basedata.entity.Holiday;
 import com.opentms.basedata.service.HolidayService;
-import com.opentms.basedata.vo.HolidayVO;
 import com.opentms.common.model.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/v1/holidays")
+@RequestMapping("/api/holiday")
 @RequiredArgsConstructor
 public class HolidayController {
 
     private final HolidayService holidayService;
 
     @GetMapping("/page")
-    public Result<com.baomidou.mybatisplus.core.metadata.IPage<HolidayVO>> page(
-            @RequestParam(required = false) Integer year,
+    public Result<com.baomidou.mybatisplus.extension.plugins.pagination.Page<Holiday>> page(
             @RequestParam(required = false) String countryCode,
-            @RequestParam(defaultValue = "1") int pageNo,
-            @RequestParam(defaultValue = "20") int pageSize) {
-        return Result.success(holidayService.queryPage(year, countryCode, pageNo, pageSize));
+            @RequestParam(required = false) Integer year,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        return Result.success(holidayService.queryPage(countryCode, year, pageNum, pageSize));
     }
 
     @GetMapping("/{id}")
-    public Result<HolidayVO> getById(@PathVariable Long id) {
-        HolidayVO vo = holidayService.getById(id);
-        return vo == null ? Result.notFound("Not found") : Result.success(vo);
+    public Result<Holiday> getById(@PathVariable Long id) {
+        Holiday holiday = holidayService.getHolidayById(id);
+        if (holiday == null) {
+            return Result.notFound("Holiday not found");
+        }
+        return Result.success(holiday);
     }
 
     @PostMapping
-    public Result<Void> save(@RequestBody HolidayDTO dto) {
-        boolean success = holidayService.save(dto);
-        return success ? Result.success() : Result.error("Save failed");
+    public Result<Void> save(@RequestBody Holiday holiday) {
+        holidayService.saveHoliday(holiday);
+        return Result.success();
+    }
+
+    @PutMapping
+    public Result<Void> update(@RequestBody Holiday holiday) {
+        holidayService.updateHoliday(holiday);
+        return Result.success();
     }
 
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
-        boolean success = holidayService.delete(id);
-        return success ? Result.success() : Result.error("Delete failed");
-    }
-
-    @PostMapping("/batch-delete")
-    public Result<Void> batchDelete(@RequestBody List<Long> ids) {
-        boolean success = holidayService.batchDelete(ids);
-        return success ? Result.success() : Result.error("Delete failed");
+        holidayService.deleteHoliday(id);
+        return Result.success();
     }
 }

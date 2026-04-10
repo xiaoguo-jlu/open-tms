@@ -1,65 +1,52 @@
 package com.opentms.basedata.controller;
 
-import com.opentms.basedata.dto.CounterpartyAccountDTO;
 import com.opentms.basedata.entity.CounterpartyAccount;
 import com.opentms.basedata.service.CounterpartyAccountService;
-import com.opentms.basedata.vo.CounterpartyAccountVO;
 import com.opentms.common.model.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/v1/counterparty-accounts")
+@RequestMapping("/api/counterparty-account")
 @RequiredArgsConstructor
 public class CounterpartyAccountController {
 
     private final CounterpartyAccountService counterpartyAccountService;
 
     @GetMapping("/page")
-    public Result<com.baomidou.mybatisplus.core.metadata.IPage<CounterpartyAccountVO>> page(
+    public Result<com.baomidou.mybatisplus.extension.plugins.pagination.Page<CounterpartyAccount>> page(
             @RequestParam(required = false) Long counterpartyId,
-            @RequestParam(required = false) String currency,
-            @RequestParam(required = false) String accountType,
+            @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String status,
-            @RequestParam(defaultValue = "1") int pageNo,
-            @RequestParam(defaultValue = "20") int pageSize) {
-        return Result.success(counterpartyAccountService.queryPage(counterpartyId, currency, accountType, status, pageNo, pageSize));
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        return Result.success(counterpartyAccountService.queryPage(counterpartyId, keyword, status, pageNum, pageSize));
     }
 
     @GetMapping("/{id}")
-    public Result<CounterpartyAccountVO> getById(@PathVariable Long id) {
-        CounterpartyAccountVO vo = counterpartyAccountService.getById(id);
-        return vo == null ? Result.notFound("Not found") : Result.success(vo);
+    public Result<CounterpartyAccount> getById(@PathVariable Long id) {
+        CounterpartyAccount account = counterpartyAccountService.getCounterpartyAccountById(id);
+        if (account == null) {
+            return Result.notFound("Counterparty account not found");
+        }
+        return Result.success(account);
     }
 
     @PostMapping
-    public Result<Void> save(@RequestBody CounterpartyAccountDTO dto) {
-        boolean success = counterpartyAccountService.save(dto);
-        return success ? Result.success() : Result.error("Save failed");
+    public Result<Void> save(@RequestBody CounterpartyAccount account) {
+        counterpartyAccountService.saveCounterpartyAccount(account);
+        return Result.success();
     }
 
     @PutMapping
-    public Result<Void> update(@RequestBody CounterpartyAccountDTO dto) {
-        boolean success = counterpartyAccountService.update(dto);
-        return success ? Result.success() : Result.error("Update failed");
+    public Result<Void> update(@RequestBody CounterpartyAccount account) {
+        counterpartyAccountService.updateCounterpartyAccount(account);
+        return Result.success();
     }
 
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
-        boolean success = counterpartyAccountService.delete(id);
-        return success ? Result.success() : Result.error("Delete failed");
-    }
-
-    @PostMapping("/batch-delete")
-    public Result<Void> batchDelete(@RequestBody List<Long> ids) {
-        boolean success = counterpartyAccountService.batchDelete(ids);
-        return success ? Result.success() : Result.error("Delete failed");
-    }
-
-    @GetMapping("/list")
-    public Result<List<CounterpartyAccountVO>> list() {
-        return Result.success(counterpartyAccountService.listAll());
+        counterpartyAccountService.deleteCounterpartyAccount(id);
+        return Result.success();
     }
 }

@@ -1,26 +1,19 @@
 package com.opentms.basedata.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.opentms.basedata.dto.TraderDTO;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.opentms.basedata.entity.Trader;
-import com.opentms.basedata.vo.TraderVO;
-import com.baomidou.mybatisplus.extension.service.IService;
 
-import java.util.List;
+public interface TraderService {
 
-public interface TraderService extends IService<Trader> {
+    Page<Trader> queryPage(String keyword, String status, int pageNum, int pageSize);
 
-    IPage<TraderVO> queryPage(String keyword, String status, int pageNo, int pageSize);
+    Trader getTraderById(Long id);
 
-    TraderVO getById(Long id);
+    boolean saveTrader(Trader trader);
 
-    boolean save(TraderDTO dto);
+    boolean updateTrader(Trader trader);
 
-    boolean update(TraderDTO dto);
+    boolean deleteTrader(Long id);
 
-    boolean delete(Long id);
-
-    boolean batchDelete(List<Long> ids);
-
-    List<TraderVO> listAll();
+    boolean checkCodeExists(String code, Long excludeId);
 }

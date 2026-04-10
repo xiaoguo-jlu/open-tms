@@ -1,26 +1,19 @@
 package com.opentms.basedata.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.opentms.basedata.dto.BankDTO;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.opentms.basedata.entity.Bank;
-import com.opentms.basedata.vo.BankVO;
-import com.baomidou.mybatisplus.extension.service.IService;
 
-import java.util.List;
+public interface BankService {
 
-public interface BankService extends IService<Bank> {
+    Page<Bank> queryPage(String keyword, String countryCode, String status, int pageNum, int pageSize);
 
-    IPage<BankVO> queryPage(String keyword, String countryCode, String bankType, String status, int pageNo, int pageSize);
+    Bank getBankById(Long id);
 
-    BankVO getById(Long id);
+    boolean saveBank(Bank bank);
 
-    boolean save(BankDTO dto);
+    boolean updateBank(Bank bank);
 
-    boolean update(BankDTO dto);
+    boolean deleteBank(Long id);
 
-    boolean delete(Long id);
-
-    boolean batchDelete(List<Long> ids);
-
-    List<BankVO> listAll();
+    boolean checkCodeExists(String code, Long excludeId);
 }
