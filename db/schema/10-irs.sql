@@ -2,14 +2,14 @@
 -- PostgreSQL
 -- 执行顺序: 10
 
--- 利率掉期表
+-- 利率掉期表 (修复: 精度提高)
 CREATE TABLE trm_irs_deal_t (
     id BIGSERIAL PRIMARY KEY,
     deal_no VARCHAR(50) NOT NULL UNIQUE,
     deal_type VARCHAR(20) NOT NULL,
-    notional_amount DECIMAL(18,2),
+    notional_amount DECIMAL(24,4),
     currency VARCHAR(10),
-    fixed_rate DECIMAL(10,6),
+    fixed_rate DECIMAL(12,8),
     floating_rate_type VARCHAR(20),
     swap_direction VARCHAR(20),
     start_date DATE,
@@ -31,3 +31,5 @@ CREATE INDEX idx_irs_type ON trm_irs_deal_t(deal_type);
 CREATE INDEX idx_irs_counterparty ON trm_irs_deal_t(counterparty_id);
 CREATE INDEX idx_irs_end_date ON trm_irs_deal_t(end_date);
 CREATE INDEX idx_irs_status ON trm_irs_deal_t(status);
+-- 复合索引 (新增)
+CREATE INDEX idx_irs_no_status ON trm_irs_deal_t(deal_no, status);

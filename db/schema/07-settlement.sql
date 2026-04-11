@@ -2,7 +2,7 @@
 -- PostgreSQL
 -- 执行顺序: 7
 
--- 支付结算表
+-- 支付结算表 (精度提高)
 CREATE TABLE trm_settlement_t (
     id BIGSERIAL PRIMARY KEY,
     settle_no VARCHAR(50) NOT NULL UNIQUE,
@@ -10,7 +10,7 @@ CREATE TABLE trm_settlement_t (
     deal_id BIGINT,
     from_account_id BIGINT,
     to_account_id BIGINT,
-    amount DECIMAL(18,2),
+    amount DECIMAL(24,4),
     currency VARCHAR(10),
     value_date DATE,
     settle_status VARCHAR(20) NOT NULL DEFAULT 'PENDING',

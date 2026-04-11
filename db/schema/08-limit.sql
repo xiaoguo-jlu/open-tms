@@ -2,7 +2,7 @@
 -- PostgreSQL
 -- 执行顺序: 8
 
--- 流动性限额表
+-- 流动性限额表 (精度提高)
 CREATE TABLE trm_limit_t (
     id BIGSERIAL PRIMARY KEY,
     limit_no VARCHAR(50) NOT NULL UNIQUE,
@@ -10,8 +10,8 @@ CREATE TABLE trm_limit_t (
     limit_type VARCHAR(20) NOT NULL,
     business_unit_id BIGINT,
     currency VARCHAR(10),
-    limit_amount DECIMAL(18,2),
-    used_amount DECIMAL(18,2) DEFAULT 0,
+    limit_amount DECIMAL(24,4),
+    used_amount DECIMAL(24,4) DEFAULT 0,
     warning_percent DECIMAL(5,2) DEFAULT 80,
     status CHAR(1) NOT NULL DEFAULT '1',
     remark VARCHAR(500),

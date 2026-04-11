@@ -2,12 +2,12 @@
 -- PostgreSQL
 -- 执行顺序: 14
 
--- 减值计算表
+-- 减值计算表 (修复: 精度提高)
 CREATE TABLE trm_impairment_t (
     id BIGSERIAL PRIMARY KEY,
     inst_id BIGINT NOT NULL,
     impairment_date DATE NOT NULL,
-    ead DECIMAL(18,2),
+    ead DECIMAL(24,4),
     probability_of_default DECIMAL(8,4),
     loss_given_default DECIMAL(8,4),
     expected_loss DECIMAL(18,2),

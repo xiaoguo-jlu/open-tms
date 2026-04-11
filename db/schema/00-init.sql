@@ -1,11 +1,25 @@
 -- Open-TMS Complete Database Schema
 -- PostgreSQL
--- 执行顺序: 01 -> 17
-
+-- 执行顺序: 01-basedata.sql -> .. -> 02-foreign-key.sql(最后)
+--
 -- 执行方式:
 -- psql -U opentms -d opentms -f 01-basedata.sql
 -- psql -U opentms -d opentms -f 02-dealing.sql
--- ... 以此类推
-
--- 或使用psql执行整个目录:
--- for f in db/schema/*.sql; do psql -U opentms -d opentms -f "$f"; done
+-- psql -U opentms -d opentms -f 03-bankaccount.sql
+-- psql -U opentms -d opentms -f 04-instrument.sql
+-- psql -U opentms -d opentms -f 05-fundplan.sql
+-- psql -U opentms -d opentms -f 06-cashpool.sql
+-- psql -U opentms -d opentms -f 07-settlement.sql
+-- psql -U opentms -d opentms -f 08-limit.sql
+-- psql -U opentms -d opentms -f 09-fx.sql
+-- psql -U opentms -d opentms -f 10-irs.sql
+-- psql -U opentms -d opentms -f 11-valuation.sql
+-- psql -U opentms -d opentms -f 12-exposure.sql
+-- psql -U opentms -d opentms -f 13-hedge.sql
+-- psql -U opentms -d opentms -f 14-impairment.sql
+-- psql -U opentms -d opentms -f 15-var.sql
+-- psql -U opentms -d opentms -f 16-cockpit.sql
+-- psql -U opentms -d opentms -f 17-report.sql
+--
+-- 最后执行外键脚本:
+-- psql -U opentms -d opentms -f 02-foreign-key.sql

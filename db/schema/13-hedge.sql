@@ -2,7 +2,7 @@
 -- PostgreSQL
 -- 执行顺序: 13
 
--- 套期保值关联表
+-- 套期保值关联表 (修复: 精度提高)
 CREATE TABLE trm_hedge_relation_t (
     id BIGSERIAL PRIMARY KEY,
     hedge_no VARCHAR(50) NOT NULL UNIQUE,
@@ -10,7 +10,7 @@ CREATE TABLE trm_hedge_relation_t (
     exposure_id BIGINT NOT NULL,
     instrument_id BIGINT,
     hedge_ratio DECIMAL(8,4),
-    hedge_amount DECIMAL(18,2),
+    hedge_amount DECIMAL(24,4),
     hedge_effectiveness DECIMAL(5,2),
     status VARCHAR(20) NOT NULL DEFAULT 'DRAFT',
     remark VARCHAR(500),

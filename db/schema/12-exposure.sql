@@ -2,15 +2,15 @@
 -- PostgreSQL
 -- 执行顺序: 12
 
--- 敞口表
+-- 敞口表 (修复: 精度提高)
 CREATE TABLE trm_exposure_t (
     id BIGSERIAL PRIMARY KEY,
     exposure_no VARCHAR(50) NOT NULL UNIQUE,
     exposure_type VARCHAR(20) NOT NULL,
     business_unit_id BIGINT,
     currency VARCHAR(10),
-    exposure_amount DECIMAL(18,2),
-    net_exposure DECIMAL(18,2),
+    exposure_amount DECIMAL(24,4),
+    net_exposure DECIMAL(24,4),
     exposure_date DATE,
     status CHAR(1) NOT NULL DEFAULT '1',
     remark VARCHAR(500),

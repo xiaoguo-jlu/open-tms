@@ -2,7 +2,7 @@
 -- PostgreSQL
 -- 执行顺序: 17
 
--- 报表表
+-- 报表表 (修复: 精度提高)
 CREATE TABLE trm_report_t (
     id BIGSERIAL PRIMARY KEY,
     report_no VARCHAR(50) NOT NULL UNIQUE,

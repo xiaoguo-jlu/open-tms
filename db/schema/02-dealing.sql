@@ -1,10 +1,29 @@
 -- Open-TMS 交易管理模块表
 -- PostgreSQL
 -- 执行顺序: 2
+-- 依赖: 01-basedata.sql (instrument需要等04-instrument.sql创建后才能添加外键)
 
--- 交易表
+-- 交易幂等表 (新增)
+CREATE TABLE trm_deal_idempotency_t (
+    id BIGSERIAL PRIMARY KEY,
+    idempotency_key VARCHAR(100) NOT NULL UNIQUE,
+    biz_type VARCHAR(20) NOT NULL,
+    biz_id BIGINT,
+    status VARCHAR(20) NOT NULL DEFAULT 'PROCESSING',
+    request_data TEXT,
+    response_data TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expired_at TIMESTAMP
+);
+COMMENT ON TABLE trm_deal_idempotency_t IS '交易幂等表';
+CREATE INDEX idx_di_key ON trm_deal_idempotency_t(idempotency_key);
+CREATE INDEX idx_di_status ON trm_deal_idempotency_t(status);
+CREATE INDEX idx_di_expired ON trm_deal_idempotency_t(expired_at);
+
+-- 交易表 (修复: 精度提高, 添加幂等键, 复合索引)
 CREATE TABLE trm_deal_t (
     id BIGSERIAL PRIMARY KEY,
+    idempotency_key VARCHAR(100),
     deal_no VARCHAR(50) NOT NULL UNIQUE,
     deal_type VARCHAR(20) NOT NULL,
     deal_subtype VARCHAR(20),
@@ -12,11 +31,11 @@ CREATE TABLE trm_deal_t (
     counterparty_id BIGINT,
     business_unit_id BIGINT,
     trader_id BIGINT,
-    amount DECIMAL(18,2),
+    amount DECIMAL(24,4),
     currency VARCHAR(10),
     value_date DATE,
     maturity_date DATE,
-    interest_rate DECIMAL(10,6),
+    interest_rate DECIMAL(12,8),
     status VARCHAR(20) NOT NULL DEFAULT 'DRAFT',
     remark VARCHAR(500),
     created_by VARCHAR(50) NOT NULL DEFAULT 'system',
@@ -24,7 +43,8 @@ CREATE TABLE trm_deal_t (
     updated_by VARCHAR(50),
     updated_at TIMESTAMP,
     version INT DEFAULT 0,
-    deleted CHAR(1) DEFAULT '0'
+    deleted CHAR(1) DEFAULT '0',
+    CONSTRAINT uq_deal_no_status UNIQUE (deal_no, status)
 );
 COMMENT ON TABLE trm_deal_t IS '交易表';
 CREATE INDEX idx_deal_no ON trm_deal_t(deal_no);
@@ -33,10 +53,6 @@ CREATE INDEX idx_deal_counterparty ON trm_deal_t(counterparty_id);
 CREATE INDEX idx_deal_value_date ON trm_deal_t(value_date);
 CREATE INDEX idx_deal_maturity_date ON trm_deal_t(maturity_date);
 CREATE INDEX idx_deal_status ON trm_deal_t(status);
-
--- 添加外键约束 (单独执行)
--- ALTER TABLE trm_deal_t ADD CONSTRAINT fk_deal_instrument FOREIGN KEY (instrument_id) REFERENCES trm_instrument_t(id);
--- ALTER TABLE trm_deal_t ADD CONSTRAINT fk_deal_counterparty FOREIGN KEY (counterparty_id) REFERENCES trm_counterparty_t(id);
--- ALTER TABLE trm_deal_t ADD CONSTRAINT fk_deal_business_unit FOREIGN KEY (business_unit_id) REFERENCES trm_business_unit_t(id);
--- ALTER TABLE trm_deal_t ADD CONSTRAINT fk_deal_trader FOREIGN KEY (trader_id) REFERENCES trm_trader_t(id);
--- ALTER TABLE trm_deal_t ADD CONSTRAINT fk_deal_currency FOREIGN KEY (currency) REFERENCES trm_currency_t(code);
+-- 复合索引 (新增)
+CREATE INDEX idx_deal_no_status ON trm_deal_t(deal_no, status);
+CREATE INDEX idx_deal_type_status ON trm_deal_t(deal_type, status);

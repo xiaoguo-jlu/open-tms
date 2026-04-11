@@ -2,7 +2,7 @@
 -- PostgreSQL
 -- 执行顺序: 6
 
--- 现金池表
+-- 现金池表 (精度提高)
 CREATE TABLE trm_cash_pool_t (
     id BIGSERIAL PRIMARY KEY,
     pool_no VARCHAR(50) NOT NULL UNIQUE,
@@ -10,8 +10,8 @@ CREATE TABLE trm_cash_pool_t (
     pool_type VARCHAR(20) NOT NULL,
     business_unit_id BIGINT,
     currency VARCHAR(10),
-    balance DECIMAL(18,2) DEFAULT 0,
-    threshold_amount DECIMAL(18,2),
+    balance DECIMAL(24,4) DEFAULT 0,
+    threshold_amount DECIMAL(24,4),
     auto_transfer CHAR(1) DEFAULT '0',
     status CHAR(1) NOT NULL DEFAULT '1',
     remark VARCHAR(500),

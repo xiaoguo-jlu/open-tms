@@ -120,13 +120,13 @@ COMMENT ON TABLE trm_bank_t IS '银行表';
 CREATE INDEX idx_bank_code ON trm_bank_t(code);
 CREATE INDEX idx_bank_swift ON trm_bank_t(swift_code);
 
--- 交易对手表
+-- 交易对手表 (修复: cp_type -> counterparty_type)
 CREATE TABLE trm_counterparty_t (
     id BIGSERIAL PRIMARY KEY,
     code VARCHAR(50) NOT NULL UNIQUE,
     name VARCHAR(200) NOT NULL,
     en_name VARCHAR(200),
-    cp_type VARCHAR(20),
+    counterparty_type VARCHAR(20),
     country_code VARCHAR(10),
     swift_code VARCHAR(20),
     status CHAR(1) NOT NULL DEFAULT '1',
@@ -139,12 +139,12 @@ CREATE TABLE trm_counterparty_t (
 );
 COMMENT ON TABLE trm_counterparty_t IS '交易对手表';
 CREATE INDEX idx_cp_code ON trm_counterparty_t(code);
-CREATE INDEX idx_cp_type ON trm_counterparty_t(cp_type);
+CREATE INDEX idx_cp_type ON trm_counterparty_t(counterparty_type);
 
--- 对手账户表
+-- 对手账户表 (修复: cp_id -> counterparty_id)
 CREATE TABLE trm_counterparty_account_t (
     id BIGSERIAL PRIMARY KEY,
-    cp_id BIGINT NOT NULL,
+    counterparty_id BIGINT NOT NULL,
     account_no VARCHAR(50) NOT NULL,
     account_name VARCHAR(200),
     bank_id BIGINT,
@@ -157,12 +157,71 @@ CREATE TABLE trm_counterparty_account_t (
     updated_at TIMESTAMP,
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0',
-    CONSTRAINT fk_cp_account_cp FOREIGN KEY (cp_id) REFERENCES trm_counterparty_t(id),
+    CONSTRAINT fk_cp_account_cp FOREIGN KEY (counterparty_id) REFERENCES trm_counterparty_t(id),
     CONSTRAINT fk_cp_account_bank FOREIGN KEY (bank_id) REFERENCES trm_bank_t(id)
 );
 COMMENT ON TABLE trm_counterparty_account_t IS '对手账户表';
-CREATE INDEX idx_cp_account_cp ON trm_counterparty_account_t(cp_id);
+CREATE INDEX idx_cp_account_cp ON trm_counterparty_account_t(counterparty_id);
 CREATE INDEX idx_cp_account_no ON trm_counterparty_account_t(account_no);
+
+-- 审计日志表 (新增)
+CREATE TABLE trm_audit_log_t (
+    id BIGSERIAL PRIMARY KEY,
+    table_name VARCHAR(50) NOT NULL,
+    record_id BIGINT NOT NULL,
+    operation VARCHAR(20) NOT NULL,
+    field_name VARCHAR(50),
+    old_value TEXT,
+    new_value TEXT,
+    operator VARCHAR(50) NOT NULL,
+    operate_ip VARCHAR(50),
+    operate_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    remark VARCHAR(500)
+);
+COMMENT ON TABLE trm_audit_log_t IS '审计日志表';
+CREATE INDEX idx_audit_table_record ON trm_audit_log_t(table_name, record_id);
+CREATE INDEX idx_audit_operation ON trm_audit_log_t(operation);
+CREATE INDEX idx_audit_time ON trm_audit_log_t(operate_time);
+
+-- 工作流模板表 (新增)
+CREATE TABLE trm_workflow_template_t (
+    id BIGSERIAL PRIMARY KEY,
+    template_code VARCHAR(50) NOT NULL UNIQUE,
+    template_name VARCHAR(200) NOT NULL,
+    biz_type VARCHAR(20) NOT NULL,
+    approval_level INT NOT NULL DEFAULT 1,
+    approver_type VARCHAR(20),
+    approver_expr VARCHAR(500),
+    config_json TEXT,
+    status CHAR(1) NOT NULL DEFAULT '1',
+    created_by VARCHAR(50) NOT NULL DEFAULT 'system',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by VARCHAR(50),
+    updated_at TIMESTAMP,
+    version INT DEFAULT 0,
+    deleted CHAR(1) DEFAULT '0'
+);
+COMMENT ON TABLE trm_workflow_template_t IS '工作流模板表';
+CREATE INDEX idx_wft_code ON trm_workflow_template_t(template_code);
+CREATE INDEX idx_wft_biz_type ON trm_workflow_template_t(biz_type);
+
+-- 审批记录表 (新增)
+CREATE TABLE trm_approval_record_t (
+    id BIGSERIAL PRIMARY KEY,
+    biz_type VARCHAR(20) NOT NULL,
+    biz_id BIGINT NOT NULL,
+    biz_no VARCHAR(50),
+    template_id BIGINT,
+    approval_level INT NOT NULL DEFAULT 1,
+    approver VARCHAR(50),
+    approval_status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    approval意见 VARCHAR(500),
+    approval_time TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON TABLE trm_approval_record_t IS '审批记录表';
+CREATE INDEX idx_ar_biz ON trm_approval_record_t(biz_type, biz_id);
+CREATE INDEX idx_ar_status ON trm_approval_record_t(approval_status);
 
 -- 初始数据
 INSERT INTO trm_currency_t (code, name, symbol, decimal_places, created_by) VALUES

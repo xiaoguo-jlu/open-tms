@@ -2,17 +2,17 @@
 -- PostgreSQL
 -- 执行顺序: 15
 
--- VaR报表表
+-- VaR报表表 (修复: 精度提高)
 CREATE TABLE trm_var_report_t (
     id BIGSERIAL PRIMARY KEY,
     report_date DATE NOT NULL,
     var_type VARCHAR(50),
     confidence_level DECIMAL(8,4),
     holding_period INT,
-    total_var DECIMAL(18,2),
-    fx_var DECIMAL(18,2),
-    ir_var DECIMAL(18,2),
-    credit_var DECIMAL(18,2),
+    total_var DECIMAL(24,4),
+    fx_var DECIMAL(24,4),
+    ir_var DECIMAL(24,4),
+    credit_var DECIMAL(24,4),
     status CHAR(1) NOT NULL DEFAULT '1',
     remark VARCHAR(500),
     created_by VARCHAR(50) NOT NULL DEFAULT 'system',

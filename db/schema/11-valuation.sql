@@ -2,16 +2,16 @@
 -- PostgreSQL
 -- 执行顺序: 11
 
--- 估值表
+-- 估值表 (修复: 精度提高)
 CREATE TABLE trm_valuation_t (
     id BIGSERIAL PRIMARY KEY,
     inst_id BIGINT NOT NULL,
     valuation_date DATE NOT NULL,
-    market_value DECIMAL(18,2),
-    cost_value DECIMAL(18,2),
-    unrealized_pl DECIMAL(18,2),
+    market_value DECIMAL(24,4),
+    cost_value DECIMAL(24,4),
+    unrealized_pl DECIMAL(24,4),
     valuation_method VARCHAR(20),
-    discount_rate DECIMAL(10,6),
+    discount_rate DECIMAL(12,8),
     status CHAR(1) NOT NULL DEFAULT '1',
     remark VARCHAR(500),
     created_by VARCHAR(50) NOT NULL DEFAULT 'system',

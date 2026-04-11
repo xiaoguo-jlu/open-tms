@@ -2,7 +2,7 @@
 -- PostgreSQL
 -- 执行顺序: 5
 
--- 资金计划表
+-- 资金计划表 (精度提高)
 CREATE TABLE trm_fund_plan_t (
     id BIGSERIAL PRIMARY KEY,
     plan_no VARCHAR(50) NOT NULL UNIQUE,
@@ -10,7 +10,7 @@ CREATE TABLE trm_fund_plan_t (
     plan_type VARCHAR(20) NOT NULL,
     business_unit_id BIGINT,
     currency VARCHAR(10),
-    plan_amount DECIMAL(18,2),
+    plan_amount DECIMAL(24,4),
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     period_type VARCHAR(20),
@@ -31,14 +31,14 @@ CREATE INDEX idx_fp_business_unit ON trm_fund_plan_t(business_unit_id);
 CREATE INDEX idx_fp_start_date ON trm_fund_plan_t(start_date);
 CREATE INDEX idx_fp_status ON trm_fund_plan_t(status);
 
--- 资金计划明细表
+-- 资金计划明细表 (精度提高)
 CREATE TABLE trm_fund_plan_detail_t (
     id BIGSERIAL PRIMARY KEY,
     plan_id BIGINT NOT NULL,
     period_date DATE NOT NULL,
-    in_amount DECIMAL(18,2) DEFAULT 0,
-    out_amount DECIMAL(18,2) DEFAULT 0,
-    balance DECIMAL(18,2) DEFAULT 0,
+    in_amount DECIMAL(24,4) DEFAULT 0,
+    out_amount DECIMAL(24,4) DEFAULT 0,
+    balance DECIMAL(24,4) DEFAULT 0,
     remark VARCHAR(500),
     created_by VARCHAR(50) NOT NULL DEFAULT 'system',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP

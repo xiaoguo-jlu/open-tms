@@ -2,16 +2,16 @@
 -- PostgreSQL
 -- 执行顺序: 9
 
--- 外汇交易表
+-- 外汇交易表 (修复: 精度提高)
 CREATE TABLE trm_fx_deal_t (
     id BIGSERIAL PRIMARY KEY,
     deal_no VARCHAR(50) NOT NULL UNIQUE,
     deal_type VARCHAR(20) NOT NULL,
     buy_currency VARCHAR(10),
     sell_currency VARCHAR(10),
-    buy_amount DECIMAL(18,2),
-    sell_amount DECIMAL(18,2),
-    rate DECIMAL(12,6),
+    buy_amount DECIMAL(24,4),
+    sell_amount DECIMAL(24,4),
+    rate DECIMAL(18,8),
     counterparty_id BIGINT,
     value_date DATE,
     maturity_date DATE,
@@ -30,3 +30,5 @@ CREATE INDEX idx_fx_type ON trm_fx_deal_t(deal_type);
 CREATE INDEX idx_fx_counterparty ON trm_fx_deal_t(counterparty_id);
 CREATE INDEX idx_fx_value_date ON trm_fx_deal_t(value_date);
 CREATE INDEX idx_fx_status ON trm_fx_deal_t(status);
+-- 复合索引 (新增)
+CREATE INDEX idx_fx_no_status ON trm_fx_deal_t(deal_no, status);
