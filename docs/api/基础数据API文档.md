@@ -2,6 +2,7 @@
 
 **版本**: v1.0  
 **日期**: 2026-04-10
+**API版本**: v1
 
 ---
 
@@ -9,7 +10,7 @@
 
 ### 1.1 分页查询
 
-**GET** `/api/business-unit/page`
+**GET** `/api/v1/business-units/page`
 
 **Query Parameters**:
 
@@ -36,7 +37,7 @@
 
 ### 1.2 获取详情
 
-**GET** `/api/business-unit/{id}`
+**GET** `/api/v1/business-units/{id}`
 
 **Response**:
 ```json
@@ -61,7 +62,7 @@
 
 ### 1.3 新增
 
-**POST** `/api/business-unit`
+**POST** `/api/v1/business-units`
 
 **Request Body**:
 ```json
@@ -78,13 +79,13 @@
 
 ### 1.4 更新
 
-**PUT** `/api/business-unit`
+**PUT** `/api/v1/business-units`
 
 **Request Body**: 同新增，需包含id
 
 ### 1.5 删除
 
-**DELETE** `/api/business-unit/{id}`
+**DELETE** `/api/v1/business-units/{id}`
 
 ---
 
@@ -92,7 +93,7 @@
 
 ### 2.1 分页查询
 
-**GET** `/api/trader/page`
+**GET** `/api/v1/traders/page`
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
@@ -103,11 +104,11 @@
 
 ### 2.2 获取详情
 
-**GET** `/api/trader/{id}`
+**GET** `/api/v1/traders/{id}`
 
 ### 2.3 新增
 
-**POST** `/api/trader`
+**POST** `/api/v1/traders`
 
 ```json
 {
@@ -123,11 +124,11 @@
 
 ### 2.4 更新
 
-**PUT** `/api/trader`
+**PUT** `/api/v1/traders`
 
 ### 2.5 删除
 
-**DELETE** `/api/trader/{id}`
+**DELETE** `/api/v1/traders/{id}`
 
 ---
 
@@ -135,7 +136,7 @@
 
 ### 3.1 分页查询
 
-**GET** `/api/currency/page`
+**GET** `/api/v1/currencies/page`
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
@@ -146,11 +147,11 @@
 
 ### 3.2 获取详情
 
-**GET** `/api/currency/{id}`
+**GET** `/api/v1/currencies/{id}`
 
 ### 3.3 新增
 
-**POST** `/api/currency`
+**POST** `/api/v1/currencies`
 
 ```json
 {
@@ -164,11 +165,11 @@
 
 ### 3.4 更新
 
-**PUT** `/api/currency`
+**PUT** `/api/v1/currencies`
 
 ### 3.5 删除
 
-**DELETE** `/api/currency/{id}`
+**DELETE** `/api/v1/currencies/{id}`
 
 ---
 
@@ -176,7 +177,7 @@
 
 ### 4.1 分页查询
 
-**GET** `/api/country/page`
+**GET** `/api/v1/countries/page`
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
@@ -187,11 +188,11 @@
 
 ### 4.2 获取详情
 
-**GET** `/api/country/{id}`
+**GET** `/api/v1/countries/{id}`
 
 ### 4.3 新增
 
-**POST** `/api/country`
+**POST** `/api/v1/countries`
 
 ```json
 {
@@ -206,11 +207,11 @@
 
 ### 4.4 更新
 
-**PUT** `/api/country`
+**PUT** `/api/v1/countries`
 
 ### 4.5 删除
 
-**DELETE** `/api/country/{id}`
+**DELETE** `/api/v1/countries/{id}`
 
 ---
 
@@ -218,7 +219,7 @@
 
 ### 5.1 分页查询
 
-**GET** `/api/bank/page`
+**GET** `/api/v1/banks/page`
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
@@ -230,11 +231,11 @@
 
 ### 5.2 获取详情
 
-**GET** `/api/bank/{id}`
+**GET** `/api/v1/banks/{id}`
 
 ### 5.3 新增
 
-**POST** `/api/bank`
+**POST** `/api/v1/banks`
 
 ```json
 {
@@ -251,11 +252,11 @@
 
 ### 5.4 更新
 
-**PUT** `/api/bank`
+**PUT** `/api/v1/banks`
 
 ### 5.5 删除
 
-**DELETE** `/api/bank/{id}`
+**DELETE** `/api/v1/banks/{id}`
 
 ---
 
@@ -263,7 +264,7 @@
 
 ### 6.1 分页查询
 
-**GET** `/api/counterparty/page`
+**GET** `/api/v1/counterparties/page`
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
@@ -276,11 +277,11 @@
 
 ### 6.2 获取详情
 
-**GET** `/api/counterparty/{id}`
+**GET** `/api/v1/counterparties/{id}`
 
 ### 6.3 新增
 
-**POST** `/api/counterparty`
+**POST** `/api/v1/counterparties`
 
 ```json
 {
@@ -299,11 +300,11 @@
 
 ### 6.4 更新
 
-**PUT** `/api/counterparty`
+**PUT** `/api/v1/counterparties`
 
 ### 6.5 删除
 
-**DELETE** `/api/counterparty/{id}`
+**DELETE** `/api/v1/counterparties/{id}`
 
 ---
 
@@ -311,7 +312,7 @@
 
 ### 7.1 分页查询
 
-**GET** `/api/counterparty-account/page`
+**GET** `/api/v1/counterparty-accounts/page`
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
@@ -323,11 +324,11 @@
 
 ### 7.2 获取详情
 
-**GET** `/api/counterparty-account/{id}`
+**GET** `/api/v1/counterparty-accounts/{id}`
 
 ### 7.3 新增
 
-**POST** `/api/counterparty-account`
+**POST** `/api/v1/counterparty-accounts`
 
 ```json
 {
@@ -344,11 +345,11 @@
 
 ### 7.4 更新
 
-**PUT** `/api/counterparty-account`
+**PUT** `/api/v1/counterparty-accounts`
 
 ### 7.5 删除
 
-**DELETE** `/api/counterparty-account/{id}`
+**DELETE** `/api/v1/counterparty-accounts/{id}`
 
 ---
 
@@ -356,7 +357,7 @@
 
 ### 8.1 分页查询
 
-**GET** `/api/holiday/page`
+**GET** `/api/v1/holidays/page`
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
@@ -367,11 +368,11 @@
 
 ### 8.2 获取详情
 
-**GET** `/api/holiday/{id}`
+**GET** `/api/v1/holidays/{id}`
 
 ### 8.3 新增
 
-**POST** `/api/holiday`
+**POST** `/api/v1/holidays`
 
 ```json
 {
@@ -385,11 +386,11 @@
 
 ### 8.4 更新
 
-**PUT** `/api/holiday`
+**PUT** `/api/v1/holidays`
 
 ### 8.5 删除
 
-**DELETE** `/api/holiday/{id}`
+**DELETE** `/api/v1/holidays/{id}`
 
 ---
 
