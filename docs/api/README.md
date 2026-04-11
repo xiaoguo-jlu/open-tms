@@ -5,6 +5,30 @@
 
 ---
 
+## 服务端口配置
+
+| 模块 | 端口 | 模块名 |
+|------|------|--------|
+| basedata | 8081 | opentms-basedata |
+| dealing | 8082 | opentms-dealing |
+| bankaccount | 8083 | opentms-bankaccount |
+| instrument | 8084 | opentms-instrument |
+| fundplan | 8085 | opentms-fundplan |
+| cashpool | 8086 | opentms-cashpool |
+| settlement | 8087 | opentms-settlement |
+| limit | 8088 | opentms-limit |
+| fx | 8089 | opentms-fx |
+| irs | 8090 | opentms-irs |
+| valuation | 8091 | opentms-valuation |
+| exposure | 8092 | opentms-exposure |
+| hedge | 8093 | opentms-hedge |
+| impairment | 8094 | opentms-impairment |
+| var | 8095 | opentms-var |
+| cockpit | 8096 | opentms-cockpit |
+| report | 8097 | opentms-report |
+
+---
+
 ## 目录
 
 ### M1-交易管理模块
@@ -47,6 +71,18 @@
 |------|------|------|
 | 15 | [管理驾驶舱](./cockpit/01-cockpit.md) | `/api/v1/cockpit` |
 | 16 | [报表分析](./report/01-report.md) | `/api/v1/reports` |
+
+---
+
+## 数据库配置
+
+所有模块共享同一数据库 `opentms`，使用PostgreSQL：
+- Host: localhost
+- Port: 5432
+- Username: opentms
+- Password: opentms123
+
+建表脚本位于 `db/schema/` 目录
 
 ---
 

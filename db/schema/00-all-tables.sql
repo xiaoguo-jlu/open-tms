@@ -1,0 +1,22 @@
+-- Open-TMS Complete Database Schema
+-- PostgreSQL
+-- Run these scripts in order: 01-basedata.sql, 02-dealing.sql, etc.
+
+-- This file is a placeholder. Execute individual schema files in order:
+-- \i 01-basedata.sql
+-- \i 02-dealing.sql
+-- \i 03-bankaccount.sql
+-- \i 04-instrument.sql
+-- \i 05-fundplan.sql
+-- \i 06-cashpool.sql
+-- \i 07-settlement.sql
+-- \i 08-limit.sql
+-- \i 09-fx.sql
+-- \i 10-irs.sql
+-- \i 11-valuation.sql
+-- \i 12-exposure.sql
+-- \i 13-hedge.sql
+-- \i 14-impairment.sql
+-- \i 15-var.sql
+-- \i 16-cockpit.sql
+-- \i 17-report.sql

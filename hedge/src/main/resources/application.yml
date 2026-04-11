@@ -1,0 +1,16 @@
+server:
+  port: 8093
+
+spring:
+  application:
+    name: opentms-hedge
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/opentms
+    username: opentms
+    password: opentms123
+
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: auto
