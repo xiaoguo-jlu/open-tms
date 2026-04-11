@@ -21,7 +21,7 @@ public class CounterpartyAccountServiceImpl extends ServiceImpl<CounterpartyAcco
         }
 
         if (StringUtils.hasText(keyword)) {
-            wrapper.like(CounterpartyAccount::getAccountCode, keyword)
+            wrapper.like(CounterpartyAccount::getAccountNo, keyword)
                    .or()
                    .like(CounterpartyAccount::getAccountName, keyword);
         }
@@ -42,7 +42,7 @@ public class CounterpartyAccountServiceImpl extends ServiceImpl<CounterpartyAcco
 
     @Override
     public boolean saveCounterpartyAccount(CounterpartyAccount account) {
-        if (checkCodeExists(account.getAccountCode(), null)) {
+        if (checkCodeExists(account.getAccountNo(), null)) {
             throw new RuntimeException("Account code already exists");
         }
         return save(account);
@@ -50,7 +50,7 @@ public class CounterpartyAccountServiceImpl extends ServiceImpl<CounterpartyAcco
 
     @Override
     public boolean updateCounterpartyAccount(CounterpartyAccount account) {
-        if (checkCodeExists(account.getAccountCode(), account.getId())) {
+        if (checkCodeExists(account.getAccountNo(), account.getId())) {
             throw new RuntimeException("Account code already exists");
         }
         return updateById(account);
@@ -67,7 +67,7 @@ public class CounterpartyAccountServiceImpl extends ServiceImpl<CounterpartyAcco
             return false;
         }
         LambdaQueryWrapper<CounterpartyAccount> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(CounterpartyAccount::getAccountCode, code);
+        wrapper.eq(CounterpartyAccount::getAccountNo, code);
         if (excludeId != null) {
             wrapper.ne(CounterpartyAccount::getId, excludeId);
         }

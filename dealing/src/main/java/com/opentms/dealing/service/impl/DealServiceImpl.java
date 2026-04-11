@@ -26,9 +26,7 @@ public class DealServiceImpl extends ServiceImpl<DealMapper, Deal> implements De
         LambdaQueryWrapper<Deal> wrapper = new LambdaQueryWrapper<>();
 
         if (StringUtils.hasText(keyword)) {
-            wrapper.like(Deal::getDealNo, keyword)
-                   .or()
-                   .like(Deal::getName, keyword);
+            wrapper.like(Deal::getDealNo, keyword);
         }
 
         if (StringUtils.hasText(dealType)) {

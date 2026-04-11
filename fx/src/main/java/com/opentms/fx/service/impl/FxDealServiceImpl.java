@@ -36,13 +36,11 @@ public class FxDealServiceImpl extends ServiceImpl<FxDealMapper, FxDeal> impleme
         LambdaQueryWrapper<FxDeal> wrapper = new LambdaQueryWrapper<>();
 
         if (StringUtils.hasText(keyword)) {
-            wrapper.like(FxDeal::getCode, keyword)
-                   .or()
-                   .like(FxDeal::getName, keyword);
+            wrapper.like(FxDeal::getDealNo, keyword);
         }
 
         if (StringUtils.hasText(fxType)) {
-            wrapper.eq(FxDeal::getFxType, fxType);
+            wrapper.eq(FxDeal::getDealType, fxType);
         }
 
         if (StringUtils.hasText(status)) {

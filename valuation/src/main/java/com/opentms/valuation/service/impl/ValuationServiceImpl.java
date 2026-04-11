@@ -24,7 +24,7 @@ public class ValuationServiceImpl extends ServiceImpl<ValuationMapper, Valuation
         LambdaQueryWrapper<Valuation> wrapper = new LambdaQueryWrapper<>();
 
         if (instrumentId != null) {
-            wrapper.eq(Valuation::getInstrumentId, instrumentId);
+            wrapper.eq(Valuation::getInstId, instrumentId);
         }
 
         if (startDate != null) {
@@ -69,7 +69,7 @@ public class ValuationServiceImpl extends ServiceImpl<ValuationMapper, Valuation
         Map<String, Object> result = new HashMap<>();
         
         Valuation valuation = new Valuation();
-        valuation.setInstrumentId(instrumentId);
+        valuation.setInstId(instrumentId);
         valuation.setValuationDate(valuationDate);
         valuation.setValuationMethod("MARK_TO_MARKET");
         
@@ -78,14 +78,14 @@ public class ValuationServiceImpl extends ServiceImpl<ValuationMapper, Valuation
         
         valuation.setMarketValue(marketValue);
         valuation.setCostValue(costValue);
-        valuation.setUnrealizedPnl(marketValue.subtract(costValue));
+        valuation.setUnrealizedPl(marketValue.subtract(costValue));
         
         save(valuation);
         
         result.put("valuationId", valuation.getId());
         result.put("marketValue", marketValue);
         result.put("costValue", costValue);
-        result.put("unrealizedPnl", valuation.getUnrealizedPnl());
+        result.put("unrealizedPnl", valuation.getUnrealizedPl());
         result.put("valuationDate", valuationDate);
         
         return result;
@@ -96,7 +96,7 @@ public class ValuationServiceImpl extends ServiceImpl<ValuationMapper, Valuation
         LambdaQueryWrapper<Valuation> wrapper = new LambdaQueryWrapper<>();
         
         if (instrumentId != null) {
-            wrapper.eq(Valuation::getInstrumentId, instrumentId);
+            wrapper.eq(Valuation::getInstId, instrumentId);
         }
         
         if (startDate != null) {

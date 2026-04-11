@@ -17,9 +17,9 @@ public class CounterpartyServiceImpl extends ServiceImpl<CounterpartyMapper, Cou
         LambdaQueryWrapper<Counterparty> wrapper = new LambdaQueryWrapper<>();
 
         if (StringUtils.hasText(keyword)) {
-            wrapper.like(Counterparty::getCounterpartyCode, keyword)
+            wrapper.like(Counterparty::getCode, keyword)
                    .or()
-                   .like(Counterparty::getCounterpartyName, keyword);
+                   .like(Counterparty::getName, keyword);
         }
 
         if (StringUtils.hasText(counterpartyType)) {
@@ -46,7 +46,7 @@ public class CounterpartyServiceImpl extends ServiceImpl<CounterpartyMapper, Cou
 
     @Override
     public boolean saveCounterparty(Counterparty counterparty) {
-        if (checkCodeExists(counterparty.getCounterpartyCode(), null)) {
+        if (checkCodeExists(counterparty.getCode(), null)) {
             throw new RuntimeException("Counterparty code already exists");
         }
         return save(counterparty);
@@ -54,7 +54,7 @@ public class CounterpartyServiceImpl extends ServiceImpl<CounterpartyMapper, Cou
 
     @Override
     public boolean updateCounterparty(Counterparty counterparty) {
-        if (checkCodeExists(counterparty.getCounterpartyCode(), counterparty.getId())) {
+        if (checkCodeExists(counterparty.getCode(), counterparty.getId())) {
             throw new RuntimeException("Counterparty code already exists");
         }
         return updateById(counterparty);
@@ -71,7 +71,7 @@ public class CounterpartyServiceImpl extends ServiceImpl<CounterpartyMapper, Cou
             return false;
         }
         LambdaQueryWrapper<Counterparty> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Counterparty::getCounterpartyCode, code);
+        wrapper.eq(Counterparty::getCode, code);
         if (excludeId != null) {
             wrapper.ne(Counterparty::getId, excludeId);
         }

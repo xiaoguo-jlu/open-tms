@@ -17,9 +17,9 @@ public class BusinessUnitServiceImpl extends ServiceImpl<BusinessUnitMapper, Bus
         LambdaQueryWrapper<BusinessUnit> wrapper = new LambdaQueryWrapper<>();
 
         if (StringUtils.hasText(keyword)) {
-            wrapper.like(BusinessUnit::getUnitCode, keyword)
+            wrapper.like(BusinessUnit::getCode, keyword)
                    .or()
-                   .like(BusinessUnit::getUnitName, keyword);
+                   .like(BusinessUnit::getName, keyword);
         }
 
         if (StringUtils.hasText(status)) {
@@ -38,7 +38,7 @@ public class BusinessUnitServiceImpl extends ServiceImpl<BusinessUnitMapper, Bus
 
     @Override
     public boolean saveBusinessUnit(BusinessUnit businessUnit) {
-        if (checkCodeExists(businessUnit.getUnitCode(), null)) {
+        if (checkCodeExists(businessUnit.getCode(), null)) {
             throw new RuntimeException("Business unit code already exists");
         }
         return save(businessUnit);
@@ -46,7 +46,7 @@ public class BusinessUnitServiceImpl extends ServiceImpl<BusinessUnitMapper, Bus
 
     @Override
     public boolean updateBusinessUnit(BusinessUnit businessUnit) {
-        if (checkCodeExists(businessUnit.getUnitCode(), businessUnit.getId())) {
+        if (checkCodeExists(businessUnit.getCode(), businessUnit.getId())) {
             throw new RuntimeException("Business unit code already exists");
         }
         return updateById(businessUnit);
@@ -63,7 +63,7 @@ public class BusinessUnitServiceImpl extends ServiceImpl<BusinessUnitMapper, Bus
             return false;
         }
         LambdaQueryWrapper<BusinessUnit> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(BusinessUnit::getUnitCode, code);
+        wrapper.eq(BusinessUnit::getCode, code);
         if (excludeId != null) {
             wrapper.ne(BusinessUnit::getId, excludeId);
         }

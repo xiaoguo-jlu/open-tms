@@ -19,9 +19,7 @@ public class CashPoolServiceImpl extends ServiceImpl<CashPoolMapper, CashPool> i
         LambdaQueryWrapper<CashPool> wrapper = new LambdaQueryWrapper<>();
 
         if (StringUtils.hasText(keyword)) {
-            wrapper.like(CashPool::getCode, keyword)
-                   .or()
-                   .like(CashPool::getName, keyword)
+            wrapper.like(CashPool::getPoolNo, keyword)
                    .or()
                    .like(CashPool::getPoolName, keyword);
         }
@@ -50,7 +48,7 @@ public class CashPoolServiceImpl extends ServiceImpl<CashPoolMapper, CashPool> i
         if (cashPool == null) {
             throw new RuntimeException("Cash pool not found");
         }
-        return cashPool.getTotalBalance() != null ? cashPool.getTotalBalance() : BigDecimal.ZERO;
+        return cashPool.getBalance() != null ? cashPool.getBalance() : BigDecimal.ZERO;
     }
 
     @Override
@@ -87,13 +85,13 @@ public class CashPoolServiceImpl extends ServiceImpl<CashPoolMapper, CashPool> i
             throw new RuntimeException("Target cash pool not found");
         }
 
-        BigDecimal fromBalance = fromPool.getTotalBalance() != null ? fromPool.getTotalBalance() : BigDecimal.ZERO;
+        BigDecimal fromBalance = fromPool.getBalance() != null ? fromPool.getBalance() : BigDecimal.ZERO;
         if (fromBalance.compareTo(amount) < 0) {
             throw new RuntimeException("Insufficient balance in source pool");
         }
 
-        fromPool.setTotalBalance(fromBalance.subtract(amount));
-        toPool.setTotalBalance(toPool.getTotalBalance() != null ? toPool.getTotalBalance().add(amount) : amount);
+        fromPool.setBalance(fromBalance.subtract(amount));
+        toPool.setBalance(toPool.getBalance() != null ? toPool.getBalance().add(amount) : amount);
 
         return updateById(fromPool) && updateById(toPool);
     }

@@ -17,9 +17,9 @@ public class CountryServiceImpl extends ServiceImpl<CountryMapper, Country> impl
         LambdaQueryWrapper<Country> wrapper = new LambdaQueryWrapper<>();
 
         if (StringUtils.hasText(keyword)) {
-            wrapper.like(Country::getCountryCode, keyword)
+            wrapper.like(Country::getCode, keyword)
                    .or()
-                   .like(Country::getCountryName, keyword);
+                   .like(Country::getName, keyword);
         }
 
         if (StringUtils.hasText(status)) {
@@ -38,7 +38,7 @@ public class CountryServiceImpl extends ServiceImpl<CountryMapper, Country> impl
 
     @Override
     public boolean saveCountry(Country country) {
-        if (checkCodeExists(country.getCountryCode(), null)) {
+        if (checkCodeExists(country.getCode(), null)) {
             throw new RuntimeException("Country code already exists");
         }
         return save(country);
@@ -46,7 +46,7 @@ public class CountryServiceImpl extends ServiceImpl<CountryMapper, Country> impl
 
     @Override
     public boolean updateCountry(Country country) {
-        if (checkCodeExists(country.getCountryCode(), country.getId())) {
+        if (checkCodeExists(country.getCode(), country.getId())) {
             throw new RuntimeException("Country code already exists");
         }
         return updateById(country);
@@ -63,7 +63,7 @@ public class CountryServiceImpl extends ServiceImpl<CountryMapper, Country> impl
             return false;
         }
         LambdaQueryWrapper<Country> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Country::getCountryCode, code);
+        wrapper.eq(Country::getCode, code);
         if (excludeId != null) {
             wrapper.ne(Country::getId, excludeId);
         }

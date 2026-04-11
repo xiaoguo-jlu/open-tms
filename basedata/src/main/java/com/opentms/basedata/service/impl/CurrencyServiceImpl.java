@@ -17,9 +17,9 @@ public class CurrencyServiceImpl extends ServiceImpl<CurrencyMapper, Currency> i
         LambdaQueryWrapper<Currency> wrapper = new LambdaQueryWrapper<>();
         
         if (StringUtils.hasText(keyword)) {
-            wrapper.like(Currency::getCurrencyCode, keyword)
+            wrapper.like(Currency::getCode, keyword)
                    .or()
-                   .like(Currency::getCurrencyName, keyword);
+                   .like(Currency::getName, keyword);
         }
         
         if (StringUtils.hasText(status)) {

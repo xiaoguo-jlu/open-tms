@@ -17,9 +17,9 @@ public class TraderServiceImpl extends ServiceImpl<TraderMapper, Trader> impleme
         LambdaQueryWrapper<Trader> wrapper = new LambdaQueryWrapper<>();
 
         if (StringUtils.hasText(keyword)) {
-            wrapper.like(Trader::getTraderCode, keyword)
+            wrapper.like(Trader::getCode, keyword)
                    .or()
-                   .like(Trader::getTraderName, keyword);
+                   .like(Trader::getName, keyword);
         }
 
         if (StringUtils.hasText(status)) {
@@ -38,7 +38,7 @@ public class TraderServiceImpl extends ServiceImpl<TraderMapper, Trader> impleme
 
     @Override
     public boolean saveTrader(Trader trader) {
-        if (checkCodeExists(trader.getTraderCode(), null)) {
+        if (checkCodeExists(trader.getCode(), null)) {
             throw new RuntimeException("Trader code already exists");
         }
         return save(trader);
@@ -46,7 +46,7 @@ public class TraderServiceImpl extends ServiceImpl<TraderMapper, Trader> impleme
 
     @Override
     public boolean updateTrader(Trader trader) {
-        if (checkCodeExists(trader.getTraderCode(), trader.getId())) {
+        if (checkCodeExists(trader.getCode(), trader.getId())) {
             throw new RuntimeException("Trader code already exists");
         }
         return updateById(trader);
@@ -63,7 +63,7 @@ public class TraderServiceImpl extends ServiceImpl<TraderMapper, Trader> impleme
             return false;
         }
         LambdaQueryWrapper<Trader> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Trader::getTraderCode, code);
+        wrapper.eq(Trader::getCode, code);
         if (excludeId != null) {
             wrapper.ne(Trader::getId, excludeId);
         }

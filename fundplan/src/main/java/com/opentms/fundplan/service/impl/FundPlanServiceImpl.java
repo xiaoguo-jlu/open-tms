@@ -19,11 +19,11 @@ public class FundPlanServiceImpl extends ServiceImpl<FundPlanMapper, FundPlan> i
         LambdaQueryWrapper<FundPlan> wrapper = new LambdaQueryWrapper<>();
 
         if (StringUtils.hasText(keyword)) {
-            wrapper.like(FundPlan::getPlanYear, keyword);
+            wrapper.like(FundPlan::getPlanNo, keyword);
         }
 
         if (planYear != null) {
-            wrapper.eq(FundPlan::getPlanYear, planYear);
+            wrapper.eq(FundPlan::getPlanNo, planYear);
         }
 
         if (StringUtils.hasText(planType)) {
@@ -44,12 +44,12 @@ public class FundPlanServiceImpl extends ServiceImpl<FundPlanMapper, FundPlan> i
         LambdaQueryWrapper<FundPlan> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(FundPlan::getPlanType, "ANNUAL");
         if (planYear != null) {
-            wrapper.eq(FundPlan::getPlanYear, planYear);
+            wrapper.eq(FundPlan::getPlanNo, planYear);
         }
         if (businessUnitId != null) {
             wrapper.eq(FundPlan::getBusinessUnitId, businessUnitId);
         }
-        wrapper.orderByDesc(FundPlan::getPlanYear);
+        wrapper.orderByDesc(FundPlan::getPlanNo);
         return list(wrapper);
     }
 
@@ -58,15 +58,15 @@ public class FundPlanServiceImpl extends ServiceImpl<FundPlanMapper, FundPlan> i
         LambdaQueryWrapper<FundPlan> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(FundPlan::getPlanType, "MONTHLY");
         if (planYear != null) {
-            wrapper.eq(FundPlan::getPlanYear, planYear);
+            wrapper.eq(FundPlan::getPlanNo, planYear);
         }
         if (planMonth != null) {
-            wrapper.eq(FundPlan::getPlanMonth, planMonth);
+            wrapper.eq(FundPlan::getPlanName, planMonth);
         }
         if (businessUnitId != null) {
             wrapper.eq(FundPlan::getBusinessUnitId, businessUnitId);
         }
-        wrapper.orderByDesc(FundPlan::getPlanYear, FundPlan::getPlanMonth);
+        wrapper.orderByDesc(FundPlan::getPlanNo, FundPlan::getPlanName);
         return list(wrapper);
     }
 
