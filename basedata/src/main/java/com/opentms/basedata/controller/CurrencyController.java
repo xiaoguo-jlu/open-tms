@@ -1,7 +1,8 @@
 package com.opentms.basedata.controller;
 
-import com.opentms.basedata.entity.Currency;
+import com.opentms.basedata.dto.CurrencyDTO;
 import com.opentms.basedata.service.CurrencyService;
+import com.opentms.basedata.vo.CurrencyVO;
 import com.opentms.common.model.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -9,51 +10,50 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/currency")
+@RequestMapping("/api/v1/currencies")
 @RequiredArgsConstructor
 public class CurrencyController {
 
     private final CurrencyService currencyService;
 
-    @GetMapping("/list")
-    public Result<List<Currency>> list(@RequestParam(required = false) String keyword,
-                                        @RequestParam(required = false) String status) {
-        return Result.success(currencyService.queryPage(keyword, status, 1, 100).getRecords());
+    @GetMapping
+    public Result<List<CurrencyVO>> list() {
+        return Result.success(currencyService.listAll());
     }
 
     @GetMapping("/page")
-    public Result<com.baomidou.mybatisplus.extension.plugins.pagination.Page<Currency>> page(
+    public Result<com.baomidou.mybatisplus.extension.plugins.pagination.Page<CurrencyVO>> page(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String status,
-            @RequestParam(defaultValue = "1") int pageNum,
-            @RequestParam(defaultValue = "10") int pageSize) {
-        return Result.success(currencyService.queryPage(keyword, status, pageNum, pageSize));
+            @RequestParam(defaultValue = "1") int pageNo,
+            @RequestParam(defaultValue = "20") int pageSize) {
+        return Result.success(currencyService.queryPage(keyword, status, pageNo, pageSize));
     }
 
     @GetMapping("/{id}")
-    public Result<Currency> getById(@PathVariable Long id) {
-        Currency currency = currencyService.getCurrencyById(id);
-        if (currency == null) {
-            return Result.notFound("Currency not found");
-        }
-        return Result.success(currency);
+    public Result<CurrencyVO> getById(@PathVariable Long id) {
+        return Result.success(currencyService.getById(id));
+    }
+
+    @GetMapping("/code/{code}")
+    public Result<CurrencyVO> getByCode(@PathVariable String code) {
+        CurrencyVO vo = currencyService.getByCode(code);
+        return vo != null ? Result.success(vo) : Result.notFound("币种不存在");
     }
 
     @PostMapping
-    public Result<Void> save(@RequestBody Currency currency) {
-        boolean success = currencyService.saveCurrency(currency);
-        return success ? Result.success() : Result.error("Save failed");
+    public Result<CurrencyVO> save(@RequestBody CurrencyDTO dto) {
+        return Result.success(currencyService.save(dto));
     }
 
     @PutMapping
-    public Result<Void> update(@RequestBody Currency currency) {
-        boolean success = currencyService.updateCurrency(currency);
-        return success ? Result.success() : Result.error("Update failed");
+    public Result<CurrencyVO> update(@RequestBody CurrencyDTO dto) {
+        return Result.success(currencyService.updateById(dto));
     }
 
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
-        boolean success = currencyService.deleteCurrency(id);
-        return success ? Result.success() : Result.error("Delete failed");
+        currencyService.removeById(id);
+        return Result.success();
     }
 }

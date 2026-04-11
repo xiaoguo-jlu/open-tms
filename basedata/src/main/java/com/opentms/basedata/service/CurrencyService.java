@@ -1,18 +1,24 @@
 package com.opentms.basedata.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.IService;
-import com.opentms.basedata.entity.Currency;
+import com.opentms.basedata.dto.CurrencyDTO;
+import com.opentms.basedata.vo.CurrencyVO;
 
-public interface CurrencyService extends IService<Currency> {
+import java.util.List;
 
-    Page<Currency> queryPage(String keyword, String status, int pageNum, int pageSize);
+public interface CurrencyService {
 
-    boolean saveCurrency(Currency currency);
+    List<CurrencyVO> listAll();
 
-    boolean updateCurrency(Currency currency);
+    Page<CurrencyVO> queryPage(String keyword, String status, int pageNo, int pageSize);
 
-    boolean deleteCurrency(Long id);
+    CurrencyVO getById(Long id);
 
-    Currency getCurrencyById(Long id);
+    CurrencyVO getByCode(String code);
+
+    CurrencyVO save(CurrencyDTO dto);
+
+    CurrencyVO updateById(CurrencyDTO dto);
+
+    void removeById(Long id);
 }
