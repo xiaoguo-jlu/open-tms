@@ -1,7 +1,19 @@
 # Open-TMS 全模块接口文档
 
-**版本**: v1.0  
+**版本**: v1.1  
 **日期**: 2026-04-11
+
+---
+
+## 数据库配置
+
+- 数据库类型: PostgreSQL
+- 表名前缀: `tms_` (原 `trm_`)
+- 数据库: `opentms`
+- Host: `localhost`
+- Port: `5432`
+- 用户名: `opentms`
+- 密码: `opentms123`
 
 ---
 

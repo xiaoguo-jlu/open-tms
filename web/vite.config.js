@@ -14,88 +14,71 @@ export default defineConfig({
     proxy: {
       '/api/v1/basedata': {
         target: 'http://localhost:8081',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/v1\/basedata/, '')
+        changeOrigin: true
       },
       '/api/v1/dealing': {
         target: 'http://localhost:8082',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/v1\/dealing/, '')
+        changeOrigin: true
       },
       '/api/v1/dealing/bank-account': {
         target: 'http://localhost:8083',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/v1\/dealing\/bank-account/, '')
+        changeOrigin: true
       },
       '/api/v1/dealing/instrument': {
         target: 'http://localhost:8084',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/v1\/dealing\/instrument/, '')
+        changeOrigin: true
       },
       '/api/v1/fundplan': {
         target: 'http://localhost:8085',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/v1\/fundplan/, '')
+        changeOrigin: true
       },
       '/api/v1/cashpool': {
         target: 'http://localhost:8086',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/v1\/cashpool/, '')
+        changeOrigin: true
       },
       '/api/v1/settlement': {
         target: 'http://localhost:8087',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/v1\/settlement/, '')
+        changeOrigin: true
       },
       '/api/v1/limit': {
         target: 'http://localhost:8088',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/v1\/limit/, '')
+        changeOrigin: true
       },
       '/api/v1/fx': {
         target: 'http://localhost:8089',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/v1\/fx/, '')
+        changeOrigin: true
       },
       '/api/v1/irs': {
         target: 'http://localhost:8090',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/v1\/irs/, '')
+        changeOrigin: true
       },
       '/api/v1/valuation': {
         target: 'http://localhost:8091',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/v1\/valuation/, '')
+        changeOrigin: true
       },
       '/api/v1/exposure': {
         target: 'http://localhost:8092',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/v1\/exposure/, '')
+        changeOrigin: true
       },
       '/api/v1/hedge': {
         target: 'http://localhost:8093',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/v1\/hedge/, '')
+        changeOrigin: true
       },
       '/api/v1/impairment': {
         target: 'http://localhost:8094',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/v1\/impairment/, '')
+        changeOrigin: true
       },
       '/api/v1/var': {
         target: 'http://localhost:8095',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/v1\/var/, '')
+        changeOrigin: true
       },
       '/api/v1/cockpit': {
         target: 'http://localhost:8096',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/v1\/cockpit/, '')
+        changeOrigin: true
       },
       '/api/v1/report': {
         target: 'http://localhost:8097',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/v1\/report/, '')
+        changeOrigin: true
       }
     }
   }
