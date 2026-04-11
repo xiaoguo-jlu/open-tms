@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function listTrader(params) {
   return request({
-    url: '/traders',
+    url: '/basedata/traders',
     method: 'get',
     params
   })
@@ -10,14 +10,14 @@ export function listTrader(params) {
 
 export function getTrader(id) {
   return request({
-    url: `/traders/${id}`,
+    url: `/basedata/traders/${id}`,
     method: 'get'
   })
 }
 
 export function saveTrader(data) {
   return request({
-    url: '/traders',
+    url: '/basedata/traders',
     method: 'post',
     data
   })
@@ -25,7 +25,7 @@ export function saveTrader(data) {
 
 export function updateTrader(data) {
   return request({
-    url: '/traders',
+    url: '/basedata/traders',
     method: 'put',
     data
   })
@@ -33,14 +33,14 @@ export function updateTrader(data) {
 
 export function deleteTrader(id) {
   return request({
-    url: `/traders/${id}`,
+    url: `/basedata/traders/${id}`,
     method: 'delete'
   })
 }
 
 export function batchDeleteTrader(ids) {
   return request({
-    url: '/traders/batch-delete',
+    url: '/basedata/traders/batch-delete',
     method: 'post',
     data: { ids }
   })
@@ -48,7 +48,7 @@ export function batchDeleteTrader(ids) {
 
 export function exportTrader(params) {
   return request({
-    url: '/traders/export',
+    url: '/basedata/traders/export',
     method: 'get',
     params,
     responseType: 'blob'
@@ -57,7 +57,7 @@ export function exportTrader(params) {
 
 export function importTrader(formData) {
   return request({
-    url: '/traders/import',
+    url: '/basedata/traders/import',
     method: 'post',
     data: formData,
     headers: { 'Content-Type': 'multipart/form-data' }

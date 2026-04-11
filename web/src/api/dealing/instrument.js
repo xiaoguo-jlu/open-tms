@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function listInstrument(params) {
   return request({
-    url: '/instruments',
+    url: '/dealing/instrument/instruments',
     method: 'get',
     params
   })
@@ -10,14 +10,14 @@ export function listInstrument(params) {
 
 export function getInstrument(id) {
   return request({
-    url: `/instruments/${id}`,
+    url: `/dealing/instrument/instruments/${id}`,
     method: 'get'
   })
 }
 
 export function saveInstrument(data) {
   return request({
-    url: '/instruments',
+    url: '/dealing/instrument/instruments',
     method: 'post',
     data
   })
@@ -25,7 +25,7 @@ export function saveInstrument(data) {
 
 export function updateInstrument(data) {
   return request({
-    url: '/instruments',
+    url: '/dealing/instrument/instruments',
     method: 'put',
     data
   })
@@ -33,14 +33,14 @@ export function updateInstrument(data) {
 
 export function deleteInstrument(id) {
   return request({
-    url: `/instruments/${id}`,
+    url: `/dealing/instrument/instruments/${id}`,
     method: 'delete'
   })
 }
 
 export function listInstrumentType() {
   return request({
-    url: '/instruments/types',
+    url: '/dealing/instrument/instruments/types',
     method: 'get'
   })
 }
