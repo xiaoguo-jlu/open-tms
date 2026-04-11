@@ -3,7 +3,7 @@
 -- 执行顺序: 7
 
 -- 支付结算表 (精度提高)
-CREATE TABLE trm_settlement_t (
+CREATE TABLE tms_settlement_t (
     id BIGSERIAL PRIMARY KEY,
     settle_no VARCHAR(50) NOT NULL UNIQUE,
     settle_type VARCHAR(20) NOT NULL,
@@ -22,9 +22,9 @@ CREATE TABLE trm_settlement_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-COMMENT ON TABLE trm_settlement_t IS '支付结算表';
-CREATE INDEX idx_st_no ON trm_settlement_t(settle_no);
-CREATE INDEX idx_st_type ON trm_settlement_t(settle_type);
-CREATE INDEX idx_st_deal ON trm_settlement_t(deal_id);
-CREATE INDEX idx_st_value_date ON trm_settlement_t(value_date);
-CREATE INDEX idx_st_status ON trm_settlement_t(settle_status);
+COMMENT ON TABLE tms_settlement_t IS '支付结算表';
+CREATE INDEX idx_st_no ON tms_settlement_t(settle_no);
+CREATE INDEX idx_st_type ON tms_settlement_t(settle_type);
+CREATE INDEX idx_st_deal ON tms_settlement_t(deal_id);
+CREATE INDEX idx_st_value_date ON tms_settlement_t(value_date);
+CREATE INDEX idx_st_status ON tms_settlement_t(settle_status);

@@ -3,7 +3,7 @@
 -- 执行顺序: 11
 
 -- 估值表 (修复: 精度提高)
-CREATE TABLE trm_valuation_t (
+CREATE TABLE tms_valuation_t (
     id BIGSERIAL PRIMARY KEY,
     inst_id BIGINT NOT NULL,
     valuation_date DATE NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE trm_valuation_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-COMMENT ON TABLE trm_valuation_t IS '估值表';
-CREATE INDEX idx_val_inst ON trm_valuation_t(inst_id);
-CREATE INDEX idx_val_date ON trm_valuation_t(valuation_date);
-CREATE INDEX idx_val_status ON trm_valuation_t(status);
+COMMENT ON TABLE tms_valuation_t IS '估值表';
+CREATE INDEX idx_val_inst ON tms_valuation_t(inst_id);
+CREATE INDEX idx_val_date ON tms_valuation_t(valuation_date);
+CREATE INDEX idx_val_status ON tms_valuation_t(status);

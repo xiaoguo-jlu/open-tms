@@ -3,16 +3,14 @@ package com.opentms.instrument.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.opentms.common.model.BaseCodeEntity;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@TableName("trm_instrument_t")
-public class Instrument extends BaseCodeEntity {
+@TableName("tms_instrument_t")
+public class Instrument {
 
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -23,9 +21,33 @@ public class Instrument extends BaseCodeEntity {
 
     private String instrumentType;
 
-    private String underlyingType;
+    private String instrumentSubtype;
 
     private String currency;
 
+    private BigDecimal faceValue;
+
+    private LocalDate issueDate;
+
     private LocalDate maturityDate;
+
+    private BigDecimal interestRate;
+
+    private Long counterpartyId;
+
+    private String status;
+
+    private String remark;
+
+    private String createdBy;
+
+    private java.time.LocalDateTime createdAt;
+
+    private String updatedBy;
+
+    private java.time.LocalDateTime updatedAt;
+
+    private Integer version;
+
+    private String deleted;
 }

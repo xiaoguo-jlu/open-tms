@@ -3,31 +3,36 @@ package com.opentms.basedata.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.opentms.common.model.BaseEntity;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@TableName("trm_bank_t")
-public class Bank extends BaseEntity {
+@TableName("tms_bank_t")
+public class Bank {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private String bankCode;
+    private String code;
 
-    private String bankName;
+    private String name;
 
-    private String bankNameEn;
+    private String enName;
 
     private String swiftCode;
 
-    private String bankLineCode;
-
     private String countryCode;
 
-    private String bankType;
-
     private String status;
+
+    private String createdBy;
+
+    private java.time.LocalDateTime createdAt;
+
+    private String updatedBy;
+
+    private java.time.LocalDateTime updatedAt;
+
+    private Integer version;
+
+    private String deleted;
 }

@@ -3,7 +3,7 @@
 -- 执行顺序: 6
 
 -- 现金池表 (精度提高)
-CREATE TABLE trm_cash_pool_t (
+CREATE TABLE tms_cash_pool_t (
     id BIGSERIAL PRIMARY KEY,
     pool_no VARCHAR(50) NOT NULL UNIQUE,
     pool_name VARCHAR(200) NOT NULL,
@@ -22,14 +22,14 @@ CREATE TABLE trm_cash_pool_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-COMMENT ON TABLE trm_cash_pool_t IS '现金池表';
-CREATE INDEX idx_cp_no ON trm_cash_pool_t(pool_no);
-CREATE INDEX idx_cp_type ON trm_cash_pool_t(pool_type);
-CREATE INDEX idx_cp_business_unit ON trm_cash_pool_t(business_unit_id);
-CREATE INDEX idx_cp_status ON trm_cash_pool_t(status);
+COMMENT ON TABLE tms_cash_pool_t IS '现金池表';
+CREATE INDEX idx_cp_no ON tms_cash_pool_t(pool_no);
+CREATE INDEX idx_cp_type ON tms_cash_pool_t(pool_type);
+CREATE INDEX idx_cp_business_unit ON tms_cash_pool_t(business_unit_id);
+CREATE INDEX idx_cp_status ON tms_cash_pool_t(status);
 
 -- 现金池账户关联表
-CREATE TABLE trm_cash_pool_account_t (
+CREATE TABLE tms_cash_pool_account_t (
     id BIGSERIAL PRIMARY KEY,
     pool_id BIGINT NOT NULL,
     account_id BIGINT NOT NULL,
@@ -38,6 +38,6 @@ CREATE TABLE trm_cash_pool_account_t (
     created_by VARCHAR(50) NOT NULL DEFAULT 'system',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-COMMENT ON TABLE trm_cash_pool_account_t IS '现金池账户关联表';
-CREATE INDEX idx_cpa_pool ON trm_cash_pool_account_t(pool_id);
-CREATE INDEX idx_cpa_account ON trm_cash_pool_account_t(account_id);
+COMMENT ON TABLE tms_cash_pool_account_t IS '现金池账户关联表';
+CREATE INDEX idx_cpa_pool ON tms_cash_pool_account_t(pool_id);
+CREATE INDEX idx_cpa_account ON tms_cash_pool_account_t(account_id);

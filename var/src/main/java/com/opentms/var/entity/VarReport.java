@@ -3,17 +3,14 @@ package com.opentms.var.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.opentms.common.model.BaseCodeEntity;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@TableName("trm_var_report_t")
-public class VarReport extends BaseCodeEntity {
+@TableName("tms_var_report_t")
+public class VarReport {
 
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -35,4 +32,18 @@ public class VarReport extends BaseCodeEntity {
     private BigDecimal creditVar;
 
     private String status;
+
+    private String remark;
+
+    private String createdBy;
+
+    private java.time.LocalDateTime createdAt;
+
+    private String updatedBy;
+
+    private java.time.LocalDateTime updatedAt;
+
+    private Integer version;
+
+    private String deleted;
 }

@@ -3,20 +3,18 @@ package com.opentms.limit.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.opentms.common.model.BaseCodeEntity;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@TableName("trm_limit_t")
-public class Limit extends BaseCodeEntity {
+@TableName("tms_limit_t")
+public class Limit {
 
     @TableId(type = IdType.AUTO)
     private Long id;
+
+    private String limitNo;
 
     private String limitName;
 
@@ -24,15 +22,27 @@ public class Limit extends BaseCodeEntity {
 
     private Long businessUnitId;
 
-    private BigDecimal limitAmount;
-
     private String currency;
 
-    private BigDecimal warningThreshold;
+    private BigDecimal limitAmount;
 
-    private BigDecimal controlThreshold;
+    private BigDecimal usedAmount;
 
-    private LocalDate startDate;
+    private BigDecimal warningPercent;
 
-    private LocalDate endDate;
+    private String status;
+
+    private String remark;
+
+    private String createdBy;
+
+    private java.time.LocalDateTime createdAt;
+
+    private String updatedBy;
+
+    private java.time.LocalDateTime updatedAt;
+
+    private Integer version;
+
+    private String deleted;
 }

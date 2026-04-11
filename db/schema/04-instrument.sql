@@ -3,7 +3,7 @@
 -- 执行顺序: 4
 
 -- 金融工具表 (修复: inst_code -> instrument_code)
-CREATE TABLE trm_instrument_t (
+CREATE TABLE tms_instrument_t (
     id BIGSERIAL PRIMARY KEY,
     instrument_code VARCHAR(50) NOT NULL UNIQUE,
     instrument_name VARCHAR(200) NOT NULL,
@@ -24,10 +24,10 @@ CREATE TABLE trm_instrument_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-COMMENT ON TABLE trm_instrument_t IS '金融工具表';
-CREATE INDEX idx_inst_code ON trm_instrument_t(instrument_code);
-CREATE INDEX idx_inst_type ON trm_instrument_t(instrument_type);
-CREATE INDEX idx_inst_counterparty ON trm_instrument_t(counterparty_id);
-CREATE INDEX idx_inst_maturity ON trm_instrument_t(maturity_date);
-CREATE INDEX idx_inst_status ON trm_instrument_t(status);
-CREATE INDEX idx_inst_maturity_status ON trm_instrument_t(maturity_date, status);
+COMMENT ON TABLE tms_instrument_t IS '金融工具表';
+CREATE INDEX idx_inst_code ON tms_instrument_t(instrument_code);
+CREATE INDEX idx_inst_type ON tms_instrument_t(instrument_type);
+CREATE INDEX idx_inst_counterparty ON tms_instrument_t(counterparty_id);
+CREATE INDEX idx_inst_maturity ON tms_instrument_t(maturity_date);
+CREATE INDEX idx_inst_status ON tms_instrument_t(status);
+CREATE INDEX idx_inst_maturity_status ON tms_instrument_t(maturity_date, status);

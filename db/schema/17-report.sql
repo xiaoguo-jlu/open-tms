@@ -3,7 +3,7 @@
 -- 执行顺序: 17
 
 -- 报表表 (修复: 精度提高)
-CREATE TABLE trm_report_t (
+CREATE TABLE tms_report_t (
     id BIGSERIAL PRIMARY KEY,
     report_no VARCHAR(50) NOT NULL UNIQUE,
     report_name VARCHAR(200) NOT NULL,
@@ -22,9 +22,9 @@ CREATE TABLE trm_report_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-COMMENT ON TABLE trm_report_t IS '报表表';
-CREATE INDEX idx_rpt_no ON trm_report_t(report_no);
-CREATE INDEX idx_rpt_type ON trm_report_t(report_type);
-CREATE INDEX idx_rpt_business_unit ON trm_report_t(business_unit_id);
-CREATE INDEX idx_rpt_start_date ON trm_report_t(start_date);
-CREATE INDEX idx_rpt_status ON trm_report_t(status);
+COMMENT ON TABLE tms_report_t IS '报表表';
+CREATE INDEX idx_rpt_no ON tms_report_t(report_no);
+CREATE INDEX idx_rpt_type ON tms_report_t(report_type);
+CREATE INDEX idx_rpt_business_unit ON tms_report_t(business_unit_id);
+CREATE INDEX idx_rpt_start_date ON tms_report_t(start_date);
+CREATE INDEX idx_rpt_status ON tms_report_t(status);

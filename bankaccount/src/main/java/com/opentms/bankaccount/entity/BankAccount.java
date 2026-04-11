@@ -3,15 +3,13 @@ package com.opentms.bankaccount.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.opentms.common.model.BaseCodeEntity;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
 import java.math.BigDecimal;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@TableName("trm_bank_account_t")
-public class BankAccount extends BaseCodeEntity {
+@TableName("tms_bank_account_t")
+public class BankAccount {
 
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -33,4 +31,22 @@ public class BankAccount extends BaseCodeEntity {
     private BigDecimal frozenBalance;
 
     private String isMain;
+
+    private Long businessUnitId;
+
+    private String status;
+
+    private String remark;
+
+    private String createdBy;
+
+    private java.time.LocalDateTime createdAt;
+
+    private String updatedBy;
+
+    private java.time.LocalDateTime updatedAt;
+
+    private Integer version;
+
+    private String deleted;
 }

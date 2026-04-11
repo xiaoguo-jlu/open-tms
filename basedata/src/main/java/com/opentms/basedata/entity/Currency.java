@@ -3,25 +3,34 @@ package com.opentms.basedata.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.opentms.common.model.BaseEntity;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@TableName("trm_currency_t")
-public class Currency extends BaseEntity {
+@TableName("tms_currency_t")
+public class Currency {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private String currencyCode;
+    private String code;
 
-    private String currencyName;
+    private String name;
 
-    private String currencySymbol;
+    private String symbol;
 
     private Integer decimalPlaces;
 
     private String status;
+
+    private String createdBy;
+
+    private java.time.LocalDateTime createdAt;
+
+    private String updatedBy;
+
+    private java.time.LocalDateTime updatedAt;
+
+    private Integer version;
+
+    private String deleted;
 }

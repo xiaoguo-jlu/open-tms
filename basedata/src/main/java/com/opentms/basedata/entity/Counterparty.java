@@ -3,35 +3,38 @@ package com.opentms.basedata.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.opentms.common.model.BaseEntity;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@TableName("trm_counterparty_t")
-public class Counterparty extends BaseEntity {
+@TableName("tms_counterparty_t")
+public class Counterparty {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private String counterpartyCode;
+    private String code;
 
-    private String counterpartyName;
+    private String name;
 
-    private String counterpartyNameEn;
+    private String enName;
 
     private String counterpartyType;
 
     private String countryCode;
 
-    private String creditRating;
-
-    private String externalRating;
-
-    private String address;
-
-    private String phone;
+    private String swiftCode;
 
     private String status;
+
+    private String createdBy;
+
+    private java.time.LocalDateTime createdAt;
+
+    private String updatedBy;
+
+    private java.time.LocalDateTime updatedAt;
+
+    private Integer version;
+
+    private String deleted;
 }

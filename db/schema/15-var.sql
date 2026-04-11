@@ -3,7 +3,7 @@
 -- 执行顺序: 15
 
 -- VaR报表表 (修复: 精度提高)
-CREATE TABLE trm_var_report_t (
+CREATE TABLE tms_var_report_t (
     id BIGSERIAL PRIMARY KEY,
     report_date DATE NOT NULL,
     var_type VARCHAR(50),
@@ -22,7 +22,7 @@ CREATE TABLE trm_var_report_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-COMMENT ON TABLE trm_var_report_t IS 'VaR报表表';
-CREATE INDEX idx_var_date ON trm_var_report_t(report_date);
-CREATE INDEX idx_var_type ON trm_var_report_t(var_type);
-CREATE INDEX idx_var_status ON trm_var_report_t(status);
+COMMENT ON TABLE tms_var_report_t IS 'VaR报表表';
+CREATE INDEX idx_var_date ON tms_var_report_t(report_date);
+CREATE INDEX idx_var_type ON tms_var_report_t(var_type);
+CREATE INDEX idx_var_status ON tms_var_report_t(status);

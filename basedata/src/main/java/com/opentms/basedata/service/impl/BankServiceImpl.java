@@ -17,9 +17,9 @@ public class BankServiceImpl extends ServiceImpl<BankMapper, Bank> implements Ba
         LambdaQueryWrapper<Bank> wrapper = new LambdaQueryWrapper<>();
 
         if (StringUtils.hasText(keyword)) {
-            wrapper.like(Bank::getBankCode, keyword)
+            wrapper.like(Bank::getCode, keyword)
                    .or()
-                   .like(Bank::getBankName, keyword);
+                   .like(Bank::getName, keyword);
         }
 
         if (StringUtils.hasText(countryCode)) {
@@ -42,7 +42,7 @@ public class BankServiceImpl extends ServiceImpl<BankMapper, Bank> implements Ba
 
     @Override
     public boolean saveBank(Bank bank) {
-        if (checkCodeExists(bank.getBankCode(), null)) {
+        if (checkCodeExists(bank.getCode(), null)) {
             throw new RuntimeException("Bank code already exists");
         }
         return save(bank);
@@ -50,7 +50,7 @@ public class BankServiceImpl extends ServiceImpl<BankMapper, Bank> implements Ba
 
     @Override
     public boolean updateBank(Bank bank) {
-        if (checkCodeExists(bank.getBankCode(), bank.getId())) {
+        if (checkCodeExists(bank.getCode(), bank.getId())) {
             throw new RuntimeException("Bank code already exists");
         }
         return updateById(bank);
@@ -67,7 +67,7 @@ public class BankServiceImpl extends ServiceImpl<BankMapper, Bank> implements Ba
             return false;
         }
         LambdaQueryWrapper<Bank> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Bank::getBankCode, code);
+        wrapper.eq(Bank::getCode, code);
         if (excludeId != null) {
             wrapper.ne(Bank::getId, excludeId);
         }

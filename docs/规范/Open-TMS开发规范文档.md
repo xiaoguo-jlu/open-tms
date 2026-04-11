@@ -16,7 +16,7 @@
 | 规范项 | 规则 | 示例 |
 |--------|------|------|
 | 数据库名 | `{project}_{env}` | opentms_dev / opentms_prod |
-| 表名 | `trm_{module}_{type}` | trm_transaction_t / trm_user_t |
+| 表名 | `tms_{module}_{type}` | tms_transaction_t / tms_user_t |
 | 主键 | `id` BIGSERIAL PRIMARY KEY | id BIGINT PRIMARY KEY |
 | 外键 | `{table}_id` | bank_id / user_id |
 
@@ -24,12 +24,12 @@
 
 | 后缀 | 含义 | 示例 |
 |------|------|------|
-| `_t` | 主表/实体表 | trm_user_t |
-| `_d` | 字典表/配置表 | trm_dict_d |
-| `_log` | 日志表 | trm_audit_log |
-| `_rel` | 关联表 | trm_user_role_rel |
-| `_his` | 历史表 | trm_transaction_his |
-| `_tmp` | 临时表 | trm_calc_tmp |
+| `_t` | 主表/实体表 | tms_user_t |
+| `_d` | 字典表/配置表 | tms_dict_d |
+| `_log` | 日志表 | tms_audit_log |
+| `_rel` | 关联表 | tms_user_role_rel |
+| `_his` | 历史表 | tms_transaction_his |
+| `_tmp` | 临时表 | tms_calc_tmp |
 
 #### 1.1.3 字段命名
 
@@ -118,7 +118,7 @@ idempotency_key VARCHAR(64),                    -- 外部幂等key
 version         INT DEFAULT 0,                   -- 乐观锁
 
 -- 审计日志（自动记录）
-CREATE TABLE trm_audit_log_t (
+CREATE TABLE tms_audit_log_t (
     id              BIGSERIAL PRIMARY KEY,
     table_name      VARCHAR(50) NOT NULL,
     record_id       BIGINT NOT NULL,
@@ -136,7 +136,7 @@ CREATE TABLE trm_audit_log_t (
 
 ```sql
 -- 幂等表（防重复提交）
-CREATE TABLE trm_idempotency_t (
+CREATE TABLE tms_idempotency_t (
     idempotency_key VARCHAR(64) PRIMARY KEY,
     request_hash    VARCHAR(64),
     response_data   JSONB,
@@ -145,7 +145,7 @@ CREATE TABLE trm_idempotency_t (
 );
 
 -- 交易状态机（防止重复执行）
-CREATE TABLE trm_transaction_status_t (
+CREATE TABLE tms_transaction_status_t (
     transaction_no  VARCHAR(50) PRIMARY KEY,
     current_status  VARCHAR(20) NOT NULL,
     lock_version    INT DEFAULT 0,
@@ -160,7 +160,7 @@ CREATE TABLE trm_transaction_status_t (
 -- {表描述}
 -- 模块: {module}
 -- ============================================
-CREATE TABLE trm_{table}_t (
+CREATE TABLE tms_{table}_t (
     id                  BIGSERIAL PRIMARY KEY,
     {table}_code        VARCHAR(50) NOT NULL UNIQUE,
     {table}_name        VARCHAR(200) NOT NULL,
@@ -175,9 +175,9 @@ CREATE TABLE trm_{table}_t (
     deleted             CHAR(1) DEFAULT '0'
 );
 
-COMMENT ON TABLE trm_{table}_t IS '{表描述}';
-CREATE INDEX idx_{table}_code ON trm_{table}_t({table}_code);
-CREATE INDEX idx_{table}_status ON trm_{table}_t(status);
+COMMENT ON TABLE tms_{table}_t IS '{表描述}';
+CREATE INDEX idx_{table}_code ON tms_{table}_t({table}_code);
+CREATE INDEX idx_{table}_status ON tms_{table}_t(status);
 ```
 
 ---

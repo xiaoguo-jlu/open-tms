@@ -3,7 +3,7 @@
 -- 执行顺序: 12
 
 -- 敞口表 (修复: 精度提高)
-CREATE TABLE trm_exposure_t (
+CREATE TABLE tms_exposure_t (
     id BIGSERIAL PRIMARY KEY,
     exposure_no VARCHAR(50) NOT NULL UNIQUE,
     exposure_type VARCHAR(20) NOT NULL,
@@ -21,9 +21,9 @@ CREATE TABLE trm_exposure_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-COMMENT ON TABLE trm_exposure_t IS '敞口表';
-CREATE INDEX idx_exp_no ON trm_exposure_t(exposure_no);
-CREATE INDEX idx_exp_type ON trm_exposure_t(exposure_type);
-CREATE INDEX idx_exp_business_unit ON trm_exposure_t(business_unit_id);
-CREATE INDEX idx_exp_date ON trm_exposure_t(exposure_date);
-CREATE INDEX idx_exp_status ON trm_exposure_t(status);
+COMMENT ON TABLE tms_exposure_t IS '敞口表';
+CREATE INDEX idx_exp_no ON tms_exposure_t(exposure_no);
+CREATE INDEX idx_exp_type ON tms_exposure_t(exposure_type);
+CREATE INDEX idx_exp_business_unit ON tms_exposure_t(business_unit_id);
+CREATE INDEX idx_exp_date ON tms_exposure_t(exposure_date);
+CREATE INDEX idx_exp_status ON tms_exposure_t(status);

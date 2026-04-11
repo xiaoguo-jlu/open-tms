@@ -3,38 +3,51 @@ package com.opentms.fx.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.opentms.common.model.BaseCodeEntity;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@TableName("fx_deal_t")
-public class FxDeal extends BaseCodeEntity {
+@TableName("tms_fx_deal_t")
+public class FxDeal {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private String fxType;
+    private String dealNo;
+
+    private String dealType;
 
     private String buyCurrency;
 
     private String sellCurrency;
 
-    private BigDecimal amount;
+    private BigDecimal buyAmount;
+
+    private BigDecimal sellAmount;
 
     private BigDecimal rate;
 
     private Long counterpartyId;
 
-    private Long accountId;
-
     private LocalDate valueDate;
+
+    private LocalDate maturityDate;
 
     private String status;
 
     private String remark;
+
+    private String createdBy;
+
+    private java.time.LocalDateTime createdAt;
+
+    private String updatedBy;
+
+    private java.time.LocalDateTime updatedAt;
+
+    private Integer version;
+
+    private String deleted;
 }

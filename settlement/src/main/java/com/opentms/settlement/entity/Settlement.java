@@ -3,40 +3,47 @@ package com.opentms.settlement.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.opentms.common.model.BaseEntity;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@TableName("trm_settlement_t")
-public class Settlement extends BaseEntity {
+@TableName("tms_settlement_t")
+public class Settlement {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private String settlementType;
+    private String settleNo;
 
-    private Long accountId;
+    private String settleType;
 
-    private Long payeeId;
+    private Long dealId;
 
-    private String payeeName;
+    private Long fromAccountId;
 
-    private String payeeBank;
-
-    private String payeeAccountNo;
+    private Long toAccountId;
 
     private BigDecimal amount;
 
     private String currency;
 
-    private String purpose;
+    private LocalDate valueDate;
 
-    private LocalDate executeDate;
+    private String settleStatus;
 
-    private String status;
+    private String remark;
+
+    private String createdBy;
+
+    private java.time.LocalDateTime createdAt;
+
+    private String updatedBy;
+
+    private java.time.LocalDateTime updatedAt;
+
+    private Integer version;
+
+    private String deleted;
 }

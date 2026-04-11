@@ -3,40 +3,46 @@ package com.opentms.report.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.opentms.common.model.BaseCodeEntity;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@TableName("trm_report_t")
-public class Report extends BaseCodeEntity {
+@TableName("tms_report_t")
+public class Report {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    private String reportNo;
+
     private String reportName;
 
-    private Long templateId;
+    private String reportType;
 
-    private String templateName;
-
-    private LocalDate reportDate;
+    private String reportTemplate;
 
     private Long businessUnitId;
+
+    private String currency;
 
     private LocalDate startDate;
 
     private LocalDate endDate;
 
-    private String fileUrl;
+    private String reportData;
 
     private String status;
 
-    private String dataJson;
+    private String createdBy;
 
-    private LocalDateTime generatedAt;
+    private java.time.LocalDateTime createdAt;
+
+    private String updatedBy;
+
+    private java.time.LocalDateTime updatedAt;
+
+    private Integer version;
+
+    private String deleted;
 }

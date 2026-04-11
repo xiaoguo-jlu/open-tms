@@ -3,7 +3,7 @@
 -- 执行顺序: 14
 
 -- 减值计算表 (修复: 精度提高)
-CREATE TABLE trm_impairment_t (
+CREATE TABLE tms_impairment_t (
     id BIGSERIAL PRIMARY KEY,
     inst_id BIGINT NOT NULL,
     impairment_date DATE NOT NULL,
@@ -22,8 +22,8 @@ CREATE TABLE trm_impairment_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-COMMENT ON TABLE trm_impairment_t IS '减值计算表';
-CREATE INDEX idx_imp_inst ON trm_impairment_t(inst_id);
-CREATE INDEX idx_imp_date ON trm_impairment_t(impairment_date);
-CREATE INDEX idx_imp_stage ON trm_impairment_t(stage);
-CREATE INDEX idx_imp_status ON trm_impairment_t(status);
+COMMENT ON TABLE tms_impairment_t IS '减值计算表';
+CREATE INDEX idx_imp_inst ON tms_impairment_t(inst_id);
+CREATE INDEX idx_imp_date ON tms_impairment_t(impairment_date);
+CREATE INDEX idx_imp_stage ON tms_impairment_t(stage);
+CREATE INDEX idx_imp_status ON tms_impairment_t(status);

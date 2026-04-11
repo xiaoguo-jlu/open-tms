@@ -3,7 +3,7 @@
 -- 执行顺序: 16
 
 -- 驾驶舱仪表盘表
-CREATE TABLE trm_cockpit_dashboard_t (
+CREATE TABLE tms_cockpit_dashboard_t (
     id BIGSERIAL PRIMARY KEY,
     dashboard_code VARCHAR(50) NOT NULL UNIQUE,
     dashboard_name VARCHAR(200) NOT NULL,
@@ -17,11 +17,11 @@ CREATE TABLE trm_cockpit_dashboard_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-COMMENT ON TABLE trm_cockpit_dashboard_t IS '驾驶舱仪表盘表';
-CREATE INDEX idx_cd_code ON trm_cockpit_dashboard_t(dashboard_code);
+COMMENT ON TABLE tms_cockpit_dashboard_t IS '驾驶舱仪表盘表';
+CREATE INDEX idx_cd_code ON tms_cockpit_dashboard_t(dashboard_code);
 
 -- 驾驶舱组件表
-CREATE TABLE trm_cockpit_widget_t (
+CREATE TABLE tms_cockpit_widget_t (
     id BIGSERIAL PRIMARY KEY,
     dashboard_id BIGINT NOT NULL,
     widget_code VARCHAR(50) NOT NULL,
@@ -37,5 +37,5 @@ CREATE TABLE trm_cockpit_widget_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-COMMENT ON TABLE trm_cockpit_widget_t IS '驾驶舱组件表';
-CREATE INDEX idx_cw_dashboard ON trm_cockpit_widget_t(dashboard_id);
+COMMENT ON TABLE tms_cockpit_widget_t IS '驾驶舱组件表';
+CREATE INDEX idx_cw_dashboard ON tms_cockpit_widget_t(dashboard_id);

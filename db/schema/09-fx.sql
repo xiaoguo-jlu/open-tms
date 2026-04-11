@@ -3,7 +3,7 @@
 -- 执行顺序: 9
 
 -- 外汇交易表 (修复: 精度提高)
-CREATE TABLE trm_fx_deal_t (
+CREATE TABLE tms_fx_deal_t (
     id BIGSERIAL PRIMARY KEY,
     deal_no VARCHAR(50) NOT NULL UNIQUE,
     deal_type VARCHAR(20) NOT NULL,
@@ -24,11 +24,11 @@ CREATE TABLE trm_fx_deal_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-COMMENT ON TABLE trm_fx_deal_t IS '外汇交易表';
-CREATE INDEX idx_fx_no ON trm_fx_deal_t(deal_no);
-CREATE INDEX idx_fx_type ON trm_fx_deal_t(deal_type);
-CREATE INDEX idx_fx_counterparty ON trm_fx_deal_t(counterparty_id);
-CREATE INDEX idx_fx_value_date ON trm_fx_deal_t(value_date);
-CREATE INDEX idx_fx_status ON trm_fx_deal_t(status);
+COMMENT ON TABLE tms_fx_deal_t IS '外汇交易表';
+CREATE INDEX idx_fx_no ON tms_fx_deal_t(deal_no);
+CREATE INDEX idx_fx_type ON tms_fx_deal_t(deal_type);
+CREATE INDEX idx_fx_counterparty ON tms_fx_deal_t(counterparty_id);
+CREATE INDEX idx_fx_value_date ON tms_fx_deal_t(value_date);
+CREATE INDEX idx_fx_status ON tms_fx_deal_t(status);
 -- 复合索引 (新增)
-CREATE INDEX idx_fx_no_status ON trm_fx_deal_t(deal_no, status);
+CREATE INDEX idx_fx_no_status ON tms_fx_deal_t(deal_no, status);

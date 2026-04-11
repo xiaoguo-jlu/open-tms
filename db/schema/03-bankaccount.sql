@@ -3,7 +3,7 @@
 -- 执行顺序: 3
 
 -- 银行账户表
-CREATE TABLE trm_bank_account_t (
+CREATE TABLE tms_bank_account_t (
     id BIGSERIAL PRIMARY KEY,
     account_no VARCHAR(50) NOT NULL UNIQUE,
     account_name VARCHAR(200) NOT NULL,
@@ -24,16 +24,16 @@ CREATE TABLE trm_bank_account_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-COMMENT ON TABLE trm_bank_account_t IS '银行账户表';
-CREATE INDEX idx_ba_no ON trm_bank_account_t(account_no);
-CREATE INDEX idx_ba_bank ON trm_bank_account_t(bank_id);
-CREATE INDEX idx_ba_type ON trm_bank_account_t(account_type);
-CREATE INDEX idx_ba_currency ON trm_bank_account_t(currency);
-CREATE INDEX idx_ba_status ON trm_bank_account_t(status);
-CREATE INDEX idx_ba_business_unit ON trm_bank_account_t(business_unit_id);
+COMMENT ON TABLE tms_bank_account_t IS '银行账户表';
+CREATE INDEX idx_ba_no ON tms_bank_account_t(account_no);
+CREATE INDEX idx_ba_bank ON tms_bank_account_t(bank_id);
+CREATE INDEX idx_ba_type ON tms_bank_account_t(account_type);
+CREATE INDEX idx_ba_currency ON tms_bank_account_t(currency);
+CREATE INDEX idx_ba_status ON tms_bank_account_t(status);
+CREATE INDEX idx_ba_business_unit ON tms_bank_account_t(business_unit_id);
 
 -- 账户流水表 (新增)
-CREATE TABLE trm_account_transaction_t (
+CREATE TABLE tms_account_transaction_t (
     id BIGSERIAL PRIMARY KEY,
     account_id BIGINT NOT NULL,
     transaction_no VARCHAR(50) NOT NULL UNIQUE,
@@ -50,9 +50,9 @@ CREATE TABLE trm_account_transaction_t (
     operate_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     status CHAR(1) NOT NULL DEFAULT '1'
 );
-COMMENT ON TABLE trm_account_transaction_t IS '账户流水表';
-CREATE INDEX idx_at_account ON trm_account_transaction_t(account_id);
-CREATE INDEX idx_at_no ON trm_account_transaction_t(transaction_no);
-CREATE INDEX idx_at_type ON trm_account_transaction_t(transaction_type);
-CREATE INDEX idx_at_reference ON trm_account_transaction_t(reference_type, reference_id);
-CREATE INDEX idx_at_time ON trm_account_transaction_t(operate_time);
+COMMENT ON TABLE tms_account_transaction_t IS '账户流水表';
+CREATE INDEX idx_at_account ON tms_account_transaction_t(account_id);
+CREATE INDEX idx_at_no ON tms_account_transaction_t(transaction_no);
+CREATE INDEX idx_at_type ON tms_account_transaction_t(transaction_type);
+CREATE INDEX idx_at_reference ON tms_account_transaction_t(reference_type, reference_id);
+CREATE INDEX idx_at_time ON tms_account_transaction_t(operate_time);

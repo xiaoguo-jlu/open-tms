@@ -3,22 +3,19 @@ package com.opentms.valuation.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.opentms.common.model.BaseEntity;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-@TableName("trm_valuation_t")
-public class Valuation extends BaseEntity {
+@TableName("tms_valuation_t")
+public class Valuation {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private Long instrumentId;
+    private Long instId;
 
     private LocalDate valuationDate;
 
@@ -26,7 +23,25 @@ public class Valuation extends BaseEntity {
 
     private BigDecimal costValue;
 
-    private BigDecimal unrealizedPnl;
+    private BigDecimal unrealizedPl;
 
     private String valuationMethod;
+
+    private BigDecimal discountRate;
+
+    private String status;
+
+    private String remark;
+
+    private String createdBy;
+
+    private java.time.LocalDateTime createdAt;
+
+    private String updatedBy;
+
+    private java.time.LocalDateTime updatedAt;
+
+    private Integer version;
+
+    private String deleted;
 }

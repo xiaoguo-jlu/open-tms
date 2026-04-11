@@ -525,7 +525,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("trm_business_unit_t")
+@TableName("tms_business_unit_t")
 public class BusinessUnit extends BaseCodeEntity {
 
     private String enName;
@@ -880,7 +880,7 @@ git commit -m "feat(basedata): 实现BusinessUnit实体及完整CRUD"
 -- 数据库: opentms_dev
 
 -- 业务单元表
-CREATE TABLE trm_business_unit_t (
+CREATE TABLE tms_business_unit_t (
     id BIGSERIAL PRIMARY KEY,
     code VARCHAR(50) NOT NULL UNIQUE,
     name VARCHAR(200) NOT NULL,
@@ -896,11 +896,11 @@ CREATE TABLE trm_business_unit_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-CREATE INDEX idx_business_unit_code ON trm_business_unit_t(code);
-CREATE INDEX idx_business_unit_status ON trm_business_unit_t(status);
+CREATE INDEX idx_business_unit_code ON tms_business_unit_t(code);
+CREATE INDEX idx_business_unit_status ON tms_business_unit_t(status);
 
 -- 交易员表
-CREATE TABLE trm_trader_t (
+CREATE TABLE tms_trader_t (
     id BIGSERIAL PRIMARY KEY,
     code VARCHAR(50) NOT NULL UNIQUE,
     name VARCHAR(50) NOT NULL,
@@ -916,11 +916,11 @@ CREATE TABLE trm_trader_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-CREATE INDEX idx_trader_code ON trm_trader_t(code);
-CREATE INDEX idx_trader_status ON trm_trader_t(status);
+CREATE INDEX idx_trader_code ON tms_trader_t(code);
+CREATE INDEX idx_trader_status ON tms_trader_t(status);
 
 -- 币种表
-CREATE TABLE trm_currency_t (
+CREATE TABLE tms_currency_t (
     id BIGSERIAL PRIMARY KEY,
     code VARCHAR(10) NOT NULL UNIQUE,
     name VARCHAR(50) NOT NULL,
@@ -934,11 +934,11 @@ CREATE TABLE trm_currency_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-CREATE INDEX idx_currency_code ON trm_currency_t(code);
-CREATE INDEX idx_currency_status ON trm_currency_t(status);
+CREATE INDEX idx_currency_code ON tms_currency_t(code);
+CREATE INDEX idx_currency_status ON tms_currency_t(status);
 
 -- 国家表
-CREATE TABLE trm_country_t (
+CREATE TABLE tms_country_t (
     id BIGSERIAL PRIMARY KEY,
     code VARCHAR(10) NOT NULL UNIQUE,
     name VARCHAR(100) NOT NULL,
@@ -953,11 +953,11 @@ CREATE TABLE trm_country_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-CREATE INDEX idx_country_code ON trm_country_t(code);
-CREATE INDEX idx_country_status ON trm_country_t(status);
+CREATE INDEX idx_country_code ON tms_country_t(code);
+CREATE INDEX idx_country_status ON tms_country_t(status);
 
 -- 节假日表
-CREATE TABLE trm_holiday_t (
+CREATE TABLE tms_holiday_t (
     id BIGSERIAL PRIMARY KEY,
     date DATE NOT NULL,
     name VARCHAR(100) NOT NULL,
@@ -971,11 +971,11 @@ CREATE TABLE trm_holiday_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-CREATE INDEX idx_holiday_date ON trm_holiday_t(date);
-CREATE INDEX idx_holiday_country ON trm_holiday_t(country_code);
+CREATE INDEX idx_holiday_date ON tms_holiday_t(date);
+CREATE INDEX idx_holiday_country ON tms_holiday_t(country_code);
 
 -- 银行表
-CREATE TABLE trm_bank_t (
+CREATE TABLE tms_bank_t (
     id BIGSERIAL PRIMARY KEY,
     code VARCHAR(50) NOT NULL UNIQUE,
     name VARCHAR(200) NOT NULL,
@@ -992,12 +992,12 @@ CREATE TABLE trm_bank_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-CREATE INDEX idx_bank_code ON trm_bank_t(code);
-CREATE INDEX idx_bank_country ON trm_bank_t(country_code);
-CREATE INDEX idx_bank_status ON trm_bank_t(status);
+CREATE INDEX idx_bank_code ON tms_bank_t(code);
+CREATE INDEX idx_bank_country ON tms_bank_t(country_code);
+CREATE INDEX idx_bank_status ON tms_bank_t(status);
 
 -- 对手方表
-CREATE TABLE trm_counterparty_t (
+CREATE TABLE tms_counterparty_t (
     id BIGSERIAL PRIMARY KEY,
     code VARCHAR(50) NOT NULL UNIQUE,
     name VARCHAR(200) NOT NULL,
@@ -1016,12 +1016,12 @@ CREATE TABLE trm_counterparty_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-CREATE INDEX idx_counterparty_code ON trm_counterparty_t(code);
-CREATE INDEX idx_counterparty_type ON trm_counterparty_t(type);
-CREATE INDEX idx_counterparty_status ON trm_counterparty_t(status);
+CREATE INDEX idx_counterparty_code ON tms_counterparty_t(code);
+CREATE INDEX idx_counterparty_type ON tms_counterparty_t(type);
+CREATE INDEX idx_counterparty_status ON tms_counterparty_t(status);
 
 -- 对手方账户表
-CREATE TABLE trm_counterparty_account_t (
+CREATE TABLE tms_counterparty_account_t (
     id BIGSERIAL PRIMARY KEY,
     code VARCHAR(50) NOT NULL UNIQUE,
     counterparty_id BIGINT NOT NULL,
@@ -1038,10 +1038,10 @@ CREATE TABLE trm_counterparty_account_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-CREATE INDEX idx_counterparty_account_code ON trm_counterparty_account_t(code);
-CREATE INDEX idx_counterparty_account_counterparty ON trm_counterparty_account_t(counterparty_id);
-CREATE INDEX idx_counterparty_account_bank ON trm_counterparty_account_t(bank_id);
-CREATE INDEX idx_counterparty_account_status ON trm_counterparty_account_t(status);
+CREATE INDEX idx_counterparty_account_code ON tms_counterparty_account_t(code);
+CREATE INDEX idx_counterparty_account_counterparty ON tms_counterparty_account_t(counterparty_id);
+CREATE INDEX idx_counterparty_account_bank ON tms_counterparty_account_t(bank_id);
+CREATE INDEX idx_counterparty_account_status ON tms_counterparty_account_t(status);
 ```
 
 - [ ] **Step 2: Commit**

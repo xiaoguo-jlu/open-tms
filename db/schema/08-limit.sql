@@ -3,7 +3,7 @@
 -- 执行顺序: 8
 
 -- 流动性限额表 (精度提高)
-CREATE TABLE trm_limit_t (
+CREATE TABLE tms_limit_t (
     id BIGSERIAL PRIMARY KEY,
     limit_no VARCHAR(50) NOT NULL UNIQUE,
     limit_name VARCHAR(200) NOT NULL,
@@ -22,14 +22,14 @@ CREATE TABLE trm_limit_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-COMMENT ON TABLE trm_limit_t IS '流动性限额表';
-CREATE INDEX idx_limit_no ON trm_limit_t(limit_no);
-CREATE INDEX idx_limit_type ON trm_limit_t(limit_type);
-CREATE INDEX idx_limit_business_unit ON trm_limit_t(business_unit_id);
-CREATE INDEX idx_limit_status ON trm_limit_t(status);
+COMMENT ON TABLE tms_limit_t IS '流动性限额表';
+CREATE INDEX idx_limit_no ON tms_limit_t(limit_no);
+CREATE INDEX idx_limit_type ON tms_limit_t(limit_type);
+CREATE INDEX idx_limit_business_unit ON tms_limit_t(business_unit_id);
+CREATE INDEX idx_limit_status ON tms_limit_t(status);
 
 -- 限额预警记录表
-CREATE TABLE trm_limit_warning_t (
+CREATE TABLE tms_limit_warning_t (
     id BIGSERIAL PRIMARY KEY,
     limit_id BIGINT NOT NULL,
     warn_type VARCHAR(20),
@@ -39,6 +39,6 @@ CREATE TABLE trm_limit_warning_t (
     is_read CHAR(1) DEFAULT '0',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-COMMENT ON TABLE trm_limit_warning_t IS '限额预警记录表';
-CREATE INDEX idx_lw_limit ON trm_limit_warning_t(limit_id);
-CREATE INDEX idx_lw_read ON trm_limit_warning_t(is_read);
+COMMENT ON TABLE tms_limit_warning_t IS '限额预警记录表';
+CREATE INDEX idx_lw_limit ON tms_limit_warning_t(limit_id);
+CREATE INDEX idx_lw_read ON tms_limit_warning_t(is_read);
