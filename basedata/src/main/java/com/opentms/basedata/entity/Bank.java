@@ -24,6 +24,8 @@ public class Bank {
 
     private String status;
 
+    private String remark;
+
     private String createdBy;
 
     private java.time.LocalDateTime createdAt;

@@ -52,6 +52,7 @@ CREATE TABLE tms_currency_t (
     symbol VARCHAR(10),
     decimal_places INT NOT NULL DEFAULT 2,
     status CHAR(1) NOT NULL DEFAULT '1',
+    remark VARCHAR(500),
     created_by VARCHAR(50) NOT NULL DEFAULT 'system',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(50),
