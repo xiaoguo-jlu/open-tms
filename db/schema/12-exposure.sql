@@ -1,6 +1,8 @@
 -- Open-TMS 敞口管理模块表
 -- PostgreSQL
+-- 执行顺序: 12
 
+-- 敞口表
 CREATE TABLE trm_exposure_t (
     id BIGSERIAL PRIMARY KEY,
     exposure_no VARCHAR(50) NOT NULL UNIQUE,
@@ -11,14 +13,17 @@ CREATE TABLE trm_exposure_t (
     net_exposure DECIMAL(18,2),
     exposure_date DATE,
     status CHAR(1) NOT NULL DEFAULT '1',
-    created_by VARCHAR(50) NOT NULL,
+    remark VARCHAR(500),
+    created_by VARCHAR(50) NOT NULL DEFAULT 'system',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(50),
     updated_at TIMESTAMP,
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-CREATE INDEX idx_exposure_no ON trm_exposure_t(exposure_no);
-CREATE INDEX idx_exposure_type ON trm_exposure_t(exposure_type);
-CREATE INDEX idx_business_unit ON trm_exposure_t(business_unit_id);
-CREATE INDEX idx_exposure_date ON trm_exposure_t(exposure_date);
+COMMENT ON TABLE trm_exposure_t IS '敞口表';
+CREATE INDEX idx_exp_no ON trm_exposure_t(exposure_no);
+CREATE INDEX idx_exp_type ON trm_exposure_t(exposure_type);
+CREATE INDEX idx_exp_business_unit ON trm_exposure_t(business_unit_id);
+CREATE INDEX idx_exp_date ON trm_exposure_t(exposure_date);
+CREATE INDEX idx_exp_status ON trm_exposure_t(status);

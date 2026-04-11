@@ -1,6 +1,8 @@
 -- Open-TMS 利率掉期模块表
 -- PostgreSQL
+-- 执行顺序: 10
 
+-- 利率掉期表
 CREATE TABLE trm_irs_deal_t (
     id BIGSERIAL PRIMARY KEY,
     deal_no VARCHAR(50) NOT NULL UNIQUE,
@@ -14,15 +16,18 @@ CREATE TABLE trm_irs_deal_t (
     end_date DATE,
     payment_frequency VARCHAR(20),
     counterparty_id BIGINT,
-    status CHAR(1) NOT NULL DEFAULT '1',
-    created_by VARCHAR(50) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'DRAFT',
+    remark VARCHAR(500),
+    created_by VARCHAR(50) NOT NULL DEFAULT 'system',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(50),
     updated_at TIMESTAMP,
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-CREATE INDEX idx_irs_deal_no ON trm_irs_deal_t(deal_no);
-CREATE INDEX idx_deal_type ON trm_irs_deal_t(deal_type);
-CREATE INDEX idx_counterparty ON trm_irs_deal_t(counterparty_id);
-CREATE INDEX idx_end_date ON trm_irs_deal_t(end_date);
+COMMENT ON TABLE trm_irs_deal_t IS '利率掉期表';
+CREATE INDEX idx_irs_no ON trm_irs_deal_t(deal_no);
+CREATE INDEX idx_irs_type ON trm_irs_deal_t(deal_type);
+CREATE INDEX idx_irs_counterparty ON trm_irs_deal_t(counterparty_id);
+CREATE INDEX idx_irs_end_date ON trm_irs_deal_t(end_date);
+CREATE INDEX idx_irs_status ON trm_irs_deal_t(status);

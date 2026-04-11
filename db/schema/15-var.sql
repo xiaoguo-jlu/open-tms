@@ -1,6 +1,8 @@
 -- Open-TMS VaR模块表
 -- PostgreSQL
+-- 执行顺序: 15
 
+-- VaR报表表
 CREATE TABLE trm_var_report_t (
     id BIGSERIAL PRIMARY KEY,
     report_date DATE NOT NULL,
@@ -12,12 +14,15 @@ CREATE TABLE trm_var_report_t (
     ir_var DECIMAL(18,2),
     credit_var DECIMAL(18,2),
     status CHAR(1) NOT NULL DEFAULT '1',
-    created_by VARCHAR(50) NOT NULL,
+    remark VARCHAR(500),
+    created_by VARCHAR(50) NOT NULL DEFAULT 'system',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(50),
     updated_at TIMESTAMP,
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-CREATE INDEX idx_var_report_date ON trm_var_report_t(report_date);
+COMMENT ON TABLE trm_var_report_t IS 'VaR报表表';
+CREATE INDEX idx_var_date ON trm_var_report_t(report_date);
 CREATE INDEX idx_var_type ON trm_var_report_t(var_type);
+CREATE INDEX idx_var_status ON trm_var_report_t(status);
