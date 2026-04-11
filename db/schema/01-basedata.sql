@@ -157,9 +157,7 @@ CREATE TABLE tms_counterparty_account_t (
     updated_by VARCHAR(50),
     updated_at TIMESTAMP,
     version INT DEFAULT 0,
-    deleted CHAR(1) DEFAULT '0',
-    CONSTRAINT fk_cp_account_cp FOREIGN KEY (counterparty_id) REFERENCES tms_counterparty_t(id),
-    CONSTRAINT fk_cp_account_bank FOREIGN KEY (bank_id) REFERENCES tms_bank_t(id)
+    deleted CHAR(1) DEFAULT '0'
 );
 COMMENT ON TABLE tms_counterparty_account_t IS '对手账户表';
 CREATE INDEX idx_cp_account_cp ON tms_counterparty_account_t(counterparty_id);
