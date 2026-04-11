@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function listCounterpartyAccount(params) {
   return request({
-    url: '/basedata/counterparty-accounts',
+    url: '/api/counterparty-account/page',
     method: 'get',
     params
   })
@@ -10,14 +10,14 @@ export function listCounterpartyAccount(params) {
 
 export function getCounterpartyAccount(id) {
   return request({
-    url: `/basedata/counterparty-accounts/${id}`,
+    url: `/api/counterparty-account/${id}`,
     method: 'get'
   })
 }
 
 export function saveCounterpartyAccount(data) {
   return request({
-    url: '/basedata/counterparty-accounts',
+    url: '/api/counterparty-account',
     method: 'post',
     data
   })
@@ -25,7 +25,7 @@ export function saveCounterpartyAccount(data) {
 
 export function updateCounterpartyAccount(data) {
   return request({
-    url: '/basedata/counterparty-accounts',
+    url: '/api/counterparty-account',
     method: 'put',
     data
   })
@@ -33,14 +33,14 @@ export function updateCounterpartyAccount(data) {
 
 export function deleteCounterpartyAccount(id) {
   return request({
-    url: `/basedata/counterparty-accounts/${id}`,
+    url: `/api/counterparty-account/${id}`,
     method: 'delete'
   })
 }
 
 export function batchDeleteCounterpartyAccount(ids) {
   return request({
-    url: '/basedata/counterparty-accounts/batch-delete',
+    url: '/api/counterparty-account/batch-delete',
     method: 'post',
     data: { ids }
   })
@@ -48,7 +48,7 @@ export function batchDeleteCounterpartyAccount(ids) {
 
 export function exportCounterpartyAccount(params) {
   return request({
-    url: '/basedata/counterparty-accounts/export',
+    url: '/api/counterparty-account/export',
     method: 'get',
     params,
     responseType: 'blob'
@@ -57,7 +57,7 @@ export function exportCounterpartyAccount(params) {
 
 export function importCounterpartyAccount(formData) {
   return request({
-    url: '/basedata/counterparty-accounts/import',
+    url: '/api/counterparty-account/import',
     method: 'post',
     data: formData,
     headers: { 'Content-Type': 'multipart/form-data' }

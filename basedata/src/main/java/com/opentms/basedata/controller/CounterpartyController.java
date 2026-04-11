@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/counterparty")
+@RequestMapping("/api/v1/counterparties")
 @RequiredArgsConstructor
 public class CounterpartyController {
 

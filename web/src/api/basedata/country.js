@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function listCountry(params) {
   return request({
-    url: '/basedata/countries',
+    url: '/api/country/page',
     method: 'get',
     params
   })
@@ -10,14 +10,14 @@ export function listCountry(params) {
 
 export function getCountry(id) {
   return request({
-    url: `/basedata/countries/${id}`,
+    url: `/api/country/${id}`,
     method: 'get'
   })
 }
 
 export function saveCountry(data) {
   return request({
-    url: '/basedata/countries',
+    url: '/api/country',
     method: 'post',
     data
   })
@@ -25,7 +25,7 @@ export function saveCountry(data) {
 
 export function updateCountry(data) {
   return request({
-    url: '/basedata/countries',
+    url: '/api/country',
     method: 'put',
     data
   })
@@ -33,14 +33,14 @@ export function updateCountry(data) {
 
 export function deleteCountry(id) {
   return request({
-    url: `/basedata/countries/${id}`,
+    url: `/api/country/${id}`,
     method: 'delete'
   })
 }
 
 export function batchDeleteCountry(ids) {
   return request({
-    url: '/basedata/countries/batch-delete',
+    url: '/api/country/batch-delete',
     method: 'post',
     data: { ids }
   })
@@ -48,7 +48,7 @@ export function batchDeleteCountry(ids) {
 
 export function exportCountry(params) {
   return request({
-    url: '/basedata/countries/export',
+    url: '/api/country/export',
     method: 'get',
     params,
     responseType: 'blob'
@@ -57,7 +57,7 @@ export function exportCountry(params) {
 
 export function importCountry(formData) {
   return request({
-    url: '/basedata/countries/import',
+    url: '/api/country/import',
     method: 'post',
     data: formData,
     headers: { 'Content-Type': 'multipart/form-data' }

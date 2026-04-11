@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function listHoliday(params) {
   return request({
-    url: '/basedata/holidays',
+    url: '/api/holiday/page',
     method: 'get',
     params
   })
@@ -10,14 +10,14 @@ export function listHoliday(params) {
 
 export function getHoliday(id) {
   return request({
-    url: `/basedata/holidays/${id}`,
+    url: `/api/holiday/${id}`,
     method: 'get'
   })
 }
 
 export function saveHoliday(data) {
   return request({
-    url: '/basedata/holidays',
+    url: '/api/holiday',
     method: 'post',
     data
   })
@@ -25,7 +25,7 @@ export function saveHoliday(data) {
 
 export function updateHoliday(data) {
   return request({
-    url: '/basedata/holidays',
+    url: '/api/holiday',
     method: 'put',
     data
   })
@@ -33,14 +33,14 @@ export function updateHoliday(data) {
 
 export function deleteHoliday(id) {
   return request({
-    url: `/basedata/holidays/${id}`,
+    url: `/api/holiday/${id}`,
     method: 'delete'
   })
 }
 
 export function batchDeleteHoliday(ids) {
   return request({
-    url: '/basedata/holidays/batch-delete',
+    url: '/api/holiday/batch-delete',
     method: 'post',
     data: { ids }
   })
@@ -48,7 +48,7 @@ export function batchDeleteHoliday(ids) {
 
 export function exportHoliday(params) {
   return request({
-    url: '/basedata/holidays/export',
+    url: '/api/holiday/export',
     method: 'get',
     params,
     responseType: 'blob'
@@ -57,7 +57,7 @@ export function exportHoliday(params) {
 
 export function importHoliday(formData) {
   return request({
-    url: '/basedata/holidays/import',
+    url: '/api/holiday/import',
     method: 'post',
     data: formData,
     headers: { 'Content-Type': 'multipart/form-data' }

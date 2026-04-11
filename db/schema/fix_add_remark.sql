@@ -2,12 +2,7 @@
 -- PostgreSQL
 -- 执行: psql -U opentms -d opentms -f fix_add_remark.sql
 
--- 基础数据模块
-ALTER TABLE tms_business_unit_t ADD COLUMN remark VARCHAR(500);
-ALTER TABLE tms_trader_t ADD COLUMN remark VARCHAR(500);
-ALTER TABLE tms_currency_t ADD COLUMN remark VARCHAR(500);
-ALTER TABLE tms_country_t ADD COLUMN remark VARCHAR(500);
-ALTER TABLE tms_holiday_t ADD COLUMN remark VARCHAR(500);
+
 ALTER TABLE tms_bank_t ADD COLUMN remark VARCHAR(500);
 ALTER TABLE tms_counterparty_t ADD COLUMN remark VARCHAR(500);
 ALTER TABLE tms_counterparty_account_t ADD COLUMN remark VARCHAR(500);

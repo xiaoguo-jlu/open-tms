@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/business-unit")
+@RequestMapping("/api/v1/business-units")
 @RequiredArgsConstructor
 public class BusinessUnitController {
 

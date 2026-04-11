@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function listCurrency(params) {
   return request({
-    url: '/basedata/currencies',
+    url: '/api/currency/page',
     method: 'get',
     params
   })
@@ -10,14 +10,14 @@ export function listCurrency(params) {
 
 export function getCurrency(id) {
   return request({
-    url: `/basedata/currencies/${id}`,
+    url: `/api/currency/${id}`,
     method: 'get'
   })
 }
 
 export function saveCurrency(data) {
   return request({
-    url: '/basedata/currencies',
+    url: '/api/currency',
     method: 'post',
     data
   })
@@ -25,7 +25,7 @@ export function saveCurrency(data) {
 
 export function updateCurrency(data) {
   return request({
-    url: '/basedata/currencies',
+    url: '/api/currency',
     method: 'put',
     data
   })
@@ -33,14 +33,14 @@ export function updateCurrency(data) {
 
 export function deleteCurrency(id) {
   return request({
-    url: `/basedata/currencies/${id}`,
+    url: `/api/currency/${id}`,
     method: 'delete'
   })
 }
 
 export function batchDeleteCurrency(ids) {
   return request({
-    url: '/basedata/currencies/batch-delete',
+    url: '/api/currency/batch-delete',
     method: 'post',
     data: { ids }
   })
@@ -48,7 +48,7 @@ export function batchDeleteCurrency(ids) {
 
 export function exportCurrency(params) {
   return request({
-    url: '/basedata/currencies/export',
+    url: '/api/currency/export',
     method: 'get',
     params,
     responseType: 'blob'
@@ -57,7 +57,7 @@ export function exportCurrency(params) {
 
 export function importCurrency(formData) {
   return request({
-    url: '/basedata/currencies/import',
+    url: '/api/currency/import',
     method: 'post',
     data: formData,
     headers: { 'Content-Type': 'multipart/form-data' }

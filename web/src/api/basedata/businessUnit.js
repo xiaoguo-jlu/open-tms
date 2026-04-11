@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function listBusinessUnit(params) {
   return request({
-    url: '/basedata/business-units',
+    url: '/api/business-unit/page',
     method: 'get',
     params
   })
@@ -10,14 +10,14 @@ export function listBusinessUnit(params) {
 
 export function getBusinessUnit(id) {
   return request({
-    url: `/basedata/business-units/${id}`,
+    url: `/api/business-unit/${id}`,
     method: 'get'
   })
 }
 
 export function saveBusinessUnit(data) {
   return request({
-    url: '/basedata/business-units',
+    url: '/api/business-unit',
     method: 'post',
     data
   })
@@ -25,7 +25,7 @@ export function saveBusinessUnit(data) {
 
 export function updateBusinessUnit(data) {
   return request({
-    url: '/basedata/business-units',
+    url: '/api/business-unit',
     method: 'put',
     data
   })
@@ -33,14 +33,14 @@ export function updateBusinessUnit(data) {
 
 export function deleteBusinessUnit(id) {
   return request({
-    url: `/basedata/business-units/${id}`,
+    url: `/api/business-unit/${id}`,
     method: 'delete'
   })
 }
 
 export function batchDeleteBusinessUnit(ids) {
   return request({
-    url: '/basedata/business-units/batch-delete',
+    url: '/api/business-unit/batch-delete',
     method: 'post',
     data: { ids }
   })
@@ -48,7 +48,7 @@ export function batchDeleteBusinessUnit(ids) {
 
 export function exportBusinessUnit(params) {
   return request({
-    url: '/basedata/business-units/export',
+    url: '/api/business-unit/export',
     method: 'get',
     params,
     responseType: 'blob'
@@ -57,7 +57,7 @@ export function exportBusinessUnit(params) {
 
 export function importBusinessUnit(formData) {
   return request({
-    url: '/basedata/business-units/import',
+    url: '/api/business-unit/import',
     method: 'post',
     data: formData,
     headers: { 'Content-Type': 'multipart/form-data' }

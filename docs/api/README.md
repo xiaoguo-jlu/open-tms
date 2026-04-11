@@ -43,6 +43,19 @@
 
 ## 目录
 
+### M0-基础数据模块
+
+| 序号 | 文档 | 路径 |
+|------|------|------|
+| 01 | [币种管理](./03-currency.md) | `/api/v1/currencies` |
+| 02 | [银行管理](./06-bank.md) | `/api/v1/banks` |
+| 03 | [交易对手](./07-counterparty.md) | `/api/v1/counterparties` |
+| 04 | [对手账户](./08-counterparty-account.md) | `/api/v1/counterparty-accounts` |
+| 05 | [业务单元](./01-business-unit.md) | `/api/v1/business-units` |
+| 06 | [交易员](./02-trader.md) | `/api/v1/traders` |
+| 07 | [国家/地区](./04-country.md) | `/api/v1/countries` |
+| 08 | [节假日](./05-holiday.md) | `/api/v1/holidays` |
+
 ### M1-交易管理模块
 
 | 序号 | 文档 | 路径 |

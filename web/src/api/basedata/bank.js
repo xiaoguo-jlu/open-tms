@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function listBank(params) {
   return request({
-    url: '/basedata/banks',
+    url: '/api/bank/page',
     method: 'get',
     params
   })
@@ -10,14 +10,14 @@ export function listBank(params) {
 
 export function getBank(id) {
   return request({
-    url: `/basedata/banks/${id}`,
+    url: `/api/bank/${id}`,
     method: 'get'
   })
 }
 
 export function saveBank(data) {
   return request({
-    url: '/basedata/banks',
+    url: '/api/bank',
     method: 'post',
     data
   })
@@ -25,7 +25,7 @@ export function saveBank(data) {
 
 export function updateBank(data) {
   return request({
-    url: '/basedata/banks',
+    url: '/api/bank',
     method: 'put',
     data
   })
@@ -33,14 +33,14 @@ export function updateBank(data) {
 
 export function deleteBank(id) {
   return request({
-    url: `/basedata/banks/${id}`,
+    url: `/api/bank/${id}`,
     method: 'delete'
   })
 }
 
 export function batchDeleteBank(ids) {
   return request({
-    url: '/basedata/banks/batch-delete',
+    url: '/api/bank/batch-delete',
     method: 'post',
     data: { ids }
   })
@@ -48,7 +48,7 @@ export function batchDeleteBank(ids) {
 
 export function exportBank(params) {
   return request({
-    url: '/basedata/banks/export',
+    url: '/api/bank/export',
     method: 'get',
     params,
     responseType: 'blob'
@@ -57,7 +57,7 @@ export function exportBank(params) {
 
 export function importBank(formData) {
   return request({
-    url: '/basedata/banks/import',
+    url: '/api/bank/import',
     method: 'post',
     data: formData,
     headers: { 'Content-Type': 'multipart/form-data' }

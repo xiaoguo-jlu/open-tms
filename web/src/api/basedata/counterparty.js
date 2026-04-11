@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function listCounterparty(params) {
   return request({
-    url: '/basedata/counterparties',
+    url: '/api/counterparty/page',
     method: 'get',
     params
   })
@@ -10,14 +10,14 @@ export function listCounterparty(params) {
 
 export function getCounterparty(id) {
   return request({
-    url: `/basedata/counterparties/${id}`,
+    url: `/api/counterparty/${id}`,
     method: 'get'
   })
 }
 
 export function saveCounterparty(data) {
   return request({
-    url: '/basedata/counterparties',
+    url: '/api/counterparty',
     method: 'post',
     data
   })
@@ -25,7 +25,7 @@ export function saveCounterparty(data) {
 
 export function updateCounterparty(data) {
   return request({
-    url: '/basedata/counterparties',
+    url: '/api/counterparty',
     method: 'put',
     data
   })
@@ -33,14 +33,14 @@ export function updateCounterparty(data) {
 
 export function deleteCounterparty(id) {
   return request({
-    url: `/basedata/counterparties/${id}`,
+    url: `/api/counterparty/${id}`,
     method: 'delete'
   })
 }
 
 export function batchDeleteCounterparty(ids) {
   return request({
-    url: '/basedata/counterparties/batch-delete',
+    url: '/api/counterparty/batch-delete',
     method: 'post',
     data: { ids }
   })
@@ -48,7 +48,7 @@ export function batchDeleteCounterparty(ids) {
 
 export function exportCounterparty(params) {
   return request({
-    url: '/basedata/counterparties/export',
+    url: '/api/counterparty/export',
     method: 'get',
     params,
     responseType: 'blob'
@@ -57,7 +57,7 @@ export function exportCounterparty(params) {
 
 export function importCounterparty(formData) {
   return request({
-    url: '/basedata/counterparties/import',
+    url: '/api/counterparty/import',
     method: 'post',
     data: formData,
     headers: { 'Content-Type': 'multipart/form-data' }

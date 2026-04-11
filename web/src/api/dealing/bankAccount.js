@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function listBankAccount(params) {
   return request({
-    url: '/dealing/bank-account/bank-accounts',
+    url: '/api/v1/bank-accounts',
     method: 'get',
     params
   })
@@ -10,14 +10,14 @@ export function listBankAccount(params) {
 
 export function getBankAccount(id) {
   return request({
-    url: `/dealing/bank-account/bank-accounts/${id}`,
+    url: `/api/v1/bank-accounts/${id}`,
     method: 'get'
   })
 }
 
 export function saveBankAccount(data) {
   return request({
-    url: '/dealing/bank-account/bank-accounts',
+    url: '/api/v1/bank-accounts',
     method: 'post',
     data
   })
@@ -25,7 +25,7 @@ export function saveBankAccount(data) {
 
 export function updateBankAccount(data) {
   return request({
-    url: '/dealing/bank-account/bank-accounts',
+    url: '/api/v1/bank-accounts',
     method: 'put',
     data
   })
@@ -33,58 +33,66 @@ export function updateBankAccount(data) {
 
 export function deleteBankAccount(id) {
   return request({
-    url: `/dealing/bank-account/bank-accounts/${id}`,
+    url: `/api/v1/bank-accounts/${id}`,
     method: 'delete'
-  })
-}
-
-export function enableBankAccount(id) {
-  return request({
-    url: `/dealing/bank-account/bank-accounts/${id}/enable`,
-    method: 'post'
-  })
-}
-
-export function disableBankAccount(id) {
-  return request({
-    url: `/dealing/bank-account/bank-accounts/${id}/disable`,
-    method: 'post'
   })
 }
 
 export function getAccountBalance(id) {
   return request({
-    url: `/dealing/bank-account/bank-accounts/${id}/balance`,
+    url: `/api/v1/bank-accounts/${id}/balance`,
     method: 'get'
   })
 }
 
-export function getAccountStatement(params) {
+export function getAccountTransactions(id, params) {
   return request({
-    url: '/dealing/bank-account/bank-accounts/statement',
+    url: `/api/v1/bank-accounts/${id}/transactions`,
     method: 'get',
     params
   })
 }
 
-export function testEbankingConnection(data) {
+export function batchDeleteBankAccount(ids) {
   return request({
-    url: '/dealing/bank-account/ebanking/test',
+    url: '/api/v1/bank-accounts/batch-delete',
     method: 'post',
-    data
+    data: { ids }
   })
 }
 
 export function syncBankAccount(id) {
   return request({
-    url: `/dealing/bank-account/bank-accounts/${id}/sync`,
+    url: `/api/v1/bank-accounts/${id}/sync`,
     method: 'post'
   })
 }
 
 export function reconcileAccount(id) {
   return request({
-    url: `/dealing/bank-account/bank-accounts/${id}/reconcile`,
+    url: `/api/v1/bank-accounts/${id}/reconcile`,
+    method: 'post'
+  })
+}
+
+export function testEbankingConnection(data) {
+  return request({
+    url: '/api/v1/bank-accounts/ebanking/test',
+    method: 'post',
+    data
+  })
+}
+
+export function enableBankAccount(id) {
+  return request({
+    url: `/api/v1/bank-accounts/${id}/enable`,
+    method: 'post'
+  })
+}
+
+export function disableBankAccount(id) {
+  return request({
+    url: `/api/v1/bank-accounts/${id}/disable`,
     method: 'post'
   })
 }

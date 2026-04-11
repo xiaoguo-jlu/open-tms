@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function listInstrument(params) {
   return request({
-    url: '/dealing/instrument/instruments',
+    url: '/api/v1/instruments',
     method: 'get',
     params
   })
@@ -10,14 +10,14 @@ export function listInstrument(params) {
 
 export function getInstrument(id) {
   return request({
-    url: `/dealing/instrument/instruments/${id}`,
+    url: `/api/v1/instruments/${id}`,
     method: 'get'
   })
 }
 
 export function saveInstrument(data) {
   return request({
-    url: '/dealing/instrument/instruments',
+    url: '/api/v1/instruments',
     method: 'post',
     data
   })
@@ -25,7 +25,7 @@ export function saveInstrument(data) {
 
 export function updateInstrument(data) {
   return request({
-    url: '/dealing/instrument/instruments',
+    url: '/api/v1/instruments',
     method: 'put',
     data
   })
@@ -33,14 +33,33 @@ export function updateInstrument(data) {
 
 export function deleteInstrument(id) {
   return request({
-    url: `/dealing/instrument/instruments/${id}`,
+    url: `/api/v1/instruments/${id}`,
     method: 'delete'
   })
 }
 
-export function listInstrumentType() {
+export function batchDeleteInstrument(ids) {
   return request({
-    url: '/dealing/instrument/instruments/types',
-    method: 'get'
+    url: '/api/v1/instruments/batch-delete',
+    method: 'post',
+    data: { ids }
+  })
+}
+
+export function exportInstrument(params) {
+  return request({
+    url: '/api/v1/instruments/export',
+    method: 'get',
+    params,
+    responseType: 'blob'
+  })
+}
+
+export function importInstrument(formData) {
+  return request({
+    url: '/api/v1/instruments/import',
+    method: 'post',
+    data: formData,
+    headers: { 'Content-Type': 'multipart/form-data' }
   })
 }

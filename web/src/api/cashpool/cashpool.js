@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function listCashPool(params) {
   return request({
-    url: '/cashpools',
+    url: '/api/v1/cash-pools',
     method: 'get',
     params
   })
@@ -10,22 +10,24 @@ export function listCashPool(params) {
 
 export function getCashPool(id) {
   return request({
-    url: `/cashpools/${id}`,
+    url: `/api/v1/cash-pools/${id}`,
     method: 'get'
   })
 }
 
-export function saveCashPool(data) {
+export function createCashPool(data) {
   return request({
-    url: '/cashpools',
+    url: '/api/v1/cash-pools',
     method: 'post',
     data
   })
 }
 
+export const saveCashPool = createCashPool
+
 export function updateCashPool(data) {
   return request({
-    url: '/cashpools',
+    url: '/api/v1/cash-pools',
     method: 'put',
     data
   })
@@ -33,21 +35,21 @@ export function updateCashPool(data) {
 
 export function deleteCashPool(id) {
   return request({
-    url: `/cashpools/${id}`,
+    url: `/api/v1/cash-pools/${id}`,
     method: 'delete'
   })
 }
 
-export function listCashPoolMember(poolId) {
+export function listCashPoolMember(id) {
   return request({
-    url: `/cashpools/${poolId}/members`,
+    url: `/api/v1/cash-pools/${id}/members`,
     method: 'get'
   })
 }
 
-export function addCashPoolMember(poolId, data) {
+export function addCashPoolMember(id, data) {
   return request({
-    url: `/cashpools/${poolId}/members`,
+    url: `/api/v1/cash-pools/${id}/members`,
     method: 'post',
     data
   })
@@ -55,14 +57,14 @@ export function addCashPoolMember(poolId, data) {
 
 export function removeCashPoolMember(poolId, memberId) {
   return request({
-    url: `/cashpools/${poolId}/members/${memberId}`,
+    url: `/api/v1/cash-pools/${poolId}/members/${memberId}`,
     method: 'delete'
   })
 }
 
 export function listAutoRule(params) {
   return request({
-    url: '/cashpools/rules',
+    url: '/api/v1/cash-pools/rules',
     method: 'get',
     params
   })
@@ -70,37 +72,81 @@ export function listAutoRule(params) {
 
 export function getAutoRule(id) {
   return request({
-    url: `/cashpools/rules/${id}`,
+    url: `/api/v1/cash-pools/rules/${id}`,
     method: 'get'
   })
 }
 
 export function saveAutoRule(data) {
   return request({
-    url: '/cashpools/rules',
+    url: '/api/v1/cash-pools/rules',
     method: 'post',
     data
   })
 }
 
-export function updateAutoRule(data) {
+export function testAutoRule(id) {
   return request({
-    url: '/cashpools/rules',
+    url: `/api/v1/cash-pools/rules/${id}/test`,
+    method: 'post'
+  })
+}
+
+export function getCashPoolRules(id) {
+  return request({
+    url: `/api/v1/cash-pools/${id}/rules`,
+    method: 'get'
+  })
+}
+
+export const saveAutoRule2 = createCashPoolRule
+
+export function createCashPoolRule(id, data) {
+  return request({
+    url: `/api/v1/cash-pools/${id}/rules`,
+    method: 'post',
+    data
+  })
+}
+
+export function updateCashPoolRule(data) {
+  return request({
+    url: '/api/v1/cash-pools/rules',
     method: 'put',
     data
   })
 }
 
-export function deleteAutoRule(id) {
+export function deleteCashPoolRule(id) {
   return request({
-    url: `/cashpools/rules/${id}`,
+    url: `/api/v1/cash-pools/rules/${id}`,
     method: 'delete'
   })
 }
 
-export function testAutoRule(id) {
+export const deleteAutoRule = deleteCashPoolRule
+
+export const updateAutoRule = updateCashPoolRule
+
+export function transferCashPool(id, data) {
   return request({
-    url: `/cashpools/rules/${id}/test`,
-    method: 'post'
+    url: `/api/v1/cash-pools/${id}/transfer`,
+    method: 'post',
+    data
+  })
+}
+
+export function getCashPoolTransfers(id, params) {
+  return request({
+    url: `/api/v1/cash-pools/${id}/transfers`,
+    method: 'get',
+    params
+  })
+}
+
+export function getCashPoolBalance(id) {
+  return request({
+    url: `/api/v1/cash-pools/${id}/balance`,
+    method: 'get'
   })
 }
