@@ -46,7 +46,7 @@ public class IrsDealController {
         }
         return Result.success(Map.of(
             "dealId", id,
-            "dealCode", deal.getDealCode(),
+            "dealCode", deal.getDealNo(),
             "valuation", BigDecimal.ZERO,
             "currency", deal.getCurrency(),
             "valuationDate", java.time.LocalDate.now()

@@ -17,7 +17,7 @@ public class IrsDealServiceImpl extends ServiceImpl<IrsDealMapper, IrsDeal> impl
         LambdaQueryWrapper<IrsDeal> wrapper = new LambdaQueryWrapper<>();
 
         if (StringUtils.hasText(keyword)) {
-            wrapper.like(IrsDeal::getDealCode, keyword);
+            wrapper.like(IrsDeal::getDealNo, keyword);
         }
 
         if (StringUtils.hasText(dealType)) {
@@ -44,7 +44,7 @@ public class IrsDealServiceImpl extends ServiceImpl<IrsDealMapper, IrsDeal> impl
 
     @Override
     public boolean saveIrsDeal(IrsDeal irsDeal) {
-        if (StringUtils.hasText(irsDeal.getDealCode()) && checkCodeExists(irsDeal.getDealCode(), null)) {
+        if (StringUtils.hasText(irsDeal.getDealNo()) && checkCodeExists(irsDeal.getDealNo(), null)) {
             throw new RuntimeException("Deal code already exists");
         }
         if (irsDeal.getStatus() == null) {
@@ -55,7 +55,7 @@ public class IrsDealServiceImpl extends ServiceImpl<IrsDealMapper, IrsDeal> impl
 
     @Override
     public boolean updateIrsDeal(IrsDeal irsDeal) {
-        if (StringUtils.hasText(irsDeal.getDealCode()) && checkCodeExists(irsDeal.getDealCode(), irsDeal.getId())) {
+        if (StringUtils.hasText(irsDeal.getDealNo()) && checkCodeExists(irsDeal.getDealNo(), irsDeal.getId())) {
             throw new RuntimeException("Deal code already exists");
         }
         return updateById(irsDeal);
@@ -97,7 +97,7 @@ public class IrsDealServiceImpl extends ServiceImpl<IrsDealMapper, IrsDeal> impl
             return false;
         }
         LambdaQueryWrapper<IrsDeal> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(IrsDeal::getDealCode, code);
+        wrapper.eq(IrsDeal::getDealNo, code);
         if (excludeId != null) {
             wrapper.ne(IrsDeal::getId, excludeId);
         }

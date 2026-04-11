@@ -11,29 +11,25 @@ public class FxDealVO {
 
     private Long id;
 
-    private String code;
+    private String dealNo;
 
-    private String name;
-
-    private String fxType;
+    private String dealType;
 
     private String buyCurrency;
 
     private String sellCurrency;
 
-    private BigDecimal amount;
+    private BigDecimal buyAmount;
+
+    private BigDecimal sellAmount;
 
     private BigDecimal rate;
 
     private Long counterpartyId;
 
-    private String counterpartyName;
-
-    private Long accountId;
-
-    private String accountName;
-
     private LocalDate valueDate;
+
+    private LocalDate maturityDate;
 
     private String status;
 

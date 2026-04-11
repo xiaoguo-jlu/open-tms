@@ -134,16 +134,16 @@ public class FxDealServiceImpl extends ServiceImpl<FxDealMapper, FxDeal> impleme
     private FxDealVO convertToVO(FxDeal fxDeal) {
         FxDealVO vo = new FxDealVO();
         vo.setId(fxDeal.getId());
-        vo.setCode(fxDeal.getCode());
-        vo.setName(fxDeal.getName());
-        vo.setFxType(fxDeal.getFxType());
+        vo.setDealNo(fxDeal.getDealNo());
+        vo.setDealType(fxDeal.getDealType());
         vo.setBuyCurrency(fxDeal.getBuyCurrency());
         vo.setSellCurrency(fxDeal.getSellCurrency());
-        vo.setAmount(fxDeal.getAmount());
+        vo.setBuyAmount(fxDeal.getBuyAmount());
+        vo.setSellAmount(fxDeal.getSellAmount());
         vo.setRate(fxDeal.getRate());
         vo.setCounterpartyId(fxDeal.getCounterpartyId());
-        vo.setAccountId(fxDeal.getAccountId());
         vo.setValueDate(fxDeal.getValueDate());
+        vo.setMaturityDate(fxDeal.getMaturityDate());
         vo.setStatus(fxDeal.getStatus());
         vo.setRemark(fxDeal.getRemark());
         vo.setCreatedAt(fxDeal.getCreatedAt());
