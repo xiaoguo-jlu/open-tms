@@ -174,12 +174,9 @@ gh issue edit <number> -R xiaoguo-jlu/open-tms --add-label "Dev,Task" --body "##
 ### 3. 修复并验证
 - 检查Entity字段与数据库表结构是否一致
 - 编译验证: `mvn compile -f basedata/pom.xml`
-- 使用PowerShell测试POST接口:
+- 运行测试脚本验证POST接口:
 ```powershell
-$baseUrl = "http://localhost:8081/api/v1"
-$r = Invoke-WebRequest -Uri "$baseUrl/banks" -Method POST -ContentType "application/json" -Body '{"code":"TEST","name":"测试","status":"1"}' -UseBasicParsing
-Write-Host "Status: $($r.StatusCode)"
-Write-Host "Response: $($r.Content)"
+powershell -File test/scripts/basedata/test_all_post.ps1
 ```
 
 ### 4. 提交并转交QA
@@ -244,26 +241,11 @@ public class GlobalExceptionHandler {
 }
 ```
 
-### 2. 验证所有POST接口
+### 2. 运行测试脚本验证接口
 ```powershell
-# 测试所有基础数据POST接口
-$baseUrl = "http://localhost:8081/api/v1"
-$tests = @(
-    @{path="/banks"; body='{"code":"TEST","name":"Test","status":"1"}'}
-    @{path="/business-units"; body='{"code":"TEST","name":"Test","status":"1"}'}
-    @{path="/traders"; body='{"code":"TEST","name":"Test","status":"1"}'}
-    @{path="/countries"; body='{"code":"TT","name":"Test","status":"1"}'}
-    @{path="/counterparties"; body='{"code":"TEST","name":"Test","status":"1"}'}
-    @{path="/currencies"; body='{"code":"TST","name":"Test","status":"1"}'}
-    @{path="/counterparty-accounts"; body='{"accountNo":"TEST","counterpartyId":1,"bankId":1,"status":"1"}'}
-)
+# 测试基础数据模块所有POST接口
+powershell -File test/scripts/basedata/test_all_post.ps1
 
-foreach ($t in $tests) {
-    try {
-        $r = Invoke-WebRequest -Uri "$baseUrl$($t.path)" -Method POST -ContentType "application/json" -Body $t.body -UseBasicParsing -ErrorAction Stop
-        Write-Host "$($t.path): $($r.StatusCode) OK"
-    } catch {
-        Write-Host "$($t.path): FAILED - $($_.Exception.Response.StatusCode.Value__)"
-    }
-}
+# 其他模块测试脚本
+# test/scripts/<module>/test_*.ps1
 ```
