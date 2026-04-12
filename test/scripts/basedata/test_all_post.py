@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
 基础数据模块 POST API 测试脚本
-Usage: python test/scripts/basedata/test_all_post.py
+使用urllib代替requests（内置库）
 """
 
-import requests
+import urllib.request
+import urllib.error
 import json
 import sys
 
@@ -13,21 +14,23 @@ BASE_URL = "http://localhost:8081/api/v1"
 def test_post(path, data, desc):
     """测试POST接口"""
     try:
-        response = requests.post(
+        req = urllib.request.Request(
             f"{BASE_URL}{path}",
-            json=data,
-            headers={"Content-Type": "application/json"},
-            timeout=10
+            data=json.dumps(data).encode('utf-8'),
+            headers={'Content-Type': 'application/json'},
+            method='POST'
         )
-        if response.status_code == 200:
-            print(f"[✓] {desc} - {path}: {response.status_code} OK")
+        response = urllib.request.urlopen(req, timeout=10)
+        if response.status == 200:
+            print(f"[OK] {desc} - {path}: {response.status} OK")
             return True
-        else:
-            print(f"[✗] {desc} - {path}: {response.status_code} FAILED")
-            return False
-    except requests.exceptions.RequestException as e:
-        print(f"[✗] {desc} - {path}: ERROR - {e}")
-        return False
+    except urllib.error.HTTPError as e:
+        print(f"[FAIL] {desc} - {path}: {e.code}")
+    except urllib.error.URLError as e:
+        print(f"[FAIL] {desc} - {path}: ERROR - {e.reason}")
+    except Exception as e:
+        print(f"[FAIL] {desc} - {path}: ERROR - {e}")
+    return False
 
 def main():
     print("=== Basedata POST API Test ===\n")
@@ -46,7 +49,9 @@ def main():
     for path, data, desc in tests:
         results.append(test_post(path, data, desc))
 
-    print(f"\n=== Summary: {sum(results)}/{len(results)} passed ===")
+    passed = sum(results)
+    total = len(results)
+    print(f"\n=== Summary: {passed}/{total} passed ===")
     return 0 if all(results) else 1
 
 if __name__ == "__main__":

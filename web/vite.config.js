@@ -12,35 +12,35 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      '/api/business-unit': {
+      '/api/v1/business-units': {
         target: 'http://localhost:8081',
         changeOrigin: true
       },
-      '/api/trader': {
+      '/api/v1/traders': {
         target: 'http://localhost:8081',
         changeOrigin: true
       },
-      '/api/currency': {
+      '/api/v1/currencies': {
         target: 'http://localhost:8081',
         changeOrigin: true
       },
-      '/api/country': {
+      '/api/v1/countries': {
         target: 'http://localhost:8081',
         changeOrigin: true
       },
-      '/api/bank': {
+      '/api/v1/banks': {
         target: 'http://localhost:8081',
         changeOrigin: true
       },
-      '/api/counterparty': {
+      '/api/v1/counterparties': {
         target: 'http://localhost:8081',
         changeOrigin: true
       },
-      '/api/counterparty-account': {
+      '/api/v1/counterparty-accounts': {
         target: 'http://localhost:8081',
         changeOrigin: true
       },
-      '/api/holiday': {
+      '/api/v1/holidays': {
         target: 'http://localhost:8081',
         changeOrigin: true
       },

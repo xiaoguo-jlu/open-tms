@@ -128,7 +128,7 @@ const fetchData = async () => {
       pageSize: pagination.pageSize
     }
     const res = await listCurrency(params)
-    tableData.value = res.data.list || []
+    tableData.value = res.data.records || res.data.list || []
     pagination.total = res.data.total || 0
   } catch (error) {
     console.error('Failed to fetch data:', error)

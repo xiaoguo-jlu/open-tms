@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function listBank(params) {
   return request({
-    url: '/api/bank/page',
+    url: '/api/v1/banks/page',
     method: 'get',
     params
   })
@@ -10,14 +10,14 @@ export function listBank(params) {
 
 export function getBank(id) {
   return request({
-    url: `/api/bank/${id}`,
+    url: `/api/v1/banks/${id}`,
     method: 'get'
   })
 }
 
 export function saveBank(data) {
   return request({
-    url: '/api/bank',
+    url: '/api/v1/banks',
     method: 'post',
     data
   })
@@ -25,7 +25,7 @@ export function saveBank(data) {
 
 export function updateBank(data) {
   return request({
-    url: '/api/bank',
+    url: '/api/v1/banks',
     method: 'put',
     data
   })
@@ -33,14 +33,14 @@ export function updateBank(data) {
 
 export function deleteBank(id) {
   return request({
-    url: `/api/bank/${id}`,
+    url: `/api/v1/banks/${id}`,
     method: 'delete'
   })
 }
 
 export function batchDeleteBank(ids) {
   return request({
-    url: '/api/bank/batch-delete',
+    url: '/api/v1/banks/batch-delete',
     method: 'post',
     data: { ids }
   })
@@ -48,7 +48,7 @@ export function batchDeleteBank(ids) {
 
 export function exportBank(params) {
   return request({
-    url: '/api/bank/export',
+    url: '/api/v1/banks/export',
     method: 'get',
     params,
     responseType: 'blob'
@@ -57,7 +57,7 @@ export function exportBank(params) {
 
 export function importBank(formData) {
   return request({
-    url: '/api/bank/import',
+    url: '/api/v1/banks/import',
     method: 'post',
     data: formData,
     headers: { 'Content-Type': 'multipart/form-data' }

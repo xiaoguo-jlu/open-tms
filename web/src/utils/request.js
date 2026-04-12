@@ -22,7 +22,7 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   response => {
     const res = response.data
-    if (res.code === 0) {
+    if (res.code === 0 || res.code === 200) {
       return res
     }
     ElMessage.error(res.message || '操作失败')
