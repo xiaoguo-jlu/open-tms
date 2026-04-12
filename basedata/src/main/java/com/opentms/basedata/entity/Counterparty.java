@@ -26,8 +26,6 @@ public class Counterparty {
 
     private String status;
 
-    private String remark;
-
     private String createdBy;
 
     private java.time.LocalDateTime createdAt;
