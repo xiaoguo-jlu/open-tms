@@ -175,8 +175,8 @@ gh issue edit <number> -R xiaoguo-jlu/open-tms --add-label "Dev,Task" --body "##
 - 检查Entity字段与数据库表结构是否一致
 - 编译验证: `mvn compile -f basedata/pom.xml`
 - 运行测试脚本验证POST接口:
-```powershell
-powershell -File test/scripts/basedata/test_all_post.ps1
+```bash
+python test/scripts/basedata/test_all_post.py
 ```
 
 ### 4. 提交并转交QA
@@ -242,10 +242,10 @@ public class GlobalExceptionHandler {
 ```
 
 ### 2. 运行测试脚本验证接口
-```powershell
+```bash
 # 测试基础数据模块所有POST接口
-powershell -File test/scripts/basedata/test_all_post.ps1
+python test/scripts/basedata/test_all_post.py
 
 # 其他模块测试脚本
-# test/scripts/<module>/test_*.ps1
+# python test/scripts/<module>/test_*.py
 ```
