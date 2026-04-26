@@ -32,6 +32,9 @@ public class CurrencyController {
 
     @GetMapping("/{id}")
     public Result<CurrencyVO> getById(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            return Result.badRequest("ID参数格式不正确");
+        }
         return Result.success(currencyService.getById(id));
     }
 
@@ -53,6 +56,9 @@ public class CurrencyController {
 
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
+        if (id == null || id <= 0) {
+            return Result.badRequest("ID必须为正整数");
+        }
         currencyService.removeById(id);
         return Result.success();
     }
