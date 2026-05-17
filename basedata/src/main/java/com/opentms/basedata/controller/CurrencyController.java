@@ -31,11 +31,16 @@ public class CurrencyController {
     }
 
     @GetMapping("/{id}")
-    public Result<CurrencyVO> getById(@PathVariable Long id) {
-        if (id == null || id <= 0) {
+    public Result<CurrencyVO> getById(@PathVariable String id) {
+        try {
+            Long parseId = Long.parseLong(id);
+            if (parseId <= 0) {
+                return Result.badRequest("ID必须为正整数");
+            }
+            return Result.success(currencyService.getById(parseId));
+        } catch (NumberFormatException e) {
             return Result.badRequest("ID参数格式不正确");
         }
-        return Result.success(currencyService.getById(id));
     }
 
     @GetMapping("/code/{code}")
@@ -55,11 +60,16 @@ public class CurrencyController {
     }
 
     @DeleteMapping("/{id}")
-    public Result<Void> delete(@PathVariable Long id) {
-        if (id == null || id <= 0) {
-            return Result.badRequest("ID必须为正整数");
+    public Result<Void> delete(@PathVariable String id) {
+        try {
+            Long parseId = Long.parseLong(id);
+            if (parseId <= 0) {
+                return Result.badRequest("ID必须为正整数");
+            }
+            currencyService.removeById(parseId);
+            return Result.success();
+        } catch (NumberFormatException e) {
+            return Result.badRequest("ID参数格式不正确");
         }
-        currencyService.removeById(id);
-        return Result.success();
     }
 }

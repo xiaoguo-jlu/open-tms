@@ -23,9 +23,9 @@
       <el-table :data="tableData" v-loading="loading" stripe>
         <el-table-column type="selection" width="50" align="center" />
         <el-table-column type="index" label="序号" width="60" align="center" />
-        <el-table-column prop="currencyCode" label="币种代码" width="120" />
-        <el-table-column prop="currencyName" label="币种名称" width="150" />
-        <el-table-column prop="currencySymbol" label="符号" width="80" />
+        <el-table-column prop="code" label="币种代码" width="120" />
+        <el-table-column prop="name" label="币种名称" width="150" />
+        <el-table-column prop="symbol" label="符号" width="80" />
         <el-table-column prop="decimalPlaces" label="小数位数" width="100" align="center" />
         <el-table-column prop="status" label="状态" width="80" align="center">
           <template #default="{ row }">
@@ -57,14 +57,14 @@
 
     <el-drawer v-model="drawerVisible" :title="drawerTitle" direction="rtl" size="480px">
       <el-form ref="formRef" :model="formData" :rules="rules" label-width="100px">
-        <el-form-item label="币种代码" prop="currencyCode">
-          <el-input v-model="formData.currencyCode" placeholder="如: CNY, USD" :disabled="isEdit" />
+        <el-form-item label="币种代码" prop="code">
+          <el-input v-model="formData.code" placeholder="如: CNY, USD" :disabled="isEdit" />
         </el-form-item>
-        <el-form-item label="币种名称" prop="currencyName">
-          <el-input v-model="formData.currencyName" placeholder="如: 人民币, 美元" />
+        <el-form-item label="币种名称" prop="name">
+          <el-input v-model="formData.name" placeholder="如: 人民币, 美元" />
         </el-form-item>
-        <el-form-item label="币种符号" prop="currencySymbol">
-          <el-input v-model="formData.currencySymbol" placeholder="如: ¥, $" />
+        <el-form-item label="币种符号" prop="symbol">
+          <el-input v-model="formData.symbol" placeholder="如: ¥, $" />
         </el-form-item>
         <el-form-item label="小数位数" prop="decimalPlaces">
           <el-input-number v-model="formData.decimalPlaces" :min="0" :max="10" />
@@ -102,16 +102,16 @@ const pagination = reactive({ pageNum: 1, pageSize: 10, total: 0 })
 
 const formData = reactive({
   id: null,
-  currencyCode: '',
-  currencyName: '',
-  currencySymbol: '',
+  code: '',
+  name: '',
+  symbol: '',
   decimalPlaces: 2,
   status: '1'
 })
 
 const rules = {
-  currencyCode: [{ required: true, message: '请输入币种代码', trigger: 'blur' }],
-  currencyName: [{ required: true, message: '请输入币种名称', trigger: 'blur' }],
+  code: [{ required: true, message: '请输入币种代码', trigger: 'blur' }],
+  name: [{ required: true, message: '请输入币种名称', trigger: 'blur' }],
   decimalPlaces: [{ required: true, message: '请输入小数位数', trigger: 'blur' }]
 }
 
@@ -127,7 +127,9 @@ const fetchData = async () => {
       pageNum: pagination.pageNum,
       pageSize: pagination.pageSize
     }
+    console.log('Fetching currency with params:', params)
     const res = await listCurrency(params)
+    console.log('Currency response:', res)
     tableData.value = res.data.records || res.data.list || []
     pagination.total = res.data.total || 0
   } catch (error) {
@@ -150,7 +152,7 @@ const handleReset = () => {
 
 const handleAdd = () => {
   Object.assign(formData, {
-    id: null, currencyCode: '', currencyName: '', currencySymbol: '', decimalPlaces: 2, status: '1'
+    id: null, code: '', name: '', symbol: '', decimalPlaces: 2, status: '1'
   })
   formRef.value?.resetFields()
   drawerVisible.value = true
