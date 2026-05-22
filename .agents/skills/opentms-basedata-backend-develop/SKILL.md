@@ -1,6 +1,6 @@
 ---
 name: opentms-basedata-backend-develop
-description: Use when developing backend code for Open-TMS basedata module (currency, country, bank, counterparty, trader, business unit), including entity design, service implementation, REST API development, or code review
+description: Use when developing backend code for Open-TMS basedata module (currency, country, bank, counterparty, trader, business unit,currency pair, rate, management entity), including entity design, service implementation, REST API development, or code review
 ---
 
 # Open-TMS 基础数据模块后端开发规范
@@ -111,6 +111,7 @@ public class Currency {
 |------------|----------|------|
 | id | id | Long |
 | code | code | String |
+| name | name | String |
 | created_by | createdBy | String |
 | created_at | createdAt | LocalDateTime |
 | decimal_places | decimalPlaces | Integer |
