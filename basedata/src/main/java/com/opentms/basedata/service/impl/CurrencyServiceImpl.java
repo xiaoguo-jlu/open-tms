@@ -1,5 +1,6 @@
 package com.opentms.basedata.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.opentms.basedata.dto.CurrencyDTO;
 import com.opentms.basedata.entity.Currency;
 import com.opentms.basedata.mapper.CurrencyMapper;
@@ -7,10 +8,20 @@ import com.opentms.basedata.service.CurrencyService;
 import com.opentms.basedata.vo.CurrencyVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 @Service
 @Slf4j
 public class CurrencyServiceImpl extends BasedataServiceImpl<CurrencyMapper, Currency, CurrencyDTO, CurrencyVO> implements CurrencyService {
+
+    @Override
+    public List<CurrencyVO> listAll() {
+        LambdaQueryWrapper<Currency> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Currency::getStatus, "1");
+        return baseMapper.selectList(wrapper).stream()
+                .map(this::convertToVO)
+                .collect(java.util.stream.Collectors.toList());
+    }
 
     @Override
     protected CurrencyVO convertToVO(Currency entity) {

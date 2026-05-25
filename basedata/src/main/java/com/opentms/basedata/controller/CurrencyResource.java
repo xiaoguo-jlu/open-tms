@@ -18,8 +18,9 @@ public class CurrencyResource {
     }
 
     @GET
+    @Produces(jakarta.ws.rs.core.MediaType.APPLICATION_JSON)
     public Object list() {
-        return currencyService.listAll();
+        return com.opentms.common.model.Result.success(currencyService.listAll());
     }
 
     @GET

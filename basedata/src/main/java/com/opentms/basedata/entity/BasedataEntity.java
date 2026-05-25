@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@TableName(autoResultMap = true)
 public abstract class BasedataEntity extends BaseEntity {
 
     @TableId(type = IdType.AUTO)

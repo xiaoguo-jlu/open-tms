@@ -5,6 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
+@TableName(autoResultMap = true)
 public class BaseEntity {
 
     @TableId(type = IdType.AUTO)

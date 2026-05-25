@@ -9,9 +9,15 @@ spring:
     url: jdbc:postgresql://localhost:5432/opentms
     username: opentms
     password: opentms123
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
 
 cxf:
-  path: /v1
+  path: /opentms/basedata
+  jaxrs:
+    component-scan: true
 
 mybatis-plus:
   global-config:
