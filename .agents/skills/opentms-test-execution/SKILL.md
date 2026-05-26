@@ -1,3 +1,8 @@
+---
+name: opentms-test-execution
+description: Use when executing Open-TMS test cases and tracking defects as QA Engineer
+---
+
 # Open-TMS 测试执行 Skill (QA)
 
 ## 简介

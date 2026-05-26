@@ -1,3 +1,8 @@
+---
+name: opentms-db-design
+description: Use when designing Open-TMS database schema and table structures as Technical Architect
+---
+
 # Open-TMS 数据库设计 Skill (DB)
 
 ## 简介

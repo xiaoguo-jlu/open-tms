@@ -1,3 +1,8 @@
+---
+name: opentms-test-case-design
+description: Use when designing Open-TMS test cases from requirements as QA Engineer
+---
+
 # Open-TMS 测试用例设计 Skill (QA)
 
 ## 简介

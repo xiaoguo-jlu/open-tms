@@ -1,3 +1,8 @@
+---
+name: opentms-api-design
+description: Use when designing Open-TMS backend API contracts and documentation as Technical Architect
+---
+
 # Open-TMS 后端接口设计 Skill (API)
 
 ## 简介

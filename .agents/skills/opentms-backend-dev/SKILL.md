@@ -1,3 +1,8 @@
+---
+name: opentms-backend-dev
+description: Use when implementing Open-TMS backend API and business logic as Backend Developer
+---
+
 # Open-TMS 后端开发 Skill (BE)
 
 ## 简介

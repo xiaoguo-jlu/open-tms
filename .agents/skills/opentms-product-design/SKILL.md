@@ -1,3 +1,8 @@
+---
+name: opentms-product-design
+description: Use when designing Open-TMS product requirements and PRD as Product Manager
+---
+
 # Open-TMS 产品设计 Skill (PM)
 
 ## 简介
@@ -232,7 +237,8 @@ docs/
 
 **操作**：
 
-1. 根据输出规范模板编写PRD
+1. 识别对其他特性的前置依赖，如果有前置依赖性未完成，中断流程并建议用户先完成前置依赖特性的设计
+2. 根据输出规范模板编写PRD
 2. 确保包含所有必要章节
 3. 功能描述清晰、无歧义
 4. 验收标准明确、可测试

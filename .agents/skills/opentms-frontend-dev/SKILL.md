@@ -1,3 +1,8 @@
+---
+name: opentms-frontend-dev
+description: Use when implementing Open-TMS frontend pages and components as Frontend Developer
+---
+
 # Open-TMS 前端开发 Skill (FE)
 
 ## 简介

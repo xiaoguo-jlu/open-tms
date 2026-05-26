@@ -1,3 +1,8 @@
+---
+name: opentms-ux-design
+description: Use when designing Open-TMS UI/UX prototypes and interaction design as UX Designer
+---
+
 # Open-TMS UX交互设计 Skill (UX)
 
 ## 简介
