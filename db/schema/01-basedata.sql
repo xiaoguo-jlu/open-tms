@@ -32,6 +32,7 @@ CREATE TABLE tms_trader_t (
     department VARCHAR(100),
     phone VARCHAR(30),
     email VARCHAR(100),
+    remark VARCHAR(500),
     status CHAR(1) NOT NULL DEFAULT '1',
     created_by VARCHAR(50) NOT NULL DEFAULT 'system',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

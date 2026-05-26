@@ -1,72 +1,62 @@
 package com.opentms.basedata.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.opentms.basedata.dto.TraderDTO;
 import com.opentms.basedata.entity.Trader;
 import com.opentms.basedata.mapper.TraderMapper;
 import com.opentms.basedata.service.TraderService;
+import com.opentms.basedata.vo.TraderVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
+@Slf4j
 @Service
-public class TraderServiceImpl extends ServiceImpl<TraderMapper, Trader> implements TraderService {
+public class TraderServiceImpl extends BasedataServiceImpl<TraderMapper, Trader, TraderDTO, TraderVO> implements TraderService {
 
     @Override
-    public Page<Trader> queryPage(String keyword, String status, int pageNum, int pageSize) {
-        LambdaQueryWrapper<Trader> wrapper = new LambdaQueryWrapper<>();
-
-        if (StringUtils.hasText(keyword)) {
-            wrapper.like(Trader::getCode, keyword)
-                   .or()
-                   .like(Trader::getName, keyword);
-        }
-
-        if (StringUtils.hasText(status)) {
-            wrapper.eq(Trader::getStatus, status);
-        }
-
-        wrapper.orderByDesc(Trader::getCreatedAt);
-
-        return page(new Page<>(pageNum, pageSize), wrapper);
+    protected TraderVO convertToVO(Trader entity) {
+        TraderVO vo = new TraderVO();
+        vo.setId(entity.getId());
+        vo.setCode(entity.getCode());
+        vo.setName(entity.getName());
+        vo.setEnName(entity.getEnName());
+        vo.setDepartment(entity.getDepartment());
+        vo.setPhone(entity.getPhone());
+        vo.setEmail(entity.getEmail());
+        vo.setStatus(entity.getStatus());
+        vo.setRemark(entity.getRemark());
+        vo.setCreatedAt(entity.getCreatedAt());
+        vo.setUpdatedAt(entity.getUpdatedAt());
+        return vo;
     }
 
     @Override
-    public Trader getTraderById(Long id) {
-        return getById(id);
+    protected Trader convertToEntity(TraderDTO dto) {
+        Trader entity = new Trader();
+        entity.setId(dto.getId());
+        entity.setCode(dto.getCode());
+        entity.setName(dto.getName());
+        entity.setEnName(dto.getEnName());
+        entity.setDepartment(dto.getDepartment());
+        entity.setPhone(dto.getPhone());
+        entity.setEmail(dto.getEmail());
+        entity.setStatus(dto.getStatus());
+        entity.setRemark(dto.getRemark());
+        return entity;
     }
 
     @Override
-    public boolean saveTrader(Trader trader) {
-        if (checkCodeExists(trader.getCode(), null)) {
-            throw new RuntimeException("Trader code already exists");
-        }
-        return save(trader);
+    protected void updateEntityFromDTO(Trader entity, TraderDTO dto) {
+        entity.setName(dto.getName());
+        entity.setEnName(dto.getEnName());
+        entity.setDepartment(dto.getDepartment());
+        entity.setPhone(dto.getPhone());
+        entity.setEmail(dto.getEmail());
+        entity.setStatus(dto.getStatus());
+        entity.setRemark(dto.getRemark());
     }
 
     @Override
-    public boolean updateTrader(Trader trader) {
-        if (checkCodeExists(trader.getCode(), trader.getId())) {
-            throw new RuntimeException("Trader code already exists");
-        }
-        return updateById(trader);
-    }
-
-    @Override
-    public boolean deleteTrader(Long id) {
-        return removeById(id);
-    }
-
-    @Override
-    public boolean checkCodeExists(String code, Long excludeId) {
-        if (!StringUtils.hasText(code)) {
-            return false;
-        }
-        LambdaQueryWrapper<Trader> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Trader::getCode, code);
-        if (excludeId != null) {
-            wrapper.ne(Trader::getId, excludeId);
-        }
-        return count(wrapper) > 0;
+    protected String getEntityName() {
+        return "交易员";
     }
 }

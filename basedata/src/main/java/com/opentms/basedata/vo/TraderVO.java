@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class TraderVO extends BaseVO {
+public class TraderVO extends BasedataVO {
 
     private String enName;
 

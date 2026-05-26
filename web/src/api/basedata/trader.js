@@ -45,21 +45,3 @@ export function batchDeleteTrader(ids) {
     data: { ids }
   })
 }
-
-export function exportTrader(params) {
-  return request({
-    url: '/api/v1/traders/export',
-    method: 'get',
-    params,
-    responseType: 'blob'
-  })
-}
-
-export function importTrader(formData) {
-  return request({
-    url: '/api/v1/traders/import',
-    method: 'post',
-    data: formData,
-    headers: { 'Content-Type': 'multipart/form-data' }
-  })
-}
