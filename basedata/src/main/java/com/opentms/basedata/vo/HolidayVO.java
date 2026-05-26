@@ -1,33 +1,20 @@
 package com.opentms.basedata.vo;
-
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 @Data
 public class HolidayVO {
-
     private Long id;
-
-    @TableField("holiday_date")
     private LocalDate holidayDate;
-
     private String name;
-
-    @TableField("country_code")
     private String countryCode;
-
-    @TableField("is_adjust")
-    private String isAdjust;
-
+    private String isAdjacent;
     private String remark;
-
     private String createdBy;
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
-
     private String updatedBy;
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
 }

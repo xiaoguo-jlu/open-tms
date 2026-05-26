@@ -72,6 +72,7 @@ CREATE TABLE tms_country_t (
     en_name VARCHAR(100),
     timezone VARCHAR(50),
     country_no VARCHAR(10),
+    remark VARCHAR(500),
     status CHAR(1) NOT NULL DEFAULT '1',
     created_by VARCHAR(50) NOT NULL DEFAULT 'system',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -131,6 +132,7 @@ CREATE TABLE tms_counterparty_t (
     counterparty_type VARCHAR(20),
     country_code VARCHAR(10),
     swift_code VARCHAR(20),
+    remark VARCHAR(500),
     status CHAR(1) NOT NULL DEFAULT '1',
     created_by VARCHAR(50) NOT NULL DEFAULT 'system',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -222,6 +224,70 @@ CREATE TABLE tms_approval_record_t (
 COMMENT ON TABLE tms_approval_record_t IS '审批记录表';
 CREATE INDEX idx_ar_biz ON tms_approval_record_t(biz_type, biz_id);
 CREATE INDEX idx_ar_status ON tms_approval_record_t(approval_status);
+
+-- 转账交易表 (AT)
+CREATE TABLE tms_transfer_t (
+    id BIGSERIAL PRIMARY KEY,
+    transfer_no VARCHAR(50) NOT NULL,
+    transfer_date DATE NOT NULL,
+    business_unit VARCHAR(50) NOT NULL,
+    from_account VARCHAR(50) NOT NULL,
+    to_account VARCHAR(50) NOT NULL,
+    amount DECIMAL(18,2) NOT NULL,
+    currency VARCHAR(10) NOT NULL,
+    expected_date DATE NOT NULL,
+    payment_method VARCHAR(20) NOT NULL,
+    transfer_reason VARCHAR(200),
+    transfer_type VARCHAR(20) NOT NULL,
+    need_authorization CHAR(1) NOT NULL DEFAULT '0',
+    status VARCHAR(20) NOT NULL DEFAULT 'New',
+    applicant VARCHAR(50) NOT NULL,
+    remark VARCHAR(500),
+    created_by VARCHAR(50) NOT NULL DEFAULT 'system',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by VARCHAR(50),
+    updated_at TIMESTAMP,
+    version INT DEFAULT 0,
+    deleted CHAR(1) DEFAULT '0'
+);
+COMMENT ON TABLE tms_transfer_t IS '转账交易表';
+CREATE INDEX idx_transfer_no ON tms_transfer_t(transfer_no);
+CREATE INDEX idx_transfer_date ON tms_transfer_t(transfer_date);
+CREATE INDEX idx_transfer_from ON tms_transfer_t(from_account);
+CREATE INDEX idx_transfer_to ON tms_transfer_t(to_account);
+CREATE INDEX idx_transfer_status ON tms_transfer_t(status);
+
+-- 实际现金流表
+CREATE TABLE tms_cashflow_t (
+    id BIGSERIAL PRIMARY KEY,
+    cashflow_no VARCHAR(50) NOT NULL,
+    business_unit VARCHAR(50) NOT NULL,
+    bank_account VARCHAR(50) NOT NULL,
+    counterparty_account VARCHAR(50),
+    direction VARCHAR(10) NOT NULL,
+    amount DECIMAL(18,2) NOT NULL,
+    currency VARCHAR(10) NOT NULL,
+    cashflow_date DATE NOT NULL,
+    value_date DATE NOT NULL,
+    source_type VARCHAR(20) NOT NULL,
+    source_ref VARCHAR(50) NOT NULL,
+    sub_type VARCHAR(20),
+    bank_ref VARCHAR(50),
+    statement_no VARCHAR(50),
+    status VARCHAR(20) NOT NULL DEFAULT 'Created',
+    counterparty_name VARCHAR(200),
+    purpose VARCHAR(500),
+    created_by VARCHAR(50) NOT NULL DEFAULT 'system',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by VARCHAR(50),
+    updated_at TIMESTAMP,
+    version INT DEFAULT 0,
+    deleted CHAR(1) DEFAULT '0'
+);
+COMMENT ON TABLE tms_cashflow_t IS '实际现金流表';
+CREATE INDEX idx_cf_no ON tms_cashflow_t(cashflow_no);
+CREATE INDEX idx_cf_bank_account ON tms_cashflow_t(bank_account);
+CREATE INDEX idx_cf_status ON tms_cashflow_t(status);
 
 -- 初始数据
 INSERT INTO tms_currency_t (code, name, symbol, decimal_places, created_by) VALUES

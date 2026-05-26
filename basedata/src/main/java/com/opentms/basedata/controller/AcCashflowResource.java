@@ -1,8 +1,8 @@
 package com.opentms.basedata.controller;
 
-import com.opentms.basedata.dto.CounterpartyDTO;
-import com.opentms.basedata.service.CounterpartyService;
-import com.opentms.basedata.vo.CounterpartyVO;
+import com.opentms.basedata.dto.AcCashflowDTO;
+import com.opentms.basedata.service.AcCashflowService;
+import com.opentms.basedata.vo.AcCashflowVO;
 import com.opentms.common.model.Result;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -10,62 +10,70 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-@Path("/api/v1/counterparties")
-public class CounterpartyResource {
+@Path("/api/v1/ac/cashflows")
+public class AcCashflowResource {
 
     @Autowired
-    private CounterpartyService counterpartyService;
+    private AcCashflowService acCashflowService;
 
-    public CounterpartyResource() {
+    public AcCashflowResource() {
     }
 
     @GET
-    @Path("/page")
     @Produces(MediaType.APPLICATION_JSON)
     public Object page(
             @QueryParam("keyword") String keyword,
             @QueryParam("status") String status,
+            @QueryParam("bankAccount") String bankAccount,
+            @QueryParam("direction") String direction,
             @QueryParam("pageNum") @DefaultValue("1") int pageNum,
             @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
-        CounterpartyDTO dto = new CounterpartyDTO();
+        AcCashflowDTO dto = new AcCashflowDTO();
         dto.setKeyword(keyword);
         dto.setStatus(status);
-        return counterpartyService.queryPage(dto, pageNum, pageSize);
+        dto.setBankAccount(bankAccount);
+        dto.setDirection(direction);
+        return acCashflowService.queryPage(dto, pageNum, pageSize);
     }
 
     @GET
     @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Object getById(@PathParam("id") String id) {
         try {
             long parseId = Long.parseLong(id);
             if (parseId <= 0) {
                 return Result.badRequest("ID必须为正整数");
             }
-            CounterpartyVO vo = counterpartyService.getById(parseId);
+            AcCashflowVO vo = acCashflowService.getById(parseId);
             return vo != null ?
-                Result.success(vo) :
-                Result.notFound("交易对手不存在");
+                    Result.success(vo) :
+                    Result.notFound("现金流水不存在");
         } catch (NumberFormatException e) {
             return Result.badRequest("ID参数格式不正确");
         }
     }
 
     @POST
-    public Object save(CounterpartyDTO dto) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Object save(AcCashflowDTO dto) {
         try {
-            return Result.success(counterpartyService.save(dto));
+            return Result.success(acCashflowService.save(dto));
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
     }
 
     @PUT
-    public Object update(CounterpartyDTO dto) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Object update(AcCashflowDTO dto) {
         try {
             if (dto.getId() == null) {
                 return Result.badRequest("ID不能为空");
             }
-            return Result.success(counterpartyService.updateById(dto));
+            return Result.success(acCashflowService.updateById(dto));
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
@@ -73,13 +81,14 @@ public class CounterpartyResource {
 
     @DELETE
     @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Object delete(@PathParam("id") String id) {
         try {
             long parseId = Long.parseLong(id);
             if (parseId <= 0) {
                 return Result.badRequest("ID必须为正整数");
             }
-            counterpartyService.removeById(parseId);
+            acCashflowService.removeById(parseId);
             return Result.success();
         } catch (NumberFormatException e) {
             return Result.badRequest("ID参数格式不正确");
@@ -87,19 +96,17 @@ public class CounterpartyResource {
     }
 
     @POST
-    @Path("/batch-delete")
-    public Object batchDelete(java.util.Map<String, java.util.List<Long>> body) {
+    @Path("/{id}/confirm")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Object confirm(@PathParam("id") String id) {
         try {
-            java.util.List<Long> ids = body.get("ids");
-            if (ids == null || ids.isEmpty()) {
-                return Result.badRequest("ID列表不能为空");
+            long parseId = Long.parseLong(id);
+            if (parseId <= 0) {
+                return Result.badRequest("ID必须为正整数");
             }
-            for (Long id : ids) {
-                counterpartyService.removeById(id);
-            }
-            return Result.success();
-        } catch (Exception e) {
-            return Result.error(e.getMessage());
+            return Result.success(acCashflowService.confirm(parseId));
+        } catch (NumberFormatException e) {
+            return Result.badRequest("ID参数格式不正确");
         }
     }
 }

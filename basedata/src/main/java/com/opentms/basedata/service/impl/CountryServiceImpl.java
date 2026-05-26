@@ -1,72 +1,40 @@
 package com.opentms.basedata.service.impl;
-
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.opentms.basedata.dto.CountryDTO;
 import com.opentms.basedata.entity.Country;
 import com.opentms.basedata.mapper.CountryMapper;
 import com.opentms.basedata.service.CountryService;
+import com.opentms.basedata.vo.CountryVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
+@Slf4j
 @Service
-public class CountryServiceImpl extends ServiceImpl<CountryMapper, Country> implements CountryService {
-
+public class CountryServiceImpl extends BasedataServiceImpl<CountryMapper, Country, CountryDTO, CountryVO> implements CountryService {
     @Override
-    public Page<Country> queryPage(String keyword, String status, int pageNum, int pageSize) {
-        LambdaQueryWrapper<Country> wrapper = new LambdaQueryWrapper<>();
-
-        if (StringUtils.hasText(keyword)) {
-            wrapper.like(Country::getCode, keyword)
-                   .or()
-                   .like(Country::getName, keyword);
-        }
-
-        if (StringUtils.hasText(status)) {
-            wrapper.eq(Country::getStatus, status);
-        }
-
-        wrapper.orderByDesc(Country::getCreatedAt);
-
-        return page(new Page<>(pageNum, pageSize), wrapper);
+    protected CountryVO convertToVO(Country entity) {
+        CountryVO vo = new CountryVO();
+        vo.setId(entity.getId()); vo.setCode(entity.getCode()); vo.setName(entity.getName());
+        vo.setEnName(entity.getEnName()); vo.setTimezone(entity.getTimezone());
+        vo.setCountryNo(entity.getCountryNo());
+        vo.setStatus(entity.getStatus()); vo.setRemark(entity.getRemark());
+        vo.setCreatedAt(entity.getCreatedAt()); vo.setUpdatedAt(entity.getUpdatedAt());
+        return vo;
     }
-
     @Override
-    public Country getCountryById(Long id) {
-        return getById(id);
+    protected Country convertToEntity(CountryDTO dto) {
+        Country entity = new Country();
+        entity.setId(dto.getId()); entity.setCode(dto.getCode()); entity.setName(dto.getName());
+        entity.setEnName(dto.getEnName()); entity.setTimezone(dto.getTimezone());
+        entity.setCountryNo(dto.getCountryNo());
+        entity.setStatus(dto.getStatus()); entity.setRemark(dto.getRemark());
+        return entity;
     }
-
     @Override
-    public boolean saveCountry(Country country) {
-        if (checkCodeExists(country.getCode(), null)) {
-            throw new RuntimeException("Country code already exists");
-        }
-        return save(country);
+    protected void updateEntityFromDTO(Country entity, CountryDTO dto) {
+        entity.setName(dto.getName()); entity.setEnName(dto.getEnName());
+        entity.setTimezone(dto.getTimezone()); entity.setCountryNo(dto.getCountryNo());
+        entity.setStatus(dto.getStatus()); entity.setRemark(dto.getRemark());
     }
-
     @Override
-    public boolean updateCountry(Country country) {
-        if (checkCodeExists(country.getCode(), country.getId())) {
-            throw new RuntimeException("Country code already exists");
-        }
-        return updateById(country);
-    }
-
-    @Override
-    public boolean deleteCountry(Long id) {
-        return removeById(id);
-    }
-
-    @Override
-    public boolean checkCodeExists(String code, Long excludeId) {
-        if (!StringUtils.hasText(code)) {
-            return false;
-        }
-        LambdaQueryWrapper<Country> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Country::getCode, code);
-        if (excludeId != null) {
-            wrapper.ne(Country::getId, excludeId);
-        }
-        return count(wrapper) > 0;
-    }
+    protected String getEntityName() { return "国家"; }
 }

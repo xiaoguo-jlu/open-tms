@@ -1,19 +1,6 @@
 package com.opentms.basedata.service;
-
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.opentms.basedata.dto.CountryDTO;
 import com.opentms.basedata.entity.Country;
+import com.opentms.basedata.vo.CountryVO;
 
-public interface CountryService {
-
-    Page<Country> queryPage(String keyword, String status, int pageNum, int pageSize);
-
-    Country getCountryById(Long id);
-
-    boolean saveCountry(Country country);
-
-    boolean updateCountry(Country country);
-
-    boolean deleteCountry(Long id);
-
-    boolean checkCodeExists(String code, Long excludeId);
-}
+public interface CountryService extends BasedataService<Country, CountryDTO, CountryVO> {}

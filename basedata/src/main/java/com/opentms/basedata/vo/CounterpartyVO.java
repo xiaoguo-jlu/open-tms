@@ -5,19 +5,13 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class CounterpartyVO extends BaseVO {
+public class CounterpartyVO extends BasedataVO {
 
     private String enName;
 
-    private String type;
+    private String counterpartyType;
 
     private String countryCode;
 
-    private String creditRating;
-
-    private String extRating;
-
-    private String address;
-
-    private String phone;
+    private String swiftCode;
 }
