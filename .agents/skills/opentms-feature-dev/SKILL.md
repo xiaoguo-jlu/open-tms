@@ -63,6 +63,7 @@ description: Use when implementing a complete Open-TMS feature from design to te
 ┌─────────────────────────────────────────────────────────────────┐
 │                        特性启动 (Feature Kickoff)                │
 │  创建Feature Issue → 创建各角色Task → 确定版本范围和优先级       │
+│  ⚠️ 所有Task必须添加到GitHub Project进行跟踪                     │
 └─────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
@@ -73,6 +74,7 @@ description: Use when implementing a complete Open-TMS feature from design to te
 │   │  输出: PRD文档 (.md) + Feature Issue + US + Task        │   │
 │   └─────────────────────────────────────────────────────────┘   │
 │   质量门禁: PRD已评审通过 ✓                                    │
+│   ⚠️ PM Task → Done                                           │
 └─────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
@@ -83,6 +85,7 @@ description: Use when implementing a complete Open-TMS feature from design to te
 │   │  输出: UX原型文档 + 交互说明                             │   │
 │   └─────────────────────────────────────────────────────────┘   │
 │   质量门禁: 原型已评审通过 ✓                                   │
+│   ⚠️ UX Task → Done                                           │
 └─────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
@@ -103,7 +106,7 @@ description: Use when implementing a complete Open-TMS feature from design to te
                 │                                     │
                 │  ┌───────────────────────────────┐  │
                 │  │ Phase 3: 表结构设计 (TA/DB)    │  │
-                │  │ Skill: opentms-table-design   │  │
+                │  │ Skill: opentms-db-design     │  │
                 │  │ 输出: DDL SQL脚本              │  │
                 │  └───────────────────────────────┘  │
                 │                                     │
@@ -115,6 +118,7 @@ description: Use when implementing a complete Open-TMS feature from design to te
                 └────────────────────────────────────┘
                                     │
                    质量门禁: DDL已评审 + API已评审 ✓
+                   ⚠️ TA Task → Done
                                     │
                                     ▼
                 ┌────────────────────────────────────┐
@@ -135,6 +139,16 @@ description: Use when implementing a complete Open-TMS feature from design to te
                 └────────────────────────────────────┘
                                     │
                    质量门禁: 后端单元测试通过 + 前后端联调通过 ✓
+                   ⚠️ Dev Task → Done
+                                    │
+                                    ▼
+                ┌────────────────────────────────────┐
+                │   ⚠️ 启动本地服务 (测试前置条件)    │
+                │                                     │
+                │  后端: run_backend.py start         │
+                │  前端: npm run dev                   │
+                └────────────────────────────────────┘
+                                    │
                                     ▼
                 ┌────────────────────────────────────┐
                 │        测试阶段 (Phases 7+8)        │
@@ -151,29 +165,36 @@ description: Use when implementing a complete Open-TMS feature from design to te
                 │  │ Skill: opentms-test-execution │  │
                 │  │ 输出: 测试报告 + Bug单         │  │
                 │  └───────────────────────────────┘  │
-                └────────────────────────────────────┘
-                                    │
-                   质量门禁: P0用例100%通过 ✓
-                                    ▼
+                │                                     │
+                │  ⚠️ 发现Bug → 立即修复 → 回归验证   │◄──┐
+                │       (高优Bug阻塞测试)              │   │
+                │                                     │   │
+                │  ⚠️ QA Task → Done                │   │
+                └────────────────────────────────────┘   │
+                                    │                    │
+                   质量门禁: P0用例100%通过 ✓            │
+                                    │                    │
+                                    ▼                    │
 ┌─────────────────────────────────────────────────────────────────┐
 │                        特性交付 (Feature Done)                   │
 │  关闭Feature Issue → 更新发布说明 → 标记版本                    │
+│  ⚠️ 所有Task已Done → Feature关闭                               │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ### 3.2 各阶段角色分工
 
-| 阶段 | 角色 | Skill | 核心产出 |
-|------|------|-------|----------|
-| Phase 1 | PM | `opentms-product-design` | PRD文档、Feature/US/Task |
-| Phase 2 | UX | `opentms-ux-design` | UX原型、交互说明 |
+| 阶段 | 角色 | Skill                        | 核心产出 |
+|------|------|------------------------------|----------|
+| Phase 1 | PM | `opentms-product-design`     | PRD文档、Feature/US/Task |
+| Phase 2 | UX | `opentms-ux-design`          | UX原型、交互说明 |
 | Phase 3a | BA | `opentms-business-architect` | 业务架构设计（按需） |
-| Phase 3 | TA/DB | `opentms-table-design` | DDL SQL脚本 |
-| Phase 4 | TA/API | `opentms-api-design` | API接口文档 |
-| Phase 5 | BE | `opentms-backend-dev` | Java后端代码 |
-| Phase 6 | FE | `opentms-frontend-dev` | Vue前端代码 |
-| Phase 7 | QA | `opentms-test-case-design` | 测试用例 |
-| Phase 8 | QA | `opentms-test-execution` | 测试报告、Bug单 |
+| Phase 3 | TA/DB | `opentms-db-design`          | DDL SQL脚本 |
+| Phase 4 | TA/API | `opentms-api-design`         | API接口文档 |
+| Phase 5 | BE | `opentms-backend-dev`        | Java后端代码 |
+| Phase 6 | FE | `opentms-frontend-dev`       | Vue前端代码 |
+| Phase 7 | QA | `opentms-test-case-design`   | 测试用例 |
+| Phase 8 | QA | `opentms-test-execution`     | 测试报告、Bug单 |
 
 ### 3.3 特性开发时间线（参考）
 
@@ -268,6 +289,15 @@ Week 4:                                                 └──▶ 测试设�
    - [ ] 字段定义完整（类型、必填、说明）
    - [ ] 优先级标注清晰（P0/P1/P2）
 
+4. **完成后更新Task**:
+   ```bash
+   # 更新PM Task状态
+   gh issue edit <pm-task-issue-number> --add-label "Done"
+
+   # 更新Feature Issue进度
+   gh issue edit <feature-issue-number> --body "## PM设计\n✅ 已完成"
+   ```
+
 **质量门禁** — 进入下一阶段前必须满足：
 
 | 检查项 | 说明 |
@@ -275,6 +305,7 @@ Week 4:                                                 └──▶ 测试设�
 | PRD评审通过 | PM-Lead在Feature Issue中标记PRD已评审 |
 | Feature/US/Task已创建 | GitHub Projects中已创建工作项 |
 | PRD已归档 | 存入 `docs/prd/{模块}/` |
+| PM Task已标记Done | GitHub Project状态已更新 |
 
 ---
 
@@ -294,6 +325,15 @@ Week 4:                                                 └──▶ 测试设�
    - 空状态/错误状态/加载状态设计
    - 移动端适配（如有需求）
 
+4. **完成后更新Task**:
+   ```bash
+   # 更新UX Task状态
+   gh issue edit <ux-task-issue-number> --add-label "Done"
+
+   # 更新Feature Issue进度
+   gh issue edit <feature-issue-number> --body "## UX设计\n✅ 已完成"
+   ```
+
 **质量门禁** — 进入下一阶段前必须满足：
 
 | 检查项 | 说明 |
@@ -302,6 +342,7 @@ Week 4:                                                 └──▶ 测试设�
 | 交互说明完整 | 所有操作路径和状态变化已说明 |
 | 设计规范符合 | 配色、字体、间距与设计系统一致 |
 | 原型已归档 | 存入 `docs/原型/` |
+| UX Task已标记Done | GitHub Project状态已更新 |
 
 ---
 
@@ -336,6 +377,15 @@ Week 4:                                                 └──▶ 测试设�
 - 接口中的字段类型需与表设计一致
 - 复杂查询接口需在表设计中考虑索引
 
+**完成后更新Task**:
+```bash
+# 更新TA Task状态
+gh issue edit <ta-task-issue-number> --add-label "Done"
+
+# 更新Feature Issue进度
+gh issue edit <feature-issue-number> --body "## 表结构+API设计\n✅ 已完成"
+```
+
 **质量门禁** — 进入开发前必须满足：
 
 | 检查项 | 说明 |
@@ -344,6 +394,7 @@ Week 4:                                                 └──▶ 测试设�
 | API文档已评审 | TA已评审接口设计 |
 | 前后端数据模型一致 | 接口字段与业务字段匹配 |
 | 已创建数据库（如为新模块） | DDL已在目标数据库执行 |
+| TA Task已标记Done | GitHub Project状态已更新 |
 
 ---
 
@@ -367,6 +418,17 @@ Week 4:                                                 └──▶ 测试设�
    - DTO/VO → 数据传输对象
    - 单元测试 → 核心业务逻辑
 
+5. **开发完成提交**:
+   ```bash
+   # 提交后端代码
+   git add .
+   git commit -m "feat({module}): 完成{特性名}后端开发"
+   git push origin <branch>
+
+   # 更新Task状态到GitHub Project
+   gh issue edit <issue-number> --add-label "Done"
+   ```
+
 #### Phase 6: 前端开发
 
 1. **调用skill**: `opentms-frontend-dev`
@@ -382,12 +444,35 @@ Week 4:                                                 └──▶ 测试设�
    - 详情页（数据展示）
    - 交互状态（加载/空状态/错误）
 
+5. **开发完成提交**:
+   ```bash
+   # 提交前端代码
+   git add .
+   git commit -m "feat(web/{module}): 完成{特性名}前端开发"
+   git push origin <branch>
+
+   # 更新Task状态到GitHub Project
+   gh issue edit <issue-number> --add-label "Done"
+   ```
+
 **前后端联调检查点**：
 - [ ] 后端API可正常访问
 - [ ] 前端API调用正常
 - [ ] 数据格式一致
 - [ ] 错误处理正常
 - [ ] 分页查询正常
+
+**⚠️ 前后端联调后必须启动本地服务供测试执行**
+
+**后端服务启动**:
+```bash
+python .agents/skills/opentms-backend-dev/scripts/run_backend.py start
+```
+
+**前端服务启动**:
+```bash
+cd web && npm run dev
+```
 
 **质量门禁** — 进入测试前必须满足：
 
@@ -396,6 +481,8 @@ Week 4:                                                 └──▶ 测试设�
 | 后端单元测试通过 | mvn test 全部通过 |
 | 前后端联调通过 | 所有接口联调验证 |
 | 代码已提交 | 代码已push到远程分支 |
+| 后端服务已启动 | `run_backend.py start` 执行成功 |
+| 前端服务已启动 | `npm run dev` 执行成功 |
 | 无阻塞Bug | 无P0/P1级未修复Bug |
 
 ---
@@ -414,6 +501,12 @@ Week 4:                                                 └──▶ 测试设�
    - E2E测试用例（覆盖核心流程）
    - 测试数据设计
 
+4. **测试用例完成后**:
+   ```bash
+   # 更新Task状态
+   gh issue edit <issue-number> --add-label "Done"
+   ```
+
 #### Phase 8: 测试执行
 
 1. **调用skill**: `opentms-test-execution`
@@ -422,18 +515,61 @@ Week 4:                                                 └──▶ 测试设�
    ```
    P0用例（冒烟） → P1用例（功能） → P2用例（增强）
    ```
-4. **缺陷处理**:
-   - 发现Bug → 创建Bug Issue
-   - 高优Bug → 阻塞发布，立刻修复
-   - 中低Bug → 记录并在当前版本或下一版本修复
-   - 修复验证 → QA验证后关闭Bug
+4. **缺陷处理流程**:
+   ```
+   发现Bug → 创建Bug Issue → 高优Bug立刻修复 → QA回归验证 → 关闭Bug
+   ```
+
+   **发现Bug时**:
+   ```bash
+   # 创建Bug Issue
+   gh issue create \
+     --title "[Bug] {模块}-{缺陷简述}" \
+     --body "## 缺陷描述\n{详细描述}\n\n## 复现步骤\n1. ...\n\n## 预期结果\n...\n\n## 实际结果\n..." \
+     --label "Bug,Dev"
+   ```
+
+   **高优Bug（P0/P1）处理**:
+   - 阻塞测试执行
+   - 通知开发立即修复
+   - 修复后QA立即回归验证
+   - 验证通过后继续测试
+
+   **中低Bug（P2/P3）处理**:
+   - 记录到缺陷列表
+   - 当前版本修复或记录到下一版本
+   - 不阻塞测试继续
+
+5. **Bug修复后验证流程**:
+   ```bash
+   # 1. 开发修复Bug并提交代码
+   git add . && git commit -m "fix({module}): 修复{Bug编号}" && git push
+
+   # 2. QA拉取最新代码重新启动服务
+   python .agents/skills/opentms-backend-dev/scripts/run_backend.py restart
+
+   # 3. QA执行相关用例回归验证
+   python .agents/skills/opentms-test-execution/scripts/run_tests.py run <suite>
+
+   # 4. 验证通过后关闭Bug
+   gh issue close <bug-issue-number>
+   ```
+
+6. **测试完成后**:
+   ```bash
+   # 更新测试Task状态
+   gh issue edit <issue-number> --add-label "Done"
+
+   # 更新Feature Issue进度
+   gh issue edit <feature-issue-number> --body "## 测试状态\n✅ 测试通过"
+   ```
 
 **质量门禁** — 特性完成前必须满足：
 
 | 检查项 | 说明 |
 |--------|------|
 | P0用例100%通过 | 核心功能完整可用 |
-| 无未修复的P0/P1 Bug | 所有高优缺陷已处理 |
+| 所有P0/P1 Bug已修复 | 高优缺陷必须在本版本修复 |
 | 测试报告已生成 | 存入 `docs/testreport/` |
 | QA确认可交付 | QA在Feature Issue中标记测试通过 |
 
@@ -445,12 +581,16 @@ Week 4:                                                 └──▶ 测试设�
 
 **操作**：
 
-1. **更新Feature Issue**
+1. **最终检查**
+   - [ ] 所有Phase的Task都已标记Done
+   - [ ] Feature Issue中所有阶段都是✅状态
+
+2. **更新Feature Issue**
    ```bash
    gh issue edit <feature-issue-number> --body "## 状态\n已完成\n\n## 交付物\n- PRD: {链接}\n- UX原型: {链接}\n- DDL: {链接}\n- API文档: {链接}\n- 后端代码: {链接}\n- 前端代码: {链接}\n- 测试报告: {链接}\n\n## 缺陷列表\n- BUG_XXX: {描述} - 已关闭\n\n## 遗留问题\n- {遗留问题}"
    ```
 
-2. **更新版本发布说明**
+3. **更新版本发布说明**
    ```markdown
    ## v{版本号} 发布说明
    
@@ -464,7 +604,7 @@ Week 4:                                                 └──▶ 测试设�
    - {已知问题}
    ```
 
-3. **关闭Feature Issue**
+4. **关闭Feature Issue**
    ```bash
    gh issue close <feature-issue-number>
    ```
@@ -625,9 +765,59 @@ PM设计（明确定义模块边界）
 
 ---
 
-## 九、与其他Skill的关系
+## 九、工具自优化原则
 
-### 9.1 本skill编排的角色Skill
+### 9.1 工具问题处理原则
+
+**核心原则：当发现工具脚本有问题时，应该修复工具，而不是绕过工具。**
+
+| 发现的问题 | 正确做法 | 错误做法 |
+|-----------|----------|----------|
+| 测试脚本路径错误 | 修复脚本中的路径配置 | 改用curl手写命令 |
+| 测试脚本功能缺陷 | 修复脚本功能 | 放弃脚本另写命令 |
+| 服务启动脚本异常 | 修复启动脚本 | 手动启动服务 |
+
+### 9.2 自优化执行流程
+
+```
+发现工具问题 → 分析问题根因 → 修复工具脚本 → 验证修复 → 继续执行
+     │                                    │
+     │         ⚠️ 禁止：跳过工具/绕过工具  │
+     └────────────────────────────────────┘
+```
+
+### 9.3 典型场景示例
+
+**场景1：测试脚本run_tests.py路径配置错误**
+```
+错误做法：放弃使用run_tests.py，改用curl逐个测试
+正确做法：检查TEST_DIR路径配置，修复脚本，重新运行
+```
+
+**场景2：后端启动脚本run_backend.py启动失败**
+```
+错误做法：手动执行java -jar命令
+正确做法：检查脚本中的JAR路径和端口配置，修复脚本
+```
+
+### 9.4 自优化记录
+
+当修复工具脚本后，应记录修复内容：
+
+```markdown
+### 工具自优化记录
+- 日期: YYYY-MM-DD
+- 问题: {问题描述}
+- 根因: {根本原因}
+- 修复: {修复内容}
+- 验证: {验证结果}
+```
+
+---
+
+## 十、与其他Skill的关系
+
+### 10.1 本skill编排的角色Skill
 
 | 角色 | Skill | 职责 |
 |------|-------|------|
@@ -644,7 +834,7 @@ PM设计（明确定义模块边界）
 | QA | `opentms-test-case-design` | 测试用例设计 |
 | QA | `opentms-test-execution` | 测试执行 |
 
-### 9.2 本skill与其它skill的核心区别
+### 10.2 本skill与其它skill的核心区别
 
 | 对比维度 | 本skill | 各角色skill |
 |----------|---------|-------------|
@@ -656,9 +846,9 @@ PM设计（明确定义模块边界）
 
 ---
 
-## 十、交付物检查清单
+## 十一、交付物检查清单
 
-### 10.1 特性全流程总清单
+### 11.1 特性全流程总清单
 
 **产品阶段**：
 - [ ] PRD已归档到 `docs/prd/`
@@ -735,4 +925,5 @@ echo "特性 $NAME 已启动！Feature Issue: #$FEATURE_ISSUE"
 
 | 版本 | 日期 | 变更内容 |
 |------|------|---------|
-| v1.0 | YYYY-MM-DD | 初始版本 |
+| v1.1 | 2026-05-27 | 1. 完善GitHub Project协同：各阶段完成后必须更新Task状态为Done 2. 增加开发后启动本地服务步骤：后端run_backend.py start + 前端npm run dev 3. 完善Bug修复流程：高优Bug立即修复→QA回归验证→关闭Bug 4. 流程图标注关键节点 |
+| v1.0 | 2026-05-01 | 初始版本 |
