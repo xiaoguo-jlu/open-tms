@@ -282,58 +282,56 @@ docs/
 
 ### 步骤3：API接口测试执行
 
-**目的**：验证后端接口正确性。
+**目的**：使用自动化脚本验证后端接口正确性。
 
 **操作**：
 
-1. **选择测试工具**
-   - Postman：手动测试
-   - curl：快速验证
-   - pytest/newman：自动化测试
+1. **确认测试环境和脚本**
+   - 后端服务必须运行在 `http://localhost:8081`
+   - 确认测试脚本位置：`test/scripts/` 目录下各模块测试脚本
+   - 运行器脚本：`.agents/skills/opentms-test-execution/scripts/run_tests.py`
 
-2. **按接口分类执行**
-   - CRUD接口：列表→详情→新增→更新→删除
-   - 业务接口：按业务流程顺序
-   - 导出接口：验证文件生成
+2. **选择测试套件并执行**
+   ```bash
+   # 列出所有可用测试套件
+   python .agents/skills/opentms-test-execution/scripts/run_tests.py list
 
-3. **验证内容**
-   - 响应状态码
-   - 响应数据结构
-   - 业务逻辑正确性
-   - 金额计算精度
-   - 日期格式
+   # 运行指定模块测试
+   python .agents/skills/opentms-test-execution/scripts/run_tests.py run basedata  # 基于数据模块
+   python .agents/skills/opentms-test-execution/scripts/run_tests.py run ac        # 现金流模块
+   python .agents/skills/opentms-test-execution/scripts/run_tests.py run at        # 转账模块
+
+   # 运行全部测试套件
+   python .agents/skills/opentms-test-execution/scripts/run_tests.py run all
+
+   # 查看历史报告
+   python .agents/skills/opentms-test-execution/scripts/run_tests.py report basedata
+   ```
+
+3. **测试套件说明**
+   | 套件 | 测试范围 | 测试文件 |
+   |------|----------|----------|
+   | basedata | 币种/国家/银行/交易对手等基础数据API | test/scripts/basedata/test_all_post.py |
+   | ac | 实际现金流(AC) API | test/scripts/ac/test_ac_api.py |
+   | at | 账户转账(AT) API | test/scripts/at/test_at_api.py |
+   | full | 完整测试套件 | test/scripts/test_full.py |
 
 4. **记录接口测试结果**
+   - 脚本自动运行并输出测试结果
+   - 失败用例自动记录到 `test/reports/` 目录
+   - 查看报告：`python run_tests.py report <suite>`
+
+5. **快速验证（可选）**
+   仅当需要快速验证单个接口时使用curl：
+   ```bash
+   # 健康检查
+   curl -X GET "http://localhost:8081/api/health"
+
+   # 列表查询
+   curl -X GET "http://localhost:8081/api/v1/currencies"
    ```
-   | 接口 | 方法 | 路径 | 状态码 | 结果 |
-   |------|------|------|--------|------|
-   | 币种列表 | GET | /api/v1/currencies | 200 | Pass |
-   ```
 
-**API测试检查点**：
-```bash
-# 健康检查
-curl -X GET "http://localhost:8081/api/health"
-
-# 列表查询
-curl -X GET "http://localhost:8081/api/v1/currencies"
-
-# 详情查询
-curl -X GET "http://localhost:8081/api/v1/currencies/1"
-
-# 新增
-curl -X POST "http://localhost:8081/api/v1/currencies" \
-  -H "Content-Type: application/json" \
-  -d '{"code":"USD","name":"美元"}'
-
-# 更新
-curl -X PUT "http://localhost:8081/api/v1/currencies/1" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"美元修改"}'
-
-# 删除
-curl -X DELETE "http://localhost:8081/api/v1/currencies/1"
-```
+**注意**：正式测试必须使用 `run_tests.py` 脚本，禁止手写测试命令。手写curl仅用于快速探路验证。
 
 ### 步骤4：E2E端到端测试
 
@@ -518,24 +516,27 @@ gh issue close <issue-number>
 
 ```
 开发完成 ──▶ 测试准备 ──▶ 功能测试 ──▶ 缺陷跟踪
-                  │            │
-                  ▼            ▼
-             环境确认      缺陷单创建
-                  │            │
-                  ▼            ▼
-             测试数据      Dev修复
-                  │            │
-                  ▼            ▼
-             接口测试 ◀───────回归验证
-                  │
-                  ▼
-              E2E测试
-                  │
-                  ▼
-              测试报告
-                  │
-                  ▼
-              上线评审
+                   │            │
+                   ▼            ▼
+              环境确认      缺陷单创建
+                   │            │
+                   ▼            ▼
+              测试数据      Dev修复
+                   │            │
+                   ▼            ▼
+           ┌─ 自动化脚本 ─┐   回归验证
+           │  接口测试     │
+           │ (run_tests)  │
+           └──────────────┘
+                   │
+                   ▼
+               E2E测试
+                   │
+                   ▼
+               测试报告
+                   │
+                   ▼
+               上线评审
 ```
 
 ---
@@ -546,11 +547,12 @@ gh issue close <issue-number>
 
 | 检查项 | 标准 | 权重 |
 |--------|------|------|
-| 用例执行率 | P0 100%, P1≥90%, P2≥80% | 25% |
-| 缺陷报告率 | 100%记录所有发现缺陷 | 25% |
-| 报告完整性 | 包含所有必要章节 | 20% |
+| 用例执行率 | P0 100%, P1≥90%, P2≥80% | 20% |
+| 自动化脚本执行 | 必须使用run_tests.py运行测试 | 20% |
+| 缺陷报告率 | 100%记录所有发现缺陷 | 20% |
+| 报告完整性 | 包含所有必要章节 | 15% |
 | 证据完整性 | 失败用例有截图/日志 | 15% |
-| 缺陷跟踪 | 所有缺陷状态更新 | 15% |
+| 缺陷跟踪 | 所有缺陷状态更新 | 10% |
 
 ### 7.2 量化指标
 
@@ -570,6 +572,7 @@ gh issue close <issue-number>
 - [ ] 测试环境已确认
 - [ ] 测试版本已记录
 - [ ] P0用例100%执行
+- [ ] 使用 `run_tests.py` 脚本执行API测试（非手写命令）
 - [ ] 测试结果已记录
 - [ ] 失败用例有截图/日志
 
@@ -621,34 +624,37 @@ gh issue close <issue-number>
 
 ### 附录C：测试工具命令
 
-**Postman批量执行**：
+**测试运行器（主入口）**：
 ```bash
-# 导出Collection
-postman collection export
+# 查看可用测试套件
+python .agents/skills/opentms-test-execution/scripts/run_tests.py list
 
-# 使用newman执行
-newman run collection.json -e environment.json
+# 运行指定套件
+python .agents/skills/opentms-test-execution/scripts/run_tests.py run basedata
+
+# 运行全部
+python .agents/skills/opentms-test-execution/scripts/run_tests.py run all
+
+# 停止测试进程
+python .agents/skills/opentms-test-execution/scripts/run_tests.py stop
+
+# 查看报告
+python .agents/skills/opentms-test-execution/scripts/run_tests.py report basedata
 ```
 
-**curl快速测试**：
+**手动快速验证（仅快速探路用）**：
 ```bash
-# 封装测试脚本
-#!/bin/bash
-echo "=== API测试 ==="
+# 单接口验证
 curl -X GET "http://localhost:8081/api/v1/currencies"
-echo ""
+curl -X POST "http://localhost:8081/api/v1/currencies" \
+  -H "Content-Type: application/json" \
+  -d '{"code":"USD","name":"美元"}'
 ```
 
-**pytest自动化测试**：
-```python
-# test_api.py
-import requests
-
-def test_currency_list():
-    response = requests.get("http://localhost:8081/api/v1/currencies")
-    assert response.status_code == 200
-    assert response.json()["code"] == 0
-```
+**前置条件**：
+- Python 3.8+
+- requests库已安装：`pip install requests`
+- 后端服务必须运行在端口8081
 
 ### 附录D：常见缺陷模板
 
@@ -709,7 +715,8 @@ def test_currency_list():
 
 | 版本 | 日期 | 变更内容 |
 |------|------|---------|
-| v1.0 | YYYY-MM-DD | 初始版本 |
+| v1.1 | 2026-05-27 | 整合自动化测试脚本run_tests.py到主流程Step 3，移除手写curl命令为默认方式 |
+| v1.0 | 2026-05-01 | 初始版本 |
 
 ---
 
