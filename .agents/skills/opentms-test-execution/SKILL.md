@@ -710,3 +710,65 @@ def test_currency_list():
 | 版本 | 日期 | 变更内容 |
 |------|------|---------|
 | v1.0 | YYYY-MM-DD | 初始版本 |
+
+---
+
+## 附录E：测试执行脚本
+
+### 测试自动化运行器
+
+**脚本位置**: `.agents/skills/opentms-test-execution/scripts/run_tests.py`
+
+**功能**:
+- 列出可用测试套件
+- 运行指定测试套件
+- 运行全部测试套件
+- 生成测试报告
+- 停止运行中的测试
+
+**使用方法**:
+```bash
+# 列出可用测试套件
+python .agents/skills/opentms-test-execution/scripts/run_tests.py list
+
+# 运行基于数据模块测试
+python .agents/skills/opentms-test-execution/scripts/run_tests.py run basedata
+
+# 运行现金流测试
+python .agents/skills/opentms-test-execution/scripts/run_tests.py run ac
+
+# 运行转账测试
+python .agents/skills/opentms-test-execution/scripts/run_tests.py run at
+
+# 运行全部测试套件
+python .agents/skills/opentms-test-execution/scripts/run_tests.py run all
+
+# 停止运行中的测试
+python .agents/skills/opentms-test-execution/scripts/run_tests.py stop
+
+# 查看测试报告
+python .agents/skills/opentms-test-execution/scripts/run_tests.py report basedata
+```
+
+**测试套件目录结构**:
+```
+test/scripts/
+├── basedata/          # 基于数据模块测试 (currency, country, bank, etc.)
+├── ac/                # 现金流(AC)模块测试
+├── at/                # 转账(AT)模块测试
+├── general/           # 通用测试
+└── run_tests.py       # 测试运行器
+```
+
+**前置条件**:
+- Python 3.8+
+- requests库已安装: `pip install requests`
+- 后端服务必须运行在端口8081
+
+**测试套件说明**:
+| 套件 | 说明 | 测试文件 |
+|------|------|----------|
+| basedata | 币种/国家/银行等API | test_all_post.py |
+| ac | 实际现金流API | test_ac_api.py |
+| at | 账户转账API | test_at_api.py |
+| full | 完整测试套件 | test_full.py |

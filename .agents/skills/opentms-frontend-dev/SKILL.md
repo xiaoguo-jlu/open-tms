@@ -735,3 +735,36 @@ web/src/
 | 版本 | 日期 | 变更内容 |
 |------|------|---------|
 | v1.0 | YYYY-MM-DD | 初始版本 |
+
+---
+
+## 附录E：服务管理脚本
+
+### 前端服务管理
+
+**脚本位置**: `.agents/skills/opentms-frontend-dev/scripts/run_frontend.py`
+
+**功能**:
+- 启动/停止/重启前端开发服务器
+- 检查前端运行状态
+
+**使用方法**:
+```bash
+# 启动前端 (http://localhost:3000)
+python .agents/skills/opentms-frontend-dev/scripts/run_frontend.py start
+
+# 停止前端
+python .agents/skills/opentms-frontend-dev/scripts/run_frontend.py stop
+
+# 重启前端
+python .agents/skills/opentms-frontend-dev/scripts/run_frontend.py restart
+
+# 检查状态
+python .agents/skills/opentms-frontend-dev/scripts/run_frontend.py status
+```
+
+**依赖**:
+- Node.js 和 npm 必须已安装
+- 前端依赖已安装 (`cd web && npm install`)
+
+**端口**: 3000 (默认)

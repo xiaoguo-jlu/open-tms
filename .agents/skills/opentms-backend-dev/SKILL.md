@@ -757,3 +757,59 @@ Result.notFound(message)
 | 版本 | 日期 | 变更内容 |
 |------|------|---------|
 | v1.0 | YYYY-MM-DD | 初始版本 |
+
+---
+
+## 附录D：服务管理脚本
+
+### 后端服务管理
+
+**脚本位置**: `.agents/skills/opentms-backend-dev/scripts/run_backend.py`
+
+**功能**:
+- 启动/停止/重启后端Spring Boot服务
+- 自动构建（如JAR不存在）
+- 检查后端运行状态
+
+**使用方法**:
+```bash
+# 启动后端 (http://localhost:8081)
+python .agents/skills/opentms-backend-dev/scripts/run_backend.py start
+
+# 停止后端
+python .agents/skills/opentms-backend-dev/scripts/run_backend.py stop
+
+# 重启后端
+python .agents/skills/opentms-backend-dev/scripts/run_backend.py restart
+
+# 检查状态
+python .agents/skills/opentms-backend-dev/scripts/run_backend.py status
+```
+
+**依赖**:
+- Java 17+ 必须已安装
+- Maven 必须已安装
+- 基于数据模块 (basedata/) 已构建
+
+**端口**: 8081 (默认)
+
+**模块端口映射**:
+| 模块 | 端口 |
+|------|------|
+| basedata | 8081 |
+| dealing | 8082 |
+| bankaccount | 8083 |
+| instrument | 8084 |
+| fundplan | 8085 |
+| cashpool | 8086 |
+| settlement | 8087 |
+| limit | 8088 |
+| fx | 8089 |
+| irs | 8090 |
+| valuation | 8091 |
+| exposure | 8092 |
+| hedge | 8093 |
+| impairment | 8094 |
+| var | 8095 |
+| cockpit | 8096 |
+| report | 8097 |
