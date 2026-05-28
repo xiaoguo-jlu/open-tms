@@ -180,7 +180,7 @@ com.opentms.{module}/
 
 1. 创建Entity类：`entity/{Entity}.java`
 2. 继承基础实体类（如有）
-3. 添加MyBatis注解
+3. 添加MyBatis注解，注意与表结构对应，**严禁捏造表结构中不存在的字段**
 
 **Entity模板**：
 ```java
@@ -288,22 +288,174 @@ public interface {Entity}Mapper extends BaseMapper<{Entity}> {
 ### 步骤7：Service层开发
 
 **目的**：实现业务逻辑。
-
 **操作**：
-
 1. 创建Service接口：`service/{Entity}Service.java`
 2. 创建Service实现：`service/impl/{Entity}ServiceImpl.java`
+
+**⚠️ 重要：避免Java泛型类型擦除问题**
+
+**错误示例（会导致MyBatis Plus lambda缓存找不到）：**
+```java
+// 错误：使用泛型T的lambda方法引用
+public abstract class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity> {
+    public IPage<V> queryPage(D dto, int pageNum, int pageSize) {
+        LambdaQueryWrapper<T> wrapper = new LambdaQueryWrapper<>();
+        wrapper.orderByDesc(T::getCreatedAt);  // 运行时T被擦除为BaseEntity，MyBatis Plus无法找到lambda缓存
+    }
+}
+```
+
+**正确示例：**
+```java
+// 正确：每个ServiceImpl直接继承ServiceImpl，使用具体实体类
+public class {Entity}ServiceImpl extends ServiceImpl<{Entity}Mapper, {Entity}> implements {Entity}Service {
+    // lambda使用具体的{Entity}类，如{Entity}::getCode, {Entity}::getCreatedAt
+}
+```
 
 **Service接口模板**：
 ```java
 package com.opentms.{module}.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.opentms.{module}.entity.{Entity};
-import com.opentms.{module}.dto.{Entity}DTO;
 import com.opentms.{module}.vo.{Entity}VO;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 
-public interface {Entity}Service extends BaseService<{Entity}, {Entity}DTO, {Entity}VO> {
+public interface {Entity}Service {
+
+    Page<{Entity}VO> queryPage(String keyword, String status, int pageNum, int pageSize);
+
+    {Entity}VO getById(Long id);
+
+    {Entity}VO getByCode(String code);
+
+    {Entity}VO save({Entity} entity);
+
+    {Entity}VO updateById({Entity} entity);
+
+    boolean deleteById(Long id);
+
+    boolean checkCodeExists(String code, Long excludeId);
+}
+```
+
+**Service实现模板**：
+```java
+package com.opentms.{module}.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.opentms.{module}.entity.{Entity};
+import com.opentms.{module}.mapper.{Entity}Mapper;
+import com.opentms.{module}.service.{Entity}Service;
+import com.opentms.{module}.vo.{Entity}VO;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import java.util.stream.Collectors;
+
+@Slf4j
+@Service
+public class {Entity}ServiceImpl extends ServiceImpl<{Entity}Mapper, {Entity}> implements {Entity}Service {
+
+    @Override
+    public Page<{Entity}VO> queryPage(String keyword, String status, int pageNum, int pageSize) {
+        LambdaQueryWrapper<{Entity}> wrapper = new LambdaQueryWrapper<>();
+
+        // ⚠️ 必须使用具体类{Entity}，不能使用泛型T
+        if (StringUtils.hasText(keyword)) {
+            wrapper.like({Entity}::getCode, keyword)
+                   .or()
+                   .like({Entity}::getName, keyword);
+        }
+
+        if (StringUtils.hasText(status)) {
+            wrapper.eq({Entity}::getStatus, status);
+        }
+
+        // ⚠️ 必须使用具体类{Entity}::getCreatedAt
+        wrapper.orderByDesc({Entity}::getCreatedAt);
+
+        Page<{Entity}> page = baseMapper.selectPage(new Page<>(pageNum, pageSize), wrapper);
+
+        Page<{Entity}VO> result = new Page<>();
+        result.setCurrent(page.getCurrent());
+        result.setSize(page.getSize());
+        result.setTotal(page.getTotal());
+        result.setRecords(page.getRecords().stream()
+                .map(this::convertToVO)
+                .collect(Collectors.toList()));
+
+        return result;
+    }
+
+    @Override
+    public {Entity}VO getById(Long id) {
+        {Entity} entity = baseMapper.selectById(id);
+        return entity != null ? convertToVO(entity) : null;
+    }
+
+    @Override
+    public {Entity}VO save({Entity} entity) {
+        // 保存前检查编码唯一性
+        if (checkCodeExists(entity.getCode(), null)) {
+            throw new BusinessException("编码已存在: " + entity.getCode());
+        }
+        baseMapper.insert(entity);
+        return convertToVO(entity);
+    }
+
+    @Override
+    public {Entity}VO updateById({Entity} entity) {
+        if (entity.getId() == null) {
+            throw new BusinessException("ID不能为空");
+        }
+        {Entity} existing = baseMapper.selectById(entity.getId());
+        if (existing == null) {
+            throw new BusinessException("记录不存在");
+        }
+        if (checkCodeExists(entity.getCode(), entity.getId())) {
+            throw new BusinessException("编码已存在: " + entity.getCode());
+        }
+        baseMapper.updateById(entity);
+        return convertToVO(baseMapper.selectById(entity.getId()));
+    }
+
+    @Override
+    public boolean deleteById(Long id) {
+        {Entity} existing = baseMapper.selectById(id);
+        if (existing == null) {
+            throw new BusinessException("记录不存在");
+        }
+        return removeById(id);
+    }
+
+    @Override
+    public boolean checkCodeExists(String code, Long excludeId) {
+        if (!StringUtils.hasText(code)) {
+            return false;
+        }
+        LambdaQueryWrapper<{Entity}> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq({Entity}::getCode, code);
+        if (excludeId != null) {
+            wrapper.ne({Entity}::getId, excludeId);
+        }
+        return count(wrapper) > 0;
+    }
+
+    private {Entity}VO convertToVO({Entity} entity) {
+        {Entity}VO vo = new {Entity}VO();
+        // 手动映射字段，避免使用BeanUtils.copyProperties
+        vo.setId(entity.getId());
+        vo.setCode(entity.getCode());
+        vo.setName(entity.getName());
+        vo.setStatus(entity.getStatus());
+        vo.setCreatedAt(entity.getCreatedAt());
+        vo.setUpdatedAt(entity.getUpdatedAt());
+        return vo;
+    }
 }
 ```
 
@@ -425,12 +577,21 @@ public class {Entity}Resource {
     private {Entity}Service {entity}Service;
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Object list() {
         return Result.success({entity}Service.listAll());
     }
 
     @GET
+    @Path("/page")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Object page(...) {
+        return Result.success({entity}Service.queryPage(...));
+    }
+
+    @GET
     @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Object getById(@PathParam("id") String id) {
         try {
             long parseId = Long.parseLong(id);
@@ -438,8 +599,8 @@ public class {Entity}Resource {
                 return Result.badRequest("ID必须为正整数");
             }
             {Entity}VO vo = {entity}Service.getById(parseId);
-            return vo != null ? 
-                Result.success(vo) : 
+            return vo != null ?
+                Result.success(vo) :
                 Result.notFound("{Entity}不存在");
         } catch (NumberFormatException e) {
             return Result.badRequest("ID参数格式不正确");
@@ -447,6 +608,8 @@ public class {Entity}Resource {
     }
 
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Object save({Entity}DTO dto) {
         try {
             return Result.success({entity}Service.save(dto));
@@ -455,20 +618,24 @@ public class {Entity}Resource {
         }
     }
 
-    @PUT
+    @POST
+    @Path("/update")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Object update({Entity}DTO dto) {
         try {
             if (dto.getId() == null) {
                 return Result.badRequest("ID不能为空");
             }
-            return Result.success({entity}Service.update(dto));
+            return Result.success({entity}Service.updateById(dto));
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
     }
 
-    @DELETE
-    @Path("/{id}")
+    @POST
+    @Path("/delete/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
     public Object delete(@PathParam("id") String id) {
         try {
             long parseId = Long.parseLong(id);
@@ -483,6 +650,13 @@ public class {Entity}Resource {
     }
 }
 ```
+
+**⚠️ 重要：HTTP方法规范**
+- 查询：`GET`
+- 新增：`POST`
+- 修改：`POST`（使用 `/update` 路径区分）
+- 删除：`POST`（使用 `/delete/{id}` 路径区分）
+- 所有接收JSON请求的方法必须添加 `@Consumes(MediaType.APPLICATION_JSON)`
 
 ### 步骤9：事务管理
 
@@ -524,7 +698,44 @@ public class {Entity}Resource {
 2. 覆盖正常场景和异常场景
 3. 使用Mockito模拟依赖
 
-### 步骤13：创建GitHub Project工作项
+### 步骤13：API自测验证 ⚠️（重要）
+
+**目的**：确保API实际可用，不仅编译通过。
+
+**⚠️ 自测要求（必须全部通过才能提交）：**
+
+1. **启动服务**
+   ```bash
+   python test/scripts/basedata/test_crud.py
+   ```
+   或手动验证以下接口：
+
+2. **必测场景**：
+   - [ ] GET /api/v1/{entity} 返回 200 + code 200
+   - [ ] POST /api/v1/{entity} 新增成功，返回 200 + code 200
+   - [ ] POST /api/v1/{entity}/update 更新成功，返回 200 + code 200
+   - [ ] POST /api/v1/{entity}/delete/{id} 删除成功，返回 200 + code 200
+   - [ ] GET /api/v1/{entity}/99999 不存在，返回 200 + code 404 或非200
+   - [ ] POST /api/v1/{entity}/delete/99999 不存在ID，返回错误提示（不能是500）
+
+3. **异常场景验证**：
+   - [ ] 更新不存在的记录，返回业务错误提示
+   - [ ] 删除不存在的记录，返回业务错误提示
+   - [ ] 重复编码新增，返回业务错误提示
+
+**⚠️ 禁止**：API返回 HTTP 200 但 body 中 code 是 500 的情况
+
+### 步骤14：检查验证
+
+**目的**：检查生成的程序是否符合预期。
+
+**操作**：
+
+1. 编译代码，检查是否能编译通过
+2. 修正代码中的编译报错问题，直到编译通过
+3. 对照编码规范，检查是否有不符合规范之处，如果是规范不合理，弹出给用户
+
+### 步骤14：创建GitHub Project工作项
 
 **目的**：按照团队协作规范，更新任务状态。
 
@@ -538,7 +749,7 @@ gh issue edit <issue-number> --add-label "Done"
 gh issue create --title "[Bug] {描述}" --body "## 缺陷描述\n..." --label "BE,Bug"
 ```
 
-### 步骤14：生成开发摘要
+### 步骤15：生成开发摘要
 
 **目的**：记录开发过程，便于追溯。
 
@@ -550,6 +761,18 @@ gh issue create --title "[Bug] {描述}" --body "## 缺陷描述\n..." --label "
    - 遇到的问题及解决方案
    - 性能优化项
    - 待确认事项
+
+---
+
+### 步骤16：skill优化
+
+**目的**：优化本skill，避免下次再生成代码时遇到一样的错误。
+
+**操作**：
+
+1. 总结导致编译报错的代码
+2. 找到指导生成对应代码的skill片段
+3. 调整skill描述
 
 ---
 

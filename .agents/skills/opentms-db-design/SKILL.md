@@ -92,12 +92,63 @@ description: Use when designing Open-TMS database schema and table structures as
 
 #### 3.1.2 DDL脚本标准
 
+**⚠️ 重要：DROP TABLE 风险警示**
+
+| 环境 | DDL策略 |
+|------|---------|
+| 开发/测试 | 使用 `DROP TABLE IF EXISTS` 保证脚本可重复执行 |
+| 生产变更 | **禁止**使用 DROP TABLE，应使用 `ALTER TABLE` 增量变更 |
+
+**⚠️ 重要：应用层 @Version 注解注意事项**
+
+实体类继承 `BaseEntity` 后会携带 `@Version` 字段，配合 MyBatis-Plus 的乐观锁机制。但在实际使用中存在以下问题：
+
+1. **MyBatis-Plus updateById 的乐观锁问题**：
+   - 当实体有 `@Version` 字段时，MyBatis-Plus 会在 UPDATE 时自动追加 `WHERE version = ?`
+   - 如果 version 字段为 null，SQL 会变成 `WHERE version = null`（永远不匹配）
+   - 导致 `MyBatisSystemException: could not resolve property`
+
+2. **解决方案**：
+   - **方案A（推荐）**：更新前先查询完整实体，再更新
+     ```java
+     // 不要这样用
+     entity.setVersion(null);
+     mapper.updateById(entity);
+     
+     // 应该这样用
+     Entity existing = mapper.selectById(entity.getId());
+     BeanUtils.copyProperties(entity, existing);
+     mapper.updateById(existing);
+     ```
+   
+   - **方案B**：使用直接JDBC执行更新，手动处理version
+     ```java
+     @Autowired
+     private JdbcTemplate jdbcTemplate;
+     
+     public boolean updateById(Entity entity) {
+         String sql = "UPDATE tms_currency_t SET currency_code = ?, currency_name = ?, " +
+                      "updated_by = ?, updated_at = CURRENT_TIMESTAMP, version = version + 1 " +
+                      "WHERE id = ? AND deleted = '0'";
+         return jdbcTemplate.update(sql, entity.getCode(), entity.getName(), 
+                entity.getUpdatedBy(), entity.getId()) > 0;
+     }
+     ```
+
+3. **ID生成流程说明**：
+   - 数据库使用 `BIGSERIAL` 自增
+   - 应用层 new Entity() 时 id = null
+   - baseMapper.insert(entity) 后，entity.getId() 才有值
+   - return 时可以获取到完整的ID
+
+**使用DROP IF EXISTS写法先删后增，保证DDL脚本永远可重复执行**
 ```sql
 -- ============================================
 -- {表描述}
 -- 模块: {module}
 -- 创建时间: YYYY-MM-DD
 -- ============================================
+DROP TABLE IF EXISTS tms_{table}_t;
 CREATE TABLE tms_{table}_t (
     id                  BIGSERIAL PRIMARY KEY,
     {table}_code        VARCHAR(50) NOT NULL UNIQUE,
@@ -114,8 +165,8 @@ CREATE TABLE tms_{table}_t (
 );
 
 COMMENT ON TABLE tms_{table}_t IS '{表描述}';
+DROP INDEX IF EXISTS idx_{table}_code ON tms_{table}_t({table}_code);
 CREATE INDEX idx_{table}_code ON tms_{table}_t({table}_code);
-CREATE INDEX idx_{table}_status ON tms_{table}_t(status) WHERE status = '1';
 ```
 
 ### 3.2 存放路径规范
@@ -302,7 +353,7 @@ db/
    - 主表：`tms_{module}_{entity}_t`
    - 字典表：`tms_{module}_{dict}_d`
    - 日志表：`tms_{module}_{biz}_log`
-   - 关联表：`tms_{module}_{rela}_rel`
+   - 关联表：`tms_{module}_{rela}_rel_t`
 
 2. **字段设计**
    - 字段命名遵循项目规范
@@ -432,8 +483,8 @@ db/
 
 ### 5.2 金融系统数据库特殊要求
 
-**1. 金额字段**
-- 精度要求：DECIMAL(18,2)
+**1. 金额、利率、汇率字段**
+- 精度要求：DECIMAL(38,18)
 - 必须有CHECK约束 > 0
 - 避免使用FLOAT/DOUBLE
 

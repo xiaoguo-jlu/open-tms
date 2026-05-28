@@ -88,12 +88,20 @@ description: Use when designing Open-TMS backend API contracts and documentation
 ### 响应
 ```json
 {
-  "code": 0,
+  "code": 200,
   "data": {}
 }
 ```
 
-### 错误码
+### 响应码定义
+| 响应码 | 值 | 说明 |
+|--------|-----|------|
+| SUCCESS | 200 | 成功 |
+| BAD_REQUEST | 400 | 参数错误 |
+| NOT_FOUND | 404 | 资源不存在 |
+| SYSTEM_ERROR | 500 | 系统异常 |
+
+### 错误码（用于业务异常细分，可扩展）
 | 错误码 | 说明 |
 |--------|------|
 | BUSINESS_ERROR | 业务异常 |
@@ -253,7 +261,7 @@ docs/
 
 ### 步骤4：接口设计
 
-**目的**：输出符合RESTful规范和项目标准的接口文档。
+**目的**：输出符合项目标准的接口文档。
 
 **操作**：
 
@@ -263,21 +271,28 @@ docs/
    - 路径参数：`/resources/{id}`
    - 业务操作：`/resources/{id}/action`
 
-2. **HTTP方法映射**
+2. **⚠️ HTTP方法规范（重要）**
    ```
-   GET     /resources          # 列表查询
-   GET     /resources/{id}     # 详情查询
-   POST    /resources          # 新增
-   PUT     /resources          # 更新
-   PATCH   /resources/{id}     # 部分更新
-   DELETE  /resources/{id}      # 删除
-   POST    /resources/{id}/action  # 业务操作
+   GET     /api/v1/resources           # 列表查询
+   GET     /api/v1/resources/page      # 分页查询
+   GET     /api/v1/resources/{id}      # 详情查询
+   POST    /api/v1/resources          # 新增
+   POST    /api/v1/resources/update    # 更新（使用POST方法）
+   POST    /api/v1/resources/delete/{id}  # 删除（使用POST方法）
+   POST    /api/v1/resources/{id}/action  # 业务操作
    ```
+
+   **说明**：
+   - 所有查询使用 `GET`
+   - 所有新增使用 `POST`
+   - 所有修改使用 `POST` + `/update` 路径区分
+   - 所有删除使用 `POST` + `/delete/{id}` 路径区分
+   - 业务操作使用 `POST` + `/action` 路径
 
 3. **请求参数设计**
    - 查询参数：分页、排序、筛选
    - 路径参数：资源ID
-   - 请求体：JSON格式
+   - 请求体：JSON格式，所有JSON请求必须设置 `Content-Type: application/json`
 
 4. **响应结构设计**
    - 统一响应包装：`{code, message, data, timestamp}`
@@ -540,8 +555,8 @@ PRD (PM)
 
 ### 8.4 规范一致性检查
 
-- [ ] URL符合RESTful规范
-- [ ] HTTP方法正确
+- [ ] URL符合项目规范
+- [ ] HTTP方法正确（查询GET，新增POST，修改POST/update，删除POST/delete）
 - [ ] 响应结构统一
 - [ ] 错误码定义完整
 - [ ] 分页参数符合规范
@@ -619,8 +634,8 @@ PRD (PM)
 | 1 | /{resource} | GET | 列表查询 |
 | 2 | /{resource}/{id} | GET | 详情查询 |
 | 3 | /{resource} | POST | 新增 |
-| 4 | /{resource} | PUT | 更新 |
-| 5 | /{resource}/{id} | DELETE | 删除 |
+| 4 | /{resource}/update | POST | 更新 |
+| 5 | /{resource}/delete/{id} | POST | 删除 |
 | 6 | /{resource}/{id}/action | POST | 业务操作 |
 
 ---
@@ -669,14 +684,24 @@ PRD (PM)
 
 ### 附录C：通用接口模式
 
+**⚠️ HTTP方法规范（重要）**
 ```
-# CRUD接口
+# 查询操作 - 使用GET
 GET    /api/v1/{module}              # 列表查询
 GET    /api/v1/{module}/page         # 分页查询
 GET    /api/v1/{module}/{id}         # 详情查询
+GET    /api/v1/{module}/code/{code}  # 按代码查询
+
+# 新增操作 - 使用POST
 POST   /api/v1/{module}              # 新增
-PUT    /api/v1/{module}              # 更新
-DELETE /api/v1/{module}/{id}         # 删除
+
+# 修改操作 - 使用POST + /update 路径
+POST   /api/v1/{module}/update       # 更新
+
+# 删除操作 - 使用POST + /delete/{id} 路径
+POST   /api/v1/{module}/delete/{id}  # 删除
+
+# 批量操作
 POST   /api/v1/{module}/batch-delete # 批量删除
 
 # 导入导出
@@ -687,8 +712,13 @@ GET    /api/v1/{module}/export       # 导出
 POST   /api/v1/{module}/{id}/submit  # 提交
 POST   /api/v1/{module}/{id}/approve # 审批通过
 POST   /api/v1/{module}/{id}/reject  # 审批驳回
-POST   /api/v1/{module}/{id}/cancel # 撤销
+POST   /api/v1/{module}/{id}/cancel  # 撤销
 ```
+
+**说明**：
+- 所有修改操作统一使用 `POST` 方法，通过 `/update` 路径区分
+- 所有删除操作统一使用 `POST` 方法，通过 `/delete/{id}` 路径区分
+- 所有JSON请求必须设置 `Content-Type: application/json`
 
 ### 附录D：响应结构模板
 

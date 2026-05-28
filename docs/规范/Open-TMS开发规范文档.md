@@ -1008,10 +1008,16 @@ Content-Type: application/json
 
 #### 4.1.3 响应结构
 
+**⚠️ 重要：响应码规范**
+- 成功响应：`code: 200`
+- 业务异常：`code: 400` + `message` 说明原因
+- 系统异常：`code: 500` + `message` 说明原因
+- 资源不存在：`code: 404`
+
 ```yaml
 # 成功响应
 {
-  "code": 0,
+  "code": 200,
   "message": "success",
   "data": {
     # 业务数据
@@ -1021,7 +1027,7 @@ Content-Type: application/json
 
 # 分页响应
 {
-  "code": 0,
+  "code": 200,
   "message": "success",
   "data": {
     "list": [],
@@ -1032,9 +1038,9 @@ Content-Type: application/json
   "timestamp": 1704067200000
 }
 
-# 失败响应
+# 失败响应（业务异常）
 {
-  "code": "BUSINESS_ERROR",
+  "code": 400,
   "message": "交易金额必须大于0",
   "data": null,
   "timestamp": 1704067200000
@@ -1042,7 +1048,7 @@ Content-Type: application/json
 
 # 列表响应（无分页）
 {
-  "code": 0,
+  "code": 200,
   "message": "success",
   "data": [],
   "timestamp": 1704067200000
@@ -1059,6 +1065,7 @@ Authorization: Bearer <token>
 
 # 响应码
 200     - 成功
+400     - 参数错误/业务异常
 401     - 未授权（token无效或过期）
 403     - 无权限
 404     - 资源不存在
@@ -1074,7 +1081,7 @@ X-Idempotency-Key: <唯一标识>
 
 # 幂等响应（重复请求返回原结果）
 {
-  "code": 0,
+  "code": 200,
   "message": "success",
   "data": {
     "idempotent": true,
