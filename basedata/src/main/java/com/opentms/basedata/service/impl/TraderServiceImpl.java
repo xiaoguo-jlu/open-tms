@@ -49,7 +49,60 @@ public class TraderServiceImpl implements TraderService {
 
     @Override
     public com.baomidou.mybatisplus.extension.plugins.pagination.Page<TraderVO> queryPage(String keyword, String status, int pageNum, int pageSize) {
-        return new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNum, pageSize);
+        try {
+            java.sql.DriverManager.registerDriver(new org.postgresql.Driver());
+            java.sql.Connection conn = java.sql.DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASS);
+
+            String countSql = "SELECT COUNT(*) FROM tms_trader_t WHERE deleted = '0'";
+            String dataSql = "SELECT id, code, name, en_name, department, phone, email, status FROM tms_trader_t WHERE deleted = '0'";
+
+            if (keyword != null && !keyword.isEmpty()) {
+                String likeKeyword = "%" + keyword + "%";
+                countSql += " AND (code LIKE '" + likeKeyword + "' OR name LIKE '" + likeKeyword + "')";
+                dataSql += " AND (code LIKE '" + likeKeyword + "' OR name LIKE '" + likeKeyword + "')";
+            }
+            if (status != null && !status.isEmpty()) {
+                countSql += " AND status = '" + status + "'";
+                dataSql += " AND status = '" + status + "'";
+            }
+
+            PreparedStatement countPs = conn.prepareStatement(countSql);
+            ResultSet countRs = countPs.executeQuery();
+            long total = 0;
+            if (countRs.next()) {
+                total = countRs.getLong(1);
+            }
+            countRs.close();
+            countPs.close();
+
+            dataSql += " ORDER BY id DESC LIMIT " + pageSize + " OFFSET " + ((pageNum - 1) * pageSize);
+            PreparedStatement dataPs = conn.prepareStatement(dataSql);
+            ResultSet dataRs = dataPs.executeQuery();
+
+            List<TraderVO> records = new ArrayList<>();
+            while (dataRs.next()) {
+                TraderVO vo = new TraderVO();
+                vo.setId(dataRs.getLong("id"));
+                vo.setCode(dataRs.getString("code"));
+                vo.setName(dataRs.getString("name"));
+                vo.setEnName(dataRs.getString("en_name"));
+                vo.setDepartment(dataRs.getString("department"));
+                vo.setPhone(dataRs.getString("phone"));
+                vo.setEmail(dataRs.getString("email"));
+                vo.setStatus(dataRs.getString("status"));
+                records.add(vo);
+            }
+            dataRs.close();
+            dataPs.close();
+            conn.close();
+
+            com.baomidou.mybatisplus.extension.plugins.pagination.Page<TraderVO> page =
+                new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNum, pageSize, total);
+            page.setRecords(records);
+            return page;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to query traders: " + e.getMessage(), e);
+        }
     }
 
     @Override
