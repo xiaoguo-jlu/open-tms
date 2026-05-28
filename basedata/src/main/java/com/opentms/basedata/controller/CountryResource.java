@@ -1,5 +1,6 @@
 package com.opentms.basedata.controller;
-import com.opentms.basedata.dto.CountryDTO;
+
+import com.opentms.basedata.entity.Country;
 import com.opentms.basedata.service.CountryService;
 import com.opentms.basedata.vo.CountryVO;
 import com.opentms.common.model.Result;
@@ -8,51 +9,99 @@ import jakarta.ws.rs.core.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @Path("/api/v1/countries")
+@Produces(MediaType.APPLICATION_JSON)
 public class CountryResource {
+
     @Autowired
     private CountryService countryService;
-    public CountryResource() {}
-    @GET @Path("/page") @Produces(MediaType.APPLICATION_JSON)
-    public Object page(@QueryParam("keyword") String keyword, @QueryParam("status") String status,
-            @QueryParam("pageNum") @DefaultValue("1") int pageNum, @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
-        CountryDTO dto = new CountryDTO(); dto.setKeyword(keyword); dto.setStatus(status);
-        return countryService.queryPage(dto, pageNum, pageSize);
-    }
-    @GET @Path("/{id}")
-    public Object getById(@PathParam("id") String id) {
-        try { long parseId = Long.parseLong(id);
-            if (parseId <= 0) { return Result.badRequest("ID必须为正整数"); }
-            CountryVO vo = countryService.getById(parseId);
-            return vo != null ? Result.success(vo) : Result.notFound("国家不存在");
-        } catch (NumberFormatException e) { return Result.badRequest("ID参数格式不正确"); }
-    }
-    @POST
-    public Object save(CountryDTO dto) {
-        try { return Result.success(countryService.save(dto)); }
-        catch (Exception e) { return Result.error(e.getMessage()); }
-    }
-    @PUT
-    public Object update(CountryDTO dto) {
+
+    @GET
+    public Object list() {
         try {
-            if (dto.getId() == null) { return Result.badRequest("ID不能为空"); }
-            return Result.success(countryService.updateById(dto));
-        } catch (Exception e) { return Result.error(e.getMessage()); }
+            return Result.success(countryService.listAll());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("Error: " + e.getMessage());
+        }
     }
-    @DELETE @Path("/{id}")
-    public Object delete(@PathParam("id") String id) {
-        try { long parseId = Long.parseLong(id);
-            if (parseId <= 0) { return Result.badRequest("ID必须为正整数"); }
-            countryService.removeById(parseId); return Result.success();
-        } catch (NumberFormatException e) { return Result.badRequest("ID参数格式不正确"); }
+
+    @GET
+    @Path("/page")
+    public Object page(
+            @QueryParam("keyword") String keyword,
+            @QueryParam("status") String status,
+            @QueryParam("pageNum") @DefaultValue("1") int pageNum,
+            @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
+        return Result.success(countryService.queryPage(keyword, status, pageNum, pageSize));
     }
-    @POST @Path("/batch-delete")
-    public Object batchDelete(java.util.Map<String, java.util.List<Long>> body) {
-        try { java.util.List<Long> ids = body.get("ids");
-            if (ids == null || ids.isEmpty()) { return Result.badRequest("ID列表不能为空"); }
-            for (Long id : ids) { countryService.removeById(id); }
+
+    @GET
+    @Path("/testpage")
+    public Object testPage() {
+        return Result.success(new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(1, 10));
+    }
+
+    @GET
+    @Path("/{id}")
+    public Object getById(@PathParam("id") String idStr) {
+        try {
+            long id = Long.parseLong(idStr);
+            if (id <= 0) {
+                return Result.badRequest("ID must be positive");
+            }
+            CountryVO country = countryService.getCountryById(id);
+            if (country == null) {
+                return Result.notFound("Country not found");
+            }
+            return Result.success(country);
+        } catch (NumberFormatException e) {
+            return Result.badRequest("Invalid ID format");
+        }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Object save(Country country) {
+        try {
+            countryService.saveCountry(country);
             return Result.success();
-        } catch (Exception e) { return Result.error(e.getMessage()); }
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    @POST
+    @Path("/update")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Object update(Country country) {
+        try {
+            countryService.updateCountry(country);
+            return Result.success();
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    @POST
+    @Path("/delete/{id}")
+    public Object delete(@PathParam("id") String idStr) {
+        try {
+            long id = Long.parseLong(idStr);
+            if (id <= 0) {
+                return Result.badRequest("ID must be positive");
+            }
+            countryService.deleteCountry(id);
+            return Result.success();
+        } catch (NumberFormatException e) {
+            return Result.badRequest("Invalid ID format");
+        } catch (RuntimeException e) {
+            return Result.badRequest(e.getMessage());
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
     }
 }

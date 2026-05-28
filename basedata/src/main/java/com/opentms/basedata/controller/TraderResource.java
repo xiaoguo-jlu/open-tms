@@ -1,6 +1,6 @@
 package com.opentms.basedata.controller;
 
-import com.opentms.basedata.dto.TraderDTO;
+import com.opentms.basedata.entity.Trader;
 import com.opentms.basedata.service.TraderService;
 import com.opentms.basedata.vo.TraderVO;
 import com.opentms.common.model.Result;
@@ -11,93 +11,82 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Path("/api/v1/traders")
+@Produces(MediaType.APPLICATION_JSON)
 public class TraderResource {
 
     @Autowired
     private TraderService traderService;
 
-    public TraderResource() {
+    @GET
+    public Object list() {
+        return Result.success(traderService.listAll());
     }
 
     @GET
     @Path("/page")
-    @Produces(MediaType.APPLICATION_JSON)
     public Object page(
             @QueryParam("keyword") String keyword,
             @QueryParam("status") String status,
             @QueryParam("pageNum") @DefaultValue("1") int pageNum,
             @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
-        TraderDTO dto = new TraderDTO();
-        dto.setKeyword(keyword);
-        dto.setStatus(status);
-        return traderService.queryPage(dto, pageNum, pageSize);
+        return Result.success(traderService.queryPage(keyword, status, pageNum, pageSize));
     }
 
     @GET
     @Path("/{id}")
-    public Object getById(@PathParam("id") String id) {
+    public Object getById(@PathParam("id") String idStr) {
         try {
-            long parseId = Long.parseLong(id);
-            if (parseId <= 0) {
-                return Result.badRequest("ID必须为正整数");
+            long id = Long.parseLong(idStr);
+            if (id <= 0) {
+                return Result.badRequest("ID must be positive");
             }
-            TraderVO vo = traderService.getById(parseId);
-            return vo != null ?
-                Result.success(vo) :
-                Result.notFound("交易员不存在");
+            TraderVO trader = traderService.getTraderById(id);
+            if (trader == null) {
+                return Result.notFound("Trader not found");
+            }
+            return Result.success(trader);
         } catch (NumberFormatException e) {
-            return Result.badRequest("ID参数格式不正确");
+            return Result.badRequest("Invalid ID format");
         }
     }
 
     @POST
-    public Object save(TraderDTO dto) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Object save(Trader trader) {
         try {
-            return Result.success(traderService.save(dto));
+            traderService.saveTrader(trader);
+            return Result.success();
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
     }
 
-    @PUT
-    public Object update(TraderDTO dto) {
+    @POST
+    @Path("/update")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Object update(Trader trader) {
         try {
-            if (dto.getId() == null) {
-                return Result.badRequest("ID不能为空");
-            }
-            return Result.success(traderService.updateById(dto));
+            traderService.updateTrader(trader);
+            return Result.success();
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
     }
 
-    @DELETE
-    @Path("/{id}")
-    public Object delete(@PathParam("id") String id) {
+    @POST
+    @Path("/delete/{id}")
+    public Object delete(@PathParam("id") String idStr) {
         try {
-            long parseId = Long.parseLong(id);
-            if (parseId <= 0) {
-                return Result.badRequest("ID必须为正整数");
+            long id = Long.parseLong(idStr);
+            if (id <= 0) {
+                return Result.badRequest("ID must be positive");
             }
-            traderService.removeById(parseId);
+            traderService.deleteTrader(id);
             return Result.success();
         } catch (NumberFormatException e) {
-            return Result.badRequest("ID参数格式不正确");
-        }
-    }
-
-    @POST
-    @Path("/batch-delete")
-    public Object batchDelete(java.util.Map<String, java.util.List<Long>> body) {
-        try {
-            java.util.List<Long> ids = body.get("ids");
-            if (ids == null || ids.isEmpty()) {
-                return Result.badRequest("ID列表不能为空");
-            }
-            for (Long id : ids) {
-                traderService.removeById(id);
-            }
-            return Result.success();
+            return Result.badRequest("Invalid ID format");
+        } catch (RuntimeException e) {
+            return Result.badRequest(e.getMessage());
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
