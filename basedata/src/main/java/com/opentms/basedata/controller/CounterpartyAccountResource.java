@@ -48,7 +48,7 @@ public class CounterpartyAccountResource {
         }
     }
 
-    @PUT
+    @POST
     public Object update(CounterpartyAccount account) {
         try {
             counterpartyAccountService.updateCounterpartyAccount(account);

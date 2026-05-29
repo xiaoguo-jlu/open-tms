@@ -1,11 +1,9 @@
 package com.opentms.basedata.controller;
 
-import com.opentms.basedata.dto.CounterpartyDTO;
+import com.opentms.basedata.entity.Counterparty;
 import com.opentms.basedata.service.CounterpartyService;
 import com.opentms.basedata.vo.CounterpartyVO;
-import com.opentms.common.model.Result;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,90 +14,57 @@ public class CounterpartyResource {
     @Autowired
     private CounterpartyService counterpartyService;
 
-    public CounterpartyResource() {
-    }
-
     @GET
     @Path("/page")
-    @Produces(MediaType.APPLICATION_JSON)
     public Object page(
             @QueryParam("keyword") String keyword,
+            @QueryParam("counterpartyType") String counterpartyType,
+            @QueryParam("countryCode") String countryCode,
             @QueryParam("status") String status,
             @QueryParam("pageNum") @DefaultValue("1") int pageNum,
             @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
-        CounterpartyDTO dto = new CounterpartyDTO();
-        dto.setKeyword(keyword);
-        dto.setStatus(status);
-        return counterpartyService.queryPage(dto, pageNum, pageSize);
+        return com.opentms.common.model.Result.success(counterpartyService.queryPage(keyword, counterpartyType, countryCode, status, pageNum, pageSize));
     }
 
     @GET
     @Path("/{id}")
-    public Object getById(@PathParam("id") String id) {
-        try {
-            long parseId = Long.parseLong(id);
-            if (parseId <= 0) {
-                return Result.badRequest("ID必须为正整数");
-            }
-            CounterpartyVO vo = counterpartyService.getById(parseId);
-            return vo != null ?
-                Result.success(vo) :
-                Result.notFound("交易对手不存在");
-        } catch (NumberFormatException e) {
-            return Result.badRequest("ID参数格式不正确");
+    public Object getById(@PathParam("id") Long id) {
+        CounterpartyVO counterparty = counterpartyService.getCounterpartyById(id);
+        if (counterparty == null) {
+            return com.opentms.common.model.Result.notFound("Counterparty not found");
         }
+        return com.opentms.common.model.Result.success(counterparty);
     }
 
     @POST
-    public Object save(CounterpartyDTO dto) {
+    public Object save(Counterparty counterparty) {
         try {
-            return Result.success(counterpartyService.save(dto));
+            counterpartyService.saveCounterparty(counterparty);
+            return com.opentms.common.model.Result.success();
         } catch (Exception e) {
-            return Result.error(e.getMessage());
+            return com.opentms.common.model.Result.error(e.getMessage());
         }
     }
 
     @PUT
-    public Object update(CounterpartyDTO dto) {
+    @Consumes(jakarta.ws.rs.core.MediaType.APPLICATION_JSON)
+    public Object update(Counterparty counterparty) {
         try {
-            if (dto.getId() == null) {
-                return Result.badRequest("ID不能为空");
-            }
-            return Result.success(counterpartyService.updateById(dto));
+            counterpartyService.updateCounterparty(counterparty);
+            return com.opentms.common.model.Result.success();
         } catch (Exception e) {
-            return Result.error(e.getMessage());
+            return com.opentms.common.model.Result.error(e.getMessage());
         }
     }
 
     @DELETE
     @Path("/{id}")
-    public Object delete(@PathParam("id") String id) {
+    public Object delete(@PathParam("id") Long id) {
         try {
-            long parseId = Long.parseLong(id);
-            if (parseId <= 0) {
-                return Result.badRequest("ID必须为正整数");
-            }
-            counterpartyService.removeById(parseId);
-            return Result.success();
-        } catch (NumberFormatException e) {
-            return Result.badRequest("ID参数格式不正确");
-        }
-    }
-
-    @POST
-    @Path("/batch-delete")
-    public Object batchDelete(java.util.Map<String, java.util.List<Long>> body) {
-        try {
-            java.util.List<Long> ids = body.get("ids");
-            if (ids == null || ids.isEmpty()) {
-                return Result.badRequest("ID列表不能为空");
-            }
-            for (Long id : ids) {
-                counterpartyService.removeById(id);
-            }
-            return Result.success();
+            counterpartyService.deleteCounterparty(id);
+            return com.opentms.common.model.Result.success();
         } catch (Exception e) {
-            return Result.error(e.getMessage());
+            return com.opentms.common.model.Result.error(e.getMessage());
         }
     }
 }

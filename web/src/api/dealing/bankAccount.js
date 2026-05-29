@@ -26,7 +26,7 @@ export function saveBankAccount(data) {
 export function updateBankAccount(data) {
   return request({
     url: '/api/v1/bank-accounts',
-    method: 'put',
+    method: 'post',
     data
   })
 }

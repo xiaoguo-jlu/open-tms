@@ -50,6 +50,13 @@ public class CounterpartyAccountServiceImpl extends ServiceImpl<CounterpartyAcco
 
     @Override
     public boolean updateCounterpartyAccount(CounterpartyAccount account) {
+        if (account.getId() == null) {
+            throw new RuntimeException("Account ID cannot be null");
+        }
+        CounterpartyAccount existing = getById(account.getId());
+        if (existing == null) {
+            throw new RuntimeException("Account not found");
+        }
         if (checkCodeExists(account.getAccountNo(), account.getId())) {
             throw new RuntimeException("Account code already exists");
         }
@@ -58,6 +65,10 @@ public class CounterpartyAccountServiceImpl extends ServiceImpl<CounterpartyAcco
 
     @Override
     public boolean deleteCounterpartyAccount(Long id) {
+        CounterpartyAccount existing = getById(id);
+        if (existing == null) {
+            throw new RuntimeException("Account not found");
+        }
         return removeById(id);
     }
 

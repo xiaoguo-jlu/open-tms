@@ -58,7 +58,7 @@ export function savePositionLimit(data) {
 export function updatePositionLimit(data) {
   return request({
     url: '/position/limits',
-    method: 'put',
+    method: 'post',
     data
   })
 }

@@ -59,22 +59,22 @@
     <el-drawer v-model="drawerVisible" :title="drawerTitle" direction="rtl" size="480px">
       <el-form ref="formRef" :model="formData" :rules="rules" label-width="100px">
         <el-form-item label="业务单元编码" prop="code">
-          <el-input v-model="formData.code" placeholder="唯一标识，支持字母数字" :disabled="isEdit" />
+          <el-input v-model="formData.code" placeholder="唯一标识，支持字母数字" :disabled="isEdit" maxlength="20" show-word-limit />
         </el-form-item>
         <el-form-item label="业务单元名称" prop="name">
-          <el-input v-model="formData.name" placeholder="请输入业务单元名称" />
+          <el-input v-model="formData.name" placeholder="请输入业务单元名称" maxlength="100" show-word-limit />
         </el-form-item>
         <el-form-item label="英文名称" prop="enName">
-          <el-input v-model="formData.enName" placeholder="English Name" />
+          <el-input v-model="formData.enName" placeholder="English Name" maxlength="100" show-word-limit />
         </el-form-item>
         <el-form-item label="法人代表" prop="legalPerson">
-          <el-input v-model="formData.legalPerson" placeholder="请输入法人代表" />
+          <el-input v-model="formData.legalPerson" placeholder="请输入法人代表" maxlength="50" show-word-limit />
         </el-form-item>
         <el-form-item label="注册地址" prop="address">
-          <el-input v-model="formData.address" placeholder="请输入注册地址" />
+          <el-input v-model="formData.address" placeholder="请输入注册地址" maxlength="200" show-word-limit />
         </el-form-item>
         <el-form-item label="税号" prop="taxNo">
-          <el-input v-model="formData.taxNo" placeholder="请输入税号" />
+          <el-input v-model="formData.taxNo" placeholder="请输入税号" maxlength="50" show-word-limit />
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="formData.status">
@@ -119,8 +119,12 @@ const formData = reactive({
 })
 
 const rules = {
-  code: [{ required: true, message: '请输入业务单元编码', trigger: 'blur' }],
-  name: [{ required: true, message: '请输入业务单元名称', trigger: 'blur' }],
+  code: [{ required: true, message: '请输入业务单元编码', trigger: 'blur' }, { min: 1, max: 20, message: '最多20个字符', trigger: 'blur' }],
+  name: [{ required: true, message: '请输入业务单元名称', trigger: 'blur' }, { min: 1, max: 100, message: '最多100个字符', trigger: 'blur' }],
+  enName: [{ min: 0, max: 100, message: '最多100个字符', trigger: 'blur' }],
+  legalPerson: [{ min: 0, max: 50, message: '最多50个字符', trigger: 'blur' }],
+  address: [{ min: 0, max: 200, message: '最多200个字符', trigger: 'blur' }],
+  taxNo: [{ min: 0, max: 50, message: '最多50个字符', trigger: 'blur' }],
   status: [{ required: true, message: '请选择状态', trigger: 'change' }]
 }
 
@@ -137,7 +141,7 @@ const fetchData = async () => {
       pageSize: pagination.pageSize
     }
     const res = await listBusinessUnit(params)
-    tableData.value = res.data.list || []
+    tableData.value = res.data.records || res.data.list || []
     pagination.total = res.data.total || 0
   } catch (error) {
     console.error('Failed to fetch data:', error)

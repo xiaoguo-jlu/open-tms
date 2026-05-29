@@ -1,8 +1,14 @@
 # 基础数据模块接口
 
-**模块**: basedata  
-**版本**: v1.1  
+**模块**: basedata
+**版本**: v1.2
 **路径**: `/api/v1/currencies`
+
+**⚠️ HTTP方法规范**:
+- 查询：`GET`
+- 新增：`POST`
+- 修改：`POST` + `/update` 路径
+- 删除：`POST` + `/delete/{id}` 路径
 
 ---
 
@@ -95,7 +101,7 @@ Content-Type: application/json
 
 #### 请求
 ```
-PUT /api/v1/currencies
+POST /api/v1/currencies/update
 Content-Type: application/json
 
 {
@@ -113,7 +119,7 @@ Content-Type: application/json
 
 #### 请求
 ```
-DELETE /api/v1/currencies/{id}
+POST /api/v1/currencies/delete/{id}
 ```
 
 ---

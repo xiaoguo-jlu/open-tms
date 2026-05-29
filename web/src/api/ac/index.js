@@ -26,7 +26,7 @@ export function createAcTransaction(data) {
 export function updateAcTransaction(data) {
   return request({
     url: '/ac/transactions',
-    method: 'put',
+    method: 'post',
     data
   })
 }

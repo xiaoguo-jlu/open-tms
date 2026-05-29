@@ -32,8 +32,9 @@ import time
 from pathlib import Path
 from datetime import datetime
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
 TEST_DIR = PROJECT_ROOT / "test"
+SCRIPTS_DIR = PROJECT_ROOT / "test" / "scripts"
 SCRIPTS_DIR = TEST_DIR / "scripts"
 BACKEND_PORT = 8081
 BACKEND_HOST = "localhost"

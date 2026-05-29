@@ -2,7 +2,6 @@ package com.opentms.basedata.controller;
 
 import com.opentms.basedata.entity.Trader;
 import com.opentms.basedata.service.TraderService;
-import com.opentms.basedata.vo.TraderVO;
 import com.opentms.common.model.Result;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -34,20 +33,15 @@ public class TraderResource {
 
     @GET
     @Path("/{id}")
-    public Object getById(@PathParam("id") String idStr) {
-        try {
-            long id = Long.parseLong(idStr);
-            if (id <= 0) {
-                return Result.badRequest("ID must be positive");
-            }
-            TraderVO trader = traderService.getTraderById(id);
-            if (trader == null) {
-                return Result.notFound("Trader not found");
-            }
-            return Result.success(trader);
-        } catch (NumberFormatException e) {
-            return Result.badRequest("Invalid ID format");
+    public Object getById(@PathParam("id") Long id) {
+        if (id == null || id <= 0) {
+            return Result.badRequest("ID must be positive");
         }
+        Trader trader = traderService.getTraderById(id);
+        if (trader == null) {
+            return Result.notFound("Trader not found");
+        }
+        return Result.success(trader);
     }
 
     @POST
@@ -61,8 +55,7 @@ public class TraderResource {
         }
     }
 
-    @POST
-    @Path("/update")
+    @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     public Object update(Trader trader) {
         try {
@@ -73,20 +66,17 @@ public class TraderResource {
         }
     }
 
-    @POST
-    @Path("/delete/{id}")
-    public Object delete(@PathParam("id") String idStr) {
+    @DELETE
+    @Path("/{id}")
+    public Object delete(@PathParam("id") Long id) {
         try {
-            long id = Long.parseLong(idStr);
-            if (id <= 0) {
+            if (id == null || id <= 0) {
                 return Result.badRequest("ID must be positive");
             }
             traderService.deleteTrader(id);
             return Result.success();
-        } catch (NumberFormatException e) {
-            return Result.badRequest("Invalid ID format");
         } catch (RuntimeException e) {
-            return Result.badRequest(e.getMessage());
+            return Result.error(e.getMessage());
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }

@@ -1,8 +1,23 @@
 package com.opentms.basedata.service;
 
-import com.opentms.basedata.dto.TraderDTO;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.opentms.basedata.entity.Trader;
-import com.opentms.basedata.vo.TraderVO;
 
-public interface TraderService extends BasedataService<Trader, TraderDTO, TraderVO> {
+import java.util.List;
+
+public interface TraderService {
+
+    List<Trader> listAll();
+
+    Page<Trader> queryPage(String keyword, String status, int pageNum, int pageSize);
+
+    Trader getTraderById(Long id);
+
+    boolean saveTrader(Trader trader);
+
+    boolean updateTrader(Trader trader);
+
+    boolean deleteTrader(Long id);
+
+    boolean checkCodeExists(String code, Long excludeId);
 }

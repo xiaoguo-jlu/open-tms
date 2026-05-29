@@ -26,7 +26,7 @@ export function saveWorkflowTemplate(data) {
 export function updateWorkflowTemplate(data) {
   return request({
     url: '/approval/templates',
-    method: 'put',
+    method: 'post',
     data
   })
 }

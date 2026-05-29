@@ -1,8 +1,14 @@
 # 银行账户管理接口
 
-**模块**: bankaccount  
-**版本**: v1.0  
+**模块**: bankaccount
+**版本**: v1.1
 **路径**: `/api/v1/bank-accounts`
+
+**⚠️ HTTP方法规范**:
+- 查询：`GET`
+- 新增：`POST`
+- 修改：`POST` + `/update` 路径
+- 删除：`POST` + `/delete/{id}` 路径
 
 ---
 
@@ -77,7 +83,7 @@ POST /api/v1/bank-accounts
 
 ### 请求
 ```
-PUT /api/v1/bank-accounts
+POST /api/v1/bank-accounts/update
 ```
 
 ---
@@ -86,7 +92,7 @@ PUT /api/v1/bank-accounts
 
 ### 请求
 ```
-DELETE /api/v1/bank-accounts/{id}
+POST /api/v1/bank-accounts/delete/{id}
 ```
 
 ---

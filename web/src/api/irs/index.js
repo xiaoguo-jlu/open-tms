@@ -26,7 +26,7 @@ export function createIrsDeal(data) {
 export function updateIrsDeal(data) {
   return request({
     url: '/api/v1/irs-deals',
-    method: 'put',
+    method: 'post',
     data
   })
 }

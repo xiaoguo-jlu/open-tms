@@ -1,49 +1,52 @@
 package com.opentms.basedata.controller;
+
 import com.opentms.basedata.dto.HolidayDTO;
 import com.opentms.basedata.entity.Holiday;
 import com.opentms.basedata.service.HolidayService;
-import com.opentms.basedata.vo.HolidayVO;
 import com.opentms.common.model.Result;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 @Component
 @Path("/api/v1/holidays")
+@Produces(MediaType.APPLICATION_JSON)
 public class HolidayResource {
+
     @Autowired
     private HolidayService holidayService;
-    public HolidayResource() {}
-    @GET @Path("/page") @Produces(MediaType.APPLICATION_JSON)
-    public Object page(@QueryParam("countryCode") String countryCode, @QueryParam("year") Integer year,
+
+    @GET
+    public Object list() {
+        return Result.success(holidayService.listAll());
+    }
+
+    @GET
+    @Path("/page")
+    public Object page(
+            @QueryParam("countryCode") String countryCode,
+            @QueryParam("year") Integer year,
             @QueryParam("pageNum") @DefaultValue("1") int pageNum,
             @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
-        return holidayService.queryPage(countryCode, year, pageNum, pageSize);
+        return Result.success(holidayService.queryPage(countryCode, year, pageNum, pageSize));
     }
-    @GET @Path("/{id}")
-    public Object getById(@PathParam("id") String id) {
-        try {
-            long parseId = Long.parseLong(id);
-            if (parseId <= 0) return Result.badRequest("ID必须为正整数");
-            Holiday holiday = holidayService.getHolidayById(parseId);
-            if (holiday == null) return Result.notFound("节假日不存在");
-            HolidayVO vo = new HolidayVO();
-            vo.setId(holiday.getId());
-            vo.setHolidayDate(holiday.getHolidayDate());
-            vo.setName(holiday.getName());
-            vo.setCountryCode(holiday.getCountryCode());
-            vo.setIsAdjacent(holiday.getIsAdjacent());
-            vo.setRemark(holiday.getRemark());
-            vo.setCreatedBy(holiday.getCreatedBy());
-            vo.setCreatedAt(holiday.getCreatedAt());
-            vo.setUpdatedBy(holiday.getUpdatedBy());
-            vo.setUpdatedAt(holiday.getUpdatedAt());
-            return Result.success(vo);
-        } catch (NumberFormatException e) {
-            return Result.badRequest("ID参数格式不正确");
+
+    @GET
+    @Path("/{id}")
+    public Object getById(@PathParam("id") Long id) {
+        if (id == null || id <= 0) {
+            return Result.badRequest("ID必须为正整数");
         }
+        Holiday holiday = holidayService.getHolidayById(id);
+        if (holiday == null) {
+            return Result.notFound("节假日不存在");
+        }
+        return Result.success(holiday);
     }
+
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     public Object save(HolidayDTO dto) {
         try {
             Holiday entity = new Holiday();
@@ -58,12 +61,18 @@ public class HolidayResource {
             return Result.error(e.getMessage());
         }
     }
+
     @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
     public Object update(HolidayDTO dto) {
         try {
-            if (dto.getId() == null) return Result.badRequest("ID不能为空");
+            if (dto.getId() == null) {
+                return Result.badRequest("ID不能为空");
+            }
             Holiday entity = holidayService.getHolidayById(dto.getId());
-            if (entity == null) return Result.notFound("节假日不存在");
+            if (entity == null) {
+                return Result.notFound("节假日不存在");
+            }
             entity.setHolidayDate(dto.getHolidayDate());
             entity.setName(dto.getName());
             entity.setCountryCode(dto.getCountryCode());
@@ -75,15 +84,18 @@ public class HolidayResource {
             return Result.error(e.getMessage());
         }
     }
-    @DELETE @Path("/{id}")
-    public Object delete(@PathParam("id") String id) {
+
+    @DELETE
+    @Path("/{id}")
+    public Object delete(@PathParam("id") Long id) {
         try {
-            long parseId = Long.parseLong(id);
-            if (parseId <= 0) return Result.badRequest("ID必须为正整数");
-            holidayService.deleteHoliday(parseId);
+            if (id == null || id <= 0) {
+                return Result.badRequest("ID必须为正整数");
+            }
+            holidayService.deleteHoliday(id);
             return Result.success();
-        } catch (NumberFormatException e) {
-            return Result.badRequest("ID参数格式不正确");
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
         }
     }
 }

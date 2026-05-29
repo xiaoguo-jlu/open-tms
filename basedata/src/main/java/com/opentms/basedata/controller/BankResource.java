@@ -48,7 +48,7 @@ public class BankResource {
         }
     }
 
-    @PUT
+    @POST
     public Object update(Bank bank) {
         try {
             bankService.updateBank(bank);

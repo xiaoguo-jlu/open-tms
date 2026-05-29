@@ -1,8 +1,12 @@
 package com.opentms.basedata.service;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.opentms.basedata.entity.Holiday;
 import java.time.LocalDate;
+import java.util.List;
+
 public interface HolidayService {
+    List<Holiday> listAll();
     Page<Holiday> queryPage(String countryCode, Integer year, int pageNum, int pageSize);
     Holiday getHolidayById(Long id);
     boolean saveHoliday(Holiday holiday);

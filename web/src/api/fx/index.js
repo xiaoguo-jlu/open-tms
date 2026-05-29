@@ -26,7 +26,7 @@ export function createFxDeal(data) {
 export function updateFxDeal(data) {
   return request({
     url: '/api/v1/fx-deals',
-    method: 'put',
+    method: 'post',
     data
   })
 }

@@ -1,6 +1,7 @@
 package com.opentms.basedata.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -16,6 +17,7 @@ public class BusinessUnit {
 
     private String name;
 
+    @TableField("en_name")
     private String enName;
 
     private String legalPerson;

@@ -46,6 +46,13 @@ public class BusinessUnitServiceImpl extends ServiceImpl<BusinessUnitMapper, Bus
 
     @Override
     public boolean updateBusinessUnit(BusinessUnit businessUnit) {
+        if (businessUnit.getId() == null) {
+            throw new RuntimeException("BusinessUnit ID cannot be null");
+        }
+        BusinessUnit existing = getById(businessUnit.getId());
+        if (existing == null) {
+            throw new RuntimeException("BusinessUnit not found");
+        }
         if (checkCodeExists(businessUnit.getCode(), businessUnit.getId())) {
             throw new RuntimeException("Business unit code already exists");
         }
@@ -54,6 +61,10 @@ public class BusinessUnitServiceImpl extends ServiceImpl<BusinessUnitMapper, Bus
 
     @Override
     public boolean deleteBusinessUnit(Long id) {
+        BusinessUnit existing = getById(id);
+        if (existing == null) {
+            throw new RuntimeException("BusinessUnit not found");
+        }
         return removeById(id);
     }
 

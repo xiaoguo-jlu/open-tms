@@ -50,6 +50,13 @@ public class BankServiceImpl extends ServiceImpl<BankMapper, Bank> implements Ba
 
     @Override
     public boolean updateBank(Bank bank) {
+        if (bank.getId() == null) {
+            throw new RuntimeException("Bank ID cannot be null");
+        }
+        Bank existing = getById(bank.getId());
+        if (existing == null) {
+            throw new RuntimeException("Bank not found");
+        }
         if (checkCodeExists(bank.getCode(), bank.getId())) {
             throw new RuntimeException("Bank code already exists");
         }
@@ -58,6 +65,10 @@ public class BankServiceImpl extends ServiceImpl<BankMapper, Bank> implements Ba
 
     @Override
     public boolean deleteBank(Long id) {
+        Bank existing = getById(id);
+        if (existing == null) {
+            throw new RuntimeException("Bank not found");
+        }
         return removeById(id);
     }
 

@@ -13,35 +13,35 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api/v1/business-units': {
-        target: 'http://localhost:8081',
+        target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
       '/api/v1/traders': {
-        target: 'http://localhost:8081',
+        target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
       '/api/v1/currencies': {
-        target: 'http://localhost:8081',
+        target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
       '/api/v1/countries': {
-        target: 'http://localhost:8081',
+        target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
       '/api/v1/banks': {
-        target: 'http://localhost:8081',
+        target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
       '/api/v1/counterparties': {
-        target: 'http://localhost:8081',
+        target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
       '/api/v1/counterparty-accounts': {
-        target: 'http://localhost:8081',
+        target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
       '/api/v1/holidays': {
-        target: 'http://localhost:8081',
+        target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
       '/api/v1/deals': {

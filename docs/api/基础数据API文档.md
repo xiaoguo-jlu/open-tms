@@ -1,8 +1,15 @@
 # Open-TMS 基础数据模块 API 文档
 
-**版本**: v1.0  
+**版本**: v1.0
 **日期**: 2026-04-10
 **API版本**: v1
+
+**⚠️ HTTP方法规范**:
+- 查询：`GET`
+- 新增：`POST`
+- 修改：`POST` + `/update` 路径（如 `POST /api/v1/currencies/update`）
+- 删除：`POST` + `/delete/{id}` 路径（如 `POST /api/v1/currencies/delete/123`）
+- 所有JSON请求需设置 `Content-Type: application/json`
 
 ---
 
@@ -79,13 +86,13 @@
 
 ### 1.4 更新
 
-**PUT** `/api/v1/business-units`
+**POST** `/api/v1/business-units/update`
 
 **Request Body**: 同新增，需包含id
 
 ### 1.5 删除
 
-**DELETE** `/api/v1/business-units/{id}`
+**POST** `/api/v1/business-units/delete/{id}`
 
 ---
 
@@ -124,11 +131,11 @@
 
 ### 2.4 更新
 
-**PUT** `/api/v1/traders`
+**POST** `/api/v1/traders/update`
 
 ### 2.5 删除
 
-**DELETE** `/api/v1/traders/{id}`
+**POST** `/api/v1/traders/delete/{id}`
 
 ---
 
@@ -165,11 +172,11 @@
 
 ### 3.4 更新
 
-**PUT** `/api/v1/currencies`
+**POST** `/api/v1/currencies/update`
 
 ### 3.5 删除
 
-**DELETE** `/api/v1/currencies/{id}`
+**POST** `/api/v1/currencies/delete/{id}`
 
 ---
 
@@ -207,11 +214,11 @@
 
 ### 4.4 更新
 
-**PUT** `/api/v1/countries`
+**POST** `/api/v1/countries/update`
 
 ### 4.5 删除
 
-**DELETE** `/api/v1/countries/{id}`
+**POST** `/api/v1/countries/delete/{id}`
 
 ---
 
@@ -252,11 +259,11 @@
 
 ### 5.4 更新
 
-**PUT** `/api/v1/banks`
+**POST** `/api/v1/banks/update`
 
 ### 5.5 删除
 
-**DELETE** `/api/v1/banks/{id}`
+**POST** `/api/v1/banks/delete/{id}`
 
 ---
 
@@ -300,11 +307,11 @@
 
 ### 6.4 更新
 
-**PUT** `/api/v1/counterparties`
+**POST** `/api/v1/counterparties/update`
 
 ### 6.5 删除
 
-**DELETE** `/api/v1/counterparties/{id}`
+**POST** `/api/v1/counterparties/delete/{id}`
 
 ---
 
@@ -345,11 +352,11 @@
 
 ### 7.4 更新
 
-**PUT** `/api/v1/counterparty-accounts`
+**POST** `/api/v1/counterparty-accounts/update`
 
 ### 7.5 删除
 
-**DELETE** `/api/v1/counterparty-accounts/{id}`
+**POST** `/api/v1/counterparty-accounts/delete/{id}`
 
 ---
 
@@ -386,11 +393,11 @@
 
 ### 8.4 更新
 
-**PUT** `/api/v1/holidays`
+**POST** `/api/v1/holidays/update`
 
 ### 8.5 删除
 
-**DELETE** `/api/v1/holidays/{id}`
+**POST** `/api/v1/holidays/delete/{id}`
 
 ---
 

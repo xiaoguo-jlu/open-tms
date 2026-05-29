@@ -60,22 +60,22 @@
     <el-drawer v-model="drawerVisible" :title="drawerTitle" direction="rtl" size="480px">
       <el-form ref="formRef" :model="formData" :rules="rules" label-width="100px">
         <el-form-item label="交易员编号" prop="code">
-          <el-input v-model="formData.code" placeholder="唯一编号" :disabled="isEdit" />
+          <el-input v-model="formData.code" placeholder="唯一编号" :disabled="isEdit" maxlength="20" show-word-limit />
         </el-form-item>
         <el-form-item label="交易员姓名" prop="name">
-          <el-input v-model="formData.name" placeholder="请输入交易员姓名" />
+          <el-input v-model="formData.name" placeholder="请输入交易员姓名" maxlength="100" show-word-limit />
         </el-form-item>
         <el-form-item label="英文名" prop="enName">
-          <el-input v-model="formData.enName" placeholder="English Name" />
+          <el-input v-model="formData.enName" placeholder="English Name" maxlength="100" show-word-limit />
         </el-form-item>
         <el-form-item label="所属部门" prop="department">
-          <el-input v-model="formData.department" placeholder="请输入所属部门" />
+          <el-input v-model="formData.department" placeholder="请输入所属部门" maxlength="100" show-word-limit />
         </el-form-item>
         <el-form-item label="联系电话" prop="phone">
-          <el-input v-model="formData.phone" placeholder="请输入联系电话" />
+          <el-input v-model="formData.phone" placeholder="请输入联系电话" maxlength="20" show-word-limit />
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
-          <el-input v-model="formData.email" placeholder="请输入邮箱" />
+          <el-input v-model="formData.email" placeholder="请输入邮箱" maxlength="100" show-word-limit />
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="formData.status">
@@ -120,9 +120,12 @@ const formData = reactive({
 })
 
 const rules = {
-  code: [{ required: true, message: '请输入交易员编号', trigger: 'blur' }],
-  name: [{ required: true, message: '请输入交易员姓名', trigger: 'blur' }],
-  email: [{ type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }],
+  code: [{ required: true, message: '请输入交易员编号', trigger: 'blur' }, { min: 1, max: 20, message: '最多20个字符', trigger: 'blur' }],
+  name: [{ required: true, message: '请输入交易员姓名', trigger: 'blur' }, { min: 1, max: 100, message: '最多100个字符', trigger: 'blur' }],
+  enName: [{ min: 0, max: 100, message: '最多100个字符', trigger: 'blur' }],
+  department: [{ min: 0, max: 100, message: '最多100个字符', trigger: 'blur' }],
+  phone: [{ min: 0, max: 20, message: '最多20个字符', trigger: 'blur' }],
+  email: [{ type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }, { min: 0, max: 100, message: '最多100个字符', trigger: 'blur' }],
   status: [{ required: true, message: '请选择状态', trigger: 'change' }]
 }
 
@@ -139,7 +142,7 @@ const fetchData = async () => {
       pageSize: pagination.pageSize
     }
     const res = await listTrader(params)
-    tableData.value = res.data.list || []
+    tableData.value = res.data.records || res.data.list || []
     pagination.total = res.data.total || 0
   } catch (error) {
     console.error('Failed to fetch data:', error)

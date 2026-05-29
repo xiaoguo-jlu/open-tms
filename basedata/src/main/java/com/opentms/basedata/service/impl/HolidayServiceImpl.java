@@ -1,4 +1,5 @@
 package com.opentms.basedata.service.impl;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -7,9 +8,20 @@ import com.opentms.basedata.mapper.HolidayMapper;
 import com.opentms.basedata.service.HolidayService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
 import java.time.LocalDate;
+import java.util.List;
+
 @Service
 public class HolidayServiceImpl extends ServiceImpl<HolidayMapper, Holiday> implements HolidayService {
+
+    @Override
+    public List<Holiday> listAll() {
+        LambdaQueryWrapper<Holiday> wrapper = new LambdaQueryWrapper<>();
+        wrapper.orderByAsc(Holiday::getCountryCode, Holiday::getHolidayDate);
+        return list(wrapper);
+    }
+
     @Override
     public Page<Holiday> queryPage(String countryCode, Integer year, int pageNum, int pageSize) {
         LambdaQueryWrapper<Holiday> wrapper = new LambdaQueryWrapper<>();

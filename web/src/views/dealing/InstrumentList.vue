@@ -28,14 +28,14 @@
       <el-table :data="tableData" v-loading="loading" stripe>
         <el-table-column type="selection" width="50" align="center" />
         <el-table-column type="index" label="序号" width="60" align="center" />
-        <el-table-column prop="code" label="工具编码" width="140" />
-        <el-table-column prop="name" label="工具名称" min-width="180" />
+        <el-table-column prop="instrumentCode" label="工具编码" width="140" />
+        <el-table-column prop="instrumentName" label="工具名称" min-width="180" />
         <el-table-column prop="instrumentType" label="类型" width="120">
           <template #default="{ row }">
             <el-tag>{{ getTypeLabel(row.instrumentType) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="description" label="描述" min-width="200" />
+        <el-table-column prop="remark" label="描述" min-width="200" />
         <el-table-column prop="status" label="状态" width="80" align="center">
           <template #default="{ row }">
             <el-tag :type="row.status === '1' ? 'success' : 'danger'">
@@ -66,11 +66,11 @@
 
     <el-drawer v-model="drawerVisible" :title="drawerTitle" direction="rtl" size="480px">
       <el-form ref="formRef" :model="formData" :rules="rules" label-width="100px">
-        <el-form-item label="工具编码" prop="code">
-          <el-input v-model="formData.code" placeholder="唯一编码" :disabled="isEdit" />
+        <el-form-item label="工具编码" prop="instrumentCode">
+          <el-input v-model="formData.instrumentCode" placeholder="唯一编码" :disabled="isEdit" maxlength="50" />
         </el-form-item>
-        <el-form-item label="工具名称" prop="name">
-          <el-input v-model="formData.name" placeholder="请输入工具名称" />
+        <el-form-item label="工具名称" prop="instrumentName">
+          <el-input v-model="formData.instrumentName" placeholder="请输入工具名称" maxlength="200" />
         </el-form-item>
         <el-form-item label="工具类型" prop="instrumentType">
           <el-select v-model="formData.instrumentType" placeholder="请选择" style="width: 100%;">
@@ -127,12 +127,12 @@ const queryForm = reactive({ keyword: '', instrumentType: '', status: '' })
 const pagination = reactive({ pageNum: 1, pageSize: 10, total: 0 })
 
 const formData = reactive({
-  id: null, code: '', name: '', instrumentType: '', description: '', status: '1'
+  id: null, instrumentCode: '', instrumentName: '', instrumentType: '', remark: '', status: '1'
 })
 
 const rules = {
-  code: [{ required: true, message: '请输入工具编码', trigger: 'blur' }],
-  name: [{ required: true, message: '请输入工具名称', trigger: 'blur' }],
+  instrumentCode: [{ required: true, message: '请输入工具编码', trigger: 'blur' }, { maxlength: 50, message: '编码长度不能超过50', trigger: 'blur' }],
+  instrumentName: [{ required: true, message: '请输入工具名称', trigger: 'blur' }, { maxlength: 200, message: '名称长度不能超过200', trigger: 'blur' }],
   instrumentType: [{ required: true, message: '请选择工具类型', trigger: 'change' }]
 }
 
@@ -160,7 +160,7 @@ const handleReset = () => {
 }
 
 const handleAdd = () => {
-  Object.assign(formData, { id: null, code: '', name: '', instrumentType: '', description: '', status: '1' })
+  Object.assign(formData, { id: null, instrumentCode: '', instrumentName: '', instrumentType: '', remark: '', status: '1' })
   formRef.value?.resetFields()
   drawerVisible.value = true
 }

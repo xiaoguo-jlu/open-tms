@@ -521,11 +521,63 @@ public class CurrencyServiceImpl implements CurrencyService {
 }
 ```
 
+### 6.3 ⚠️ 重要：避免Java泛型类型擦除导致MyBatis Plus lambda查询失败
+
+**问题现象**：
+```
+can not find lambda cache for this entity [com.opentms.basedata.entity.BasedataEntity]
+```
+
+**根因分析**：
+- Java泛型类型擦除：`<T extends BasedataEntity>` 在运行时变为 `BasedataEntity`
+- MyBatis Plus的lambda缓存基于具体类生成：`entity.getClass()` 返回的是 `Country.class`
+- 当代码使用 `T::getCreatedAt` 时，MyBatis尝试从 `BasedataEntity.class` 查找lambda缓存，但该类是抽象类，无法生成缓存
+
+**错误示例（会导致MyBatis Plus lambda缓存找不到）：**
+```java
+// 错误：使用泛型T的lambda方法引用
+public abstract class BasedataServiceImpl<M extends BaseMapper<T>, T extends BasedataEntity> {
+    public IPage<V> queryPage(D dto, int pageNum, int pageSize) {
+        LambdaQueryWrapper<T> wrapper = new LambdaQueryWrapper<>();
+        wrapper.orderByDesc(T::getCreatedAt);  // 运行时T被擦除为BasedataEntity
+    }
+}
+
+// 子类继承 - 仍有问题！因为父类的泛型在运行时被擦除
+public class CountryServiceImpl extends BasedataServiceImpl<CountryMapper, Country> {
+}
+```
+
+**正确示例：**
+```java
+// 正确：每个ServiceImpl直接继承ServiceImpl，使用具体实体类
+public class CountryServiceImpl extends ServiceImpl<CountryMapper, Country> implements CountryService {
+    // lambda使用具体的Country类，如Country::getCode, Country::getCreatedAt
+}
+
+public class TraderServiceImpl extends ServiceImpl<TraderMapper, Trader> implements TraderService {
+}
+
+public class CounterpartyServiceImpl extends ServiceImpl<CounterpartyMapper, Counterparty> implements CounterpartyService {
+}
+```
+
+**关键原则**：
+1. **不要使用泛型基类封装MyBatis Plus的lambda查询**
+2. **每个ServiceImpl直接继承`ServiceImpl<Mapper, Entity>`**
+3. **Lambda方法引用必须使用具体类，如`Country::getCode`，不能使用`T::getCode`**
+4. **Service接口使用具体参数类型，不要使用泛型DTO**
+
 ---
 
 ## 七、Controller 层规范
 
 ### 7.1 Controller 模板
+
+**⚠️ 重要：JAX-RS注解规范**
+- 使用 `@Path`, `@GET`, `@POST` 等JAX-RS注解（jakarta.ws.rs包）
+- 所有接收JSON请求的方法必须添加 `@Consumes(MediaType.APPLICATION_JSON)`
+- 响应JSON必须添加 `@Produces(MediaType.APPLICATION_JSON)`
 
 ```java
 package com.opentms.basedata.controller;
@@ -534,56 +586,64 @@ import com.opentms.basedata.dto.CurrencyDTO;
 import com.opentms.basedata.service.CurrencyService;
 import com.opentms.basedata.vo.CurrencyVO;
 import com.opentms.common.model.Result;
-import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.util.List;
+@Component
+@Path("/api/v1/currencies")
+@Produces(MediaType.APPLICATION_JSON)
+public class CurrencyResource {
 
-/**
- * 币种管理接口
- */
-@RestController
-@RequestMapping("/api/v1/currencies")
-@RequiredArgsConstructor
-public class CurrencyController {
-
-    private final CurrencyService currencyService;
+    @Autowired
+    private CurrencyService currencyService;
 
     /**
      * 查询所有（无分页，用于下拉选择）
      */
-    @GetMapping
-    public Result<List<CurrencyVO>> list() {
+    @GET
+    public Object list() {
         return Result.success(currencyService.listAll());
     }
 
     /**
      * 分页查询
      */
-    @GetMapping("/page")
-    public Result<Page<CurrencyVO>> page(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String status,
-            @RequestParam(defaultValue = "1") int pageNo,
-            @RequestParam(defaultValue = "20") int pageSize) {
+    @GET
+    @Path("/page")
+    public Object page(
+            @QueryParam("keyword") String keyword,
+            @QueryParam("status") String status,
+            @QueryParam("pageNum") @DefaultValue("1") int pageNum,
+            @QueryParam("pageSize") @DefaultValue("20") int pageSize) {
         return Result.success(currencyService.queryPage(keyword, status, pageNo, pageSize));
     }
 
     /**
      * 根据ID查询
      */
-    @GetMapping("/{id}")
-    public Result<CurrencyVO> getById(@PathVariable Long id) {
-        CurrencyVO vo = currencyService.getById(id);
-        return vo != null ? Result.success(vo) : Result.notFound("币种不存在");
+    @GET
+    @Path("/{id}")
+    public Object getById(@PathParam("id") String id) {
+        try {
+            long parseId = Long.parseLong(id);
+            if (parseId <= 0) {
+                return Result.badRequest("ID必须为正整数");
+            }
+            CurrencyVO vo = currencyService.getById(parseId);
+            return vo != null ? Result.success(vo) : Result.notFound("币种不存在");
+        } catch (NumberFormatException e) {
+            return Result.badRequest("ID参数格式不正确");
+        }
     }
 
     /**
      * 根据代码查询
      */
-    @GetMapping("/code/{code}")
-    public Result<CurrencyVO> getByCode(@PathVariable String code) {
+    @GET
+    @Path("/code/{code}")
+    public Object getByCode(@PathParam("code") String code) {
         CurrencyVO vo = currencyService.getByCode(code);
         return vo != null ? Result.success(vo) : Result.notFound("币种不存在");
     }
@@ -591,44 +651,66 @@ public class CurrencyController {
     /**
      * 新增
      */
-    @PostMapping
-    public Result<CurrencyVO> save(@RequestBody @Validated CurrencyDTO dto) {
-        return Result.success(currencyService.save(dto));
-    }
-
-    /**
-     * 更新
-     */
-    @PutMapping
-    public Result<CurrencyVO> update(@RequestBody @Validated CurrencyDTO dto) {
-        if (dto.getId() == null) {
-            return Result.badRequest("ID不能为空");
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Object save(CurrencyDTO dto) {
+        try {
+            return Result.success(currencyService.save(dto));
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
         }
-        return Result.success(currencyService.updateById(dto));
     }
 
     /**
-     * 删除
+     * 更新（使用POST方法，路径 /update 区分）
      */
-    @DeleteMapping("/{id}")
-    public Result<Void> delete(@PathVariable Long id) {
-        currencyService.removeById(id);
-        return Result.success();
+    @POST
+    @Path("/update")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Object update(CurrencyDTO dto) {
+        try {
+            if (dto.getId() == null) {
+                return Result.badRequest("ID不能为空");
+            }
+            return Result.success(currencyService.updateById(dto));
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 删除（使用POST方法，路径 /delete/{id} 区分）
+     */
+    @POST
+    @Path("/delete/{id}")
+    public Object delete(@PathParam("id") String id) {
+        try {
+            long parseId = Long.parseLong(id);
+            if (parseId <= 0) {
+                return Result.badRequest("ID必须为正整数");
+            }
+            currencyService.removeById(parseId);
+            return Result.success();
+        } catch (NumberFormatException e) {
+            return Result.badRequest("ID参数格式不正确");
+        }
     }
 }
 ```
 
-### 7.2 RESTful URL 规范
+### 7.2 HTTP方法规范
 
-| 方法 | URL | 说明 |
-|------|-----|------|
-| GET | /api/v1/currencies | 查询所有 |
-| GET | /api/v1/currencies/page | 分页查询 |
-| GET | /api/v1/currencies/{id} | 根据ID查询 |
-| GET | /api/v1/currencies/code/{code} | 根据代码查询 |
-| POST | /api/v1/currencies | 新增 |
-| PUT | /api/v1/currencies | 更新 |
-| DELETE | /api/v1/currencies/{id} | 删除 |
+**⚠️ 重要：所有修改、删除操作统一使用POST方法**
+
+| 操作 | HTTP方法 | URL | 说明 |
+|------|----------|-----|------|
+| 查询所有 | GET | /api/v1/currencies | 无分页 |
+| 分页查询 | GET | /api/v1/currencies/page | 带分页参数 |
+| 根据ID查询 | GET | /api/v1/currencies/{id} | - |
+| 根据代码查询 | GET | /api/v1/currencies/code/{code} | - |
+| 新增 | POST | /api/v1/currencies | JSON body |
+| 更新 | POST | /api/v1/currencies/update | JSON body |
+| 删除 | POST | /api/v1/currencies/delete/{id} | - |
 
 ---
 

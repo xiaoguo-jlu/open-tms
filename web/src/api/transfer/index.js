@@ -26,7 +26,7 @@ export function createTransferTransaction(data) {
 export function updateTransferTransaction(data) {
   return request({
     url: '/transfer/transactions',
-    method: 'put',
+    method: 'post',
     data
   })
 }

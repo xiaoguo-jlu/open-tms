@@ -25,16 +25,16 @@ export function saveCurrency(data) {
 
 export function updateCurrency(data) {
   return request({
-    url: '/api/v1/currencies',
-    method: 'put',
+    url: '/api/v1/currencies/update',
+    method: 'post',
     data
   })
 }
 
 export function deleteCurrency(id) {
   return request({
-    url: `/api/v1/currencies/${id}`,
-    method: 'delete'
+    url: `/api/v1/currencies/delete/${id}`,
+    method: 'post'
   })
 }
 

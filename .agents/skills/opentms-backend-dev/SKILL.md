@@ -143,6 +143,44 @@ com.opentms.{module}/
 
 ## 四、执行步骤
 
+### ⚠️ 重要：RESTful API 规范
+
+**CRUD 操作必须遵循标准 HTTP 方法和路径：**
+
+| 操作 | 方法 | 路径 | 示例 |
+|------|------|------|------|
+| 查询列表 | GET | `/api/v1/{entities}/page` | `GET /api/v1/countries/page?pageNum=1&pageSize=10` |
+| 查询详情 | GET | `/api/v1/{entities}/{id}` | `GET /api/v1/countries/1` |
+| 新增 | POST | `/api/v1/{entities}` | `POST /api/v1/countries` |
+| 更新 | PUT | `/api/v1/{entities}` | `PUT /api/v1/countries` |
+| 删除 | DELETE | `/api/v1/{entities}/{id}` | `DELETE /api/v1/countries/1` |
+
+**❌ 错误示例（不要这样做）：**
+```java
+// 错误：使用POST方法 + action路径
+@POST @Path("/update")
+public Object update(Entity entity) { ... }
+
+// 错误：使用POST方法 + delete路径
+@POST @Path("/delete/{id}")
+public Object delete(@PathParam("id") Long id) { ... }
+```
+
+**✅ 正确示例：**
+```java
+// 正确：PUT方法更新完整资源
+@PUT
+@Consumes(MediaType.APPLICATION_JSON)
+public Object update(Entity entity) { ... }
+
+// 正确：DELETE方法删除资源
+@DELETE
+@Path("/{id}")
+public Object delete(@PathParam("id") Long id) { ... }
+```
+
+---
+
 ### 步骤1：读取输入
 
 **目的**：理解接口需求和数据库设计。

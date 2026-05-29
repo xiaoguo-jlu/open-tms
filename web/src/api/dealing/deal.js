@@ -26,7 +26,7 @@ export function createDeal(data) {
 export function updateDeal(data) {
   return request({
     url: '/api/v1/deals',
-    method: 'put',
+    method: 'post',
     data
   })
 }

@@ -79,13 +79,13 @@
     <el-drawer v-model="drawerVisible" :title="drawerTitle" direction="rtl" size="480px">
       <el-form ref="formRef" :model="formData" :rules="rules" label-width="100px">
         <el-form-item label="对手方编号" prop="code">
-          <el-input v-model="formData.code" placeholder="唯一编号" :disabled="isEdit" />
+          <el-input v-model="formData.code" placeholder="唯一编号" :disabled="isEdit" maxlength="20" show-word-limit />
         </el-form-item>
         <el-form-item label="对手方名称" prop="name">
-          <el-input v-model="formData.name" placeholder="请输入对手方名称" />
+          <el-input v-model="formData.name" placeholder="请输入对手方名称" maxlength="100" show-word-limit />
         </el-form-item>
         <el-form-item label="英文名称" prop="enName">
-          <el-input v-model="formData.enName" placeholder="English Name" />
+          <el-input v-model="formData.enName" placeholder="English Name" maxlength="100" />
         </el-form-item>
         <el-form-item label="对手方类型" prop="counterpartyType">
           <el-select v-model="formData.counterpartyType" placeholder="请选择" style="width: 100%;">
@@ -197,7 +197,8 @@ const fetchData = async () => {
       pageSize: pagination.pageSize
     }
     const res = await listCounterparty(params)
-    tableData.value = res.data.list || []
+    // MyBatis-Plus returns: { records: [], total: number, current: number, size: number }
+    tableData.value = res.data.records || res.data.list || []
     pagination.total = res.data.total || 0
   } catch (error) {
     console.error('Failed to fetch data:', error)

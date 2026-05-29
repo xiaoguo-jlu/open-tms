@@ -1,5 +1,6 @@
 package com.opentms.basedata.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,6 +10,7 @@ import lombok.EqualsAndHashCode;
 @TableName("tms_trader_t")
 public class Trader extends BasedataEntity {
 
+    @TableField("en_name")
     private String enName;
 
     private String department;

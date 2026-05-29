@@ -2,6 +2,7 @@ package com.opentms.basedata.controller;
 
 import com.opentms.basedata.dto.CurrencyDTO;
 import com.opentms.basedata.service.CurrencyService;
+import com.opentms.basedata.service.impl.CurrencyServiceImpl;
 import com.opentms.basedata.vo.CurrencyVO;
 import com.opentms.common.model.Result;
 import jakarta.ws.rs.*;

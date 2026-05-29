@@ -28,7 +28,7 @@ export const saveCashPool = createCashPool
 export function updateCashPool(data) {
   return request({
     url: '/api/v1/cash-pools',
-    method: 'put',
+    method: 'post',
     data
   })
 }
@@ -112,7 +112,7 @@ export function createCashPoolRule(id, data) {
 export function updateCashPoolRule(data) {
   return request({
     url: '/api/v1/cash-pools/rules',
-    method: 'put',
+    method: 'post',
     data
   })
 }

@@ -9,7 +9,7 @@ import urllib.error
 import json
 import sys
 
-BASE_URL = "http://localhost:8081/api/v1"
+BASE_URL = "http://localhost:8081/opentms/basedata/api/v1"
 
 def test_post(path, data, desc):
     """测试POST接口"""

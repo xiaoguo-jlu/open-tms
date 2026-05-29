@@ -13,7 +13,7 @@ export function createDeposit(data) {
 }
 
 export function updateDeposit(data) {
-  return request({ url: '/deposit/deals', method: 'put', data })
+  return request({ url: '/deposit/deals', method: 'post', data })
 }
 
 export function deleteDeposit(id) {
@@ -53,7 +53,7 @@ export function saveDepositProduct(data) {
 }
 
 export function updateDepositProduct(data) {
-  return request({ url: '/deposit/products', method: 'put', data })
+  return request({ url: '/deposit/products', method: 'post', data })
 }
 
 export function deleteDepositProduct(id) {

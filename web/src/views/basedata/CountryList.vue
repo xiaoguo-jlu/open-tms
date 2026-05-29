@@ -59,19 +59,19 @@
     <el-drawer v-model="drawerVisible" :title="drawerTitle" direction="rtl" size="480px">
       <el-form ref="formRef" :model="formData" :rules="rules" label-width="100px">
         <el-form-item label="国家代码" prop="code">
-          <el-input v-model="formData.code" placeholder="ISO 2位代码如CN/US" :disabled="isEdit" />
+          <el-input v-model="formData.code" placeholder="ISO 2位代码如CN/US" :disabled="isEdit" maxlength="10" show-word-limit />
         </el-form-item>
         <el-form-item label="国家名称" prop="name">
-          <el-input v-model="formData.name" placeholder="请输入国家名称" />
+          <el-input v-model="formData.name" placeholder="请输入国家名称" maxlength="100" show-word-limit />
         </el-form-item>
         <el-form-item label="英文名称" prop="enName">
-          <el-input v-model="formData.enName" placeholder="English Name" />
+          <el-input v-model="formData.enName" placeholder="English Name" maxlength="100" />
         </el-form-item>
         <el-form-item label="时区" prop="timezone">
           <el-input v-model="formData.timezone" placeholder="如: Asia/Shanghai" />
         </el-form-item>
         <el-form-item label="区号" prop="areaCode">
-          <el-input v-model="formData.areaCode" placeholder="如: +86" />
+          <el-input v-model="formData.areaCode" placeholder="如: +86" maxlength="10" />
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="formData.status">
@@ -115,7 +115,7 @@ const formData = reactive({
 })
 
 const rules = {
-  code: [{ required: true, message: '请输入国家代码', trigger: 'blur' }],
+  code: [{ required: true, message: '请输入国家代码', trigger: 'blur' }, { min: 1, max: 10, message: '代码最多10个字符', trigger: 'blur' }],
   name: [{ required: true, message: '请输入国家名称', trigger: 'blur' }],
   status: [{ required: true, message: '请选择状态', trigger: 'change' }]
 }
@@ -133,7 +133,8 @@ const fetchData = async () => {
       pageSize: pagination.pageSize
     }
     const res = await listCountry(params)
-    tableData.value = res.data.list || []
+    // MyBatis-Plus returns: { records: [], total: number, current: number, size: number }
+    tableData.value = res.data.records || res.data.list || []
     pagination.total = res.data.total || 0
   } catch (error) {
     console.error('Failed to fetch data:', error)

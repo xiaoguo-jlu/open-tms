@@ -26,7 +26,7 @@ export function saveCounterpartyAccount(data) {
 export function updateCounterpartyAccount(data) {
   return request({
     url: '/api/v1/counterparty-accounts',
-    method: 'put',
+    method: 'post',
     data
   })
 }

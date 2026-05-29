@@ -23,13 +23,12 @@
         <el-table-column type="selection" width="50" align="center" />
         <el-table-column type="index" label="序号" width="60" align="center" />
         <el-table-column prop="holidayDate" label="日期" width="120" />
-        <el-table-column prop="holidayName" label="节假日名称" min-width="150" />
+        <el-table-column prop="name" label="节假日名称" min-width="150" />
         <el-table-column prop="countryCode" label="国家代码" width="120" />
-        <el-table-column prop="countryName" label="国家名称" width="120" />
-        <el-table-column prop="isAdjustment" label="是否调休" width="100" align="center">
+        <el-table-column prop="isAdjacent" label="是否调休" width="100" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.isAdjustment === '1' ? 'warning' : 'info'">
-              {{ row.isAdjustment === '1' ? '是' : '否' }}
+            <el-tag :type="row.isAdjacent === '1' ? 'warning' : 'info'">
+              {{ row.isAdjacent === '1' ? '是' : '否' }}
             </el-tag>
           </template>
         </el-table-column>
@@ -60,22 +59,22 @@
         <el-form-item label="日期" prop="holidayDate">
           <el-date-picker v-model="formData.holidayDate" type="date" placeholder="选择日期" value-format="YYYY-MM-DD" style="width: 100%;" />
         </el-form-item>
-        <el-form-item label="节假日名称" prop="holidayName">
-          <el-input v-model="formData.holidayName" placeholder="如: 春节, 元旦" />
+        <el-form-item label="节假日名称" prop="name">
+          <el-input v-model="formData.name" placeholder="如: 春节, 元旦" maxlength="100" show-word-limit />
         </el-form-item>
         <el-form-item label="国家" prop="countryCode">
           <el-select v-model="formData.countryCode" placeholder="请选择" style="width: 100%;">
             <el-option v-for="item in countryList" :key="item.code" :label="item.name" :value="item.code" />
           </el-select>
         </el-form-item>
-        <el-form-item label="是否调休" prop="isAdjustment">
-          <el-radio-group v-model="formData.isAdjustment">
+        <el-form-item label="是否调休" prop="isAdjacent">
+          <el-radio-group v-model="formData.isAdjacent">
             <el-radio value="1">是</el-radio>
             <el-radio value="0">否</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
-          <el-input v-model="formData.remark" type="textarea" :rows="3" placeholder="请输入备注" />
+          <el-input v-model="formData.remark" type="textarea" :rows="3" placeholder="请输入备注" maxlength="500" show-word-limit />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -107,17 +106,18 @@ const pagination = reactive({ pageNum: 1, pageSize: 10, total: 0 })
 const formData = reactive({
   id: null,
   holidayDate: '',
-  holidayName: '',
+  name: '',
   countryCode: '',
-  isAdjustment: '0',
+  isAdjacent: '0',
   remark: ''
 })
 
 const rules = {
   holidayDate: [{ required: true, message: '请选择日期', trigger: 'change' }],
-  holidayName: [{ required: true, message: '请输入节假日名称', trigger: 'blur' }],
+  name: [{ required: true, message: '请输入节假日名称', trigger: 'blur' }, { min: 1, max: 100, message: '最多100个字符', trigger: 'blur' }],
   countryCode: [{ required: true, message: '请选择国家', trigger: 'change' }],
-  isAdjustment: [{ required: true, message: '请选择是否调休', trigger: 'change' }]
+  isAdjacent: [{ required: true, message: '请选择是否调休', trigger: 'change' }],
+  remark: [{ min: 0, max: 500, message: '最多500个字符', trigger: 'blur' }]
 }
 
 const drawerTitle = computed(() => (formData.id ? '编辑节假日' : '新增节假日'))
@@ -126,7 +126,7 @@ const isEdit = computed(() => !!formData.id)
 const fetchCountryList = async () => {
   try {
     const res = await listCountry({ pageSize: 1000 })
-    countryList.value = res.data.list || []
+    countryList.value = res.data.records || res.data.list || []
   } catch (error) {
     console.error('Failed to fetch countries:', error)
   }
@@ -142,7 +142,7 @@ const fetchData = async () => {
       pageSize: pagination.pageSize
     }
     const res = await listHoliday(params)
-    tableData.value = res.data.list || []
+    tableData.value = res.data.records || res.data.list || []
     pagination.total = res.data.total || 0
   } catch (error) {
     console.error('Failed to fetch data:', error)
@@ -164,7 +164,7 @@ const handleReset = () => {
 
 const handleAdd = () => {
   Object.assign(formData, {
-    id: null, holidayDate: '', holidayName: '', countryCode: '', isAdjustment: '0', remark: ''
+    id: null, holidayDate: '', name: '', countryCode: '', isAdjacent: '0', remark: ''
   })
   formRef.value?.resetFields()
   drawerVisible.value = true
