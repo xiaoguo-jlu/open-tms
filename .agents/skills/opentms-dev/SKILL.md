@@ -176,7 +176,7 @@ gh issue edit <number> -R xiaoguo-jlu/open-tms --add-label "Dev,Task" --body "##
 - 编译验证: `mvn compile -f basedata/pom.xml`
 - 运行测试脚本验证POST接口:
 ```bash
-python test/scripts/basedata/test_all_post.py
+python scripts/test/test_all.py
 ```
 
 ### 4. 提交并转交QA
@@ -244,8 +244,8 @@ public class GlobalExceptionHandler {
 ### 2. 运行测试脚本验证接口
 ```bash
 # 测试基础数据模块所有POST接口
-python test/scripts/basedata/test_all_post.py
+python scripts/test/test_all.py
 
 # 其他模块测试脚本
-# python test/scripts/<module>/test_*.py
+# python scripts/test/test_*.py
 ```

@@ -744,7 +744,7 @@ public class {Entity}Resource {
 
 1. **启动服务**
    ```bash
-   python test/scripts/basedata/test_crud.py
+   python scripts/test/test_all.py
    ```
    或手动验证以下接口：
 

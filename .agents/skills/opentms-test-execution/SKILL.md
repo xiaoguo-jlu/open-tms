@@ -288,7 +288,7 @@ docs/
 
 1. **确认测试环境和脚本**
    - 后端服务必须运行在 `http://localhost:8081`
-   - 确认测试脚本位置：`test/scripts/` 目录下各模块测试脚本
+   - 确认测试脚本位置：`scripts/test/` 目录下各模块测试脚本
    - 运行器脚本：`.agents/skills/opentms-test-execution/scripts/run_tests.py`
 
 2. **选择测试套件并执行**
@@ -311,10 +311,10 @@ docs/
 3. **测试套件说明**
    | 套件 | 测试范围 | 测试文件 |
    |------|----------|----------|
-   | basedata | 币种/国家/银行/交易对手等基础数据API | test/scripts/basedata/test_all_post.py |
-   | ac | 实际现金流(AC) API | test/scripts/ac/test_ac_api.py |
-   | at | 账户转账(AT) API | test/scripts/at/test_at_api.py |
-   | full | 完整测试套件 | test/scripts/test_full.py |
+   | basedata | 币种/国家/银行/交易对手等基础数据API | scripts/test/basedata/test_all_post.py |
+   | ac | 实际现金流(AC) API | scripts/test/ac/test_ac_api.py |
+   | at | 账户转账(AT) API | scripts/test/at/test_at_api.py |
+   | full | 完整测试套件 | scripts/test/test_full.py |
 
 4. **记录接口测试结果**
    - 脚本自动运行并输出测试结果
@@ -759,7 +759,7 @@ python .agents/skills/opentms-test-execution/scripts/run_tests.py report basedat
 
 **测试套件目录结构**:
 ```
-test/scripts/
+scripts/test/
 ├── basedata/          # 基于数据模块测试 (currency, country, bank, etc.)
 ├── ac/                # 现金流(AC)模块测试
 ├── at/                # 转账(AT)模块测试
