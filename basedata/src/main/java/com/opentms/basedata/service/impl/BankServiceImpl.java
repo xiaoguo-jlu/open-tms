@@ -45,6 +45,9 @@ public class BankServiceImpl extends ServiceImpl<BankMapper, Bank> implements Ba
         if (checkCodeExists(bank.getCode(), null)) {
             throw new RuntimeException("Bank code already exists");
         }
+        bank.setCreatedBy("system");
+        bank.setCreatedAt(java.time.LocalDateTime.now());
+        bank.setStatus("1");
         return save(bank);
     }
 
@@ -60,6 +63,8 @@ public class BankServiceImpl extends ServiceImpl<BankMapper, Bank> implements Ba
         if (checkCodeExists(bank.getCode(), bank.getId())) {
             throw new RuntimeException("Bank code already exists");
         }
+        bank.setUpdatedBy("system");
+        bank.setUpdatedAt(java.time.LocalDateTime.now());
         return updateById(bank);
     }
 

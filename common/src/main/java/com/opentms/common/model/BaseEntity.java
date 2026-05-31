@@ -14,6 +14,8 @@ public class BaseEntity {
     @TableField(fill = FieldFill.INSERT)
     private String createdBy;
 
+    // createdAt/updatedAt use database DEFAULT (now() on PostgreSQL)
+    // Do NOT set these manually in Service layer - let database handle timestamps
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 

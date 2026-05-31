@@ -1,49 +1,47 @@
 package com.opentms.basedata.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.opentms.basedata.entity.Bank;
-import com.opentms.basedata.service.BankService;
+import com.opentms.basedata.entity.ApprovalRule;
+import com.opentms.basedata.service.ApprovalRuleService;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-@Path("/api/v1/banks")
-public class BankResource {
+@Path("/api/v1/approval-rules")
+public class ApprovalRuleResource {
 
     @Autowired
-    private BankService bankService;
+    private ApprovalRuleService approvalRuleService;
 
-    public BankResource() {
+    public ApprovalRuleResource() {
     }
 
     @GET
     @Path("/page")
     public Object page(
             @QueryParam("keyword") String keyword,
-            @QueryParam("countryCode") String countryCode,
+            @QueryParam("bizType") String bizType,
             @QueryParam("status") String status,
             @QueryParam("pageNum") @DefaultValue("1") int pageNum,
             @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
-        return bankService.queryPage(keyword, countryCode, status, pageNum, pageSize);
+        return approvalRuleService.queryPage(keyword, bizType, status, pageNum, pageSize);
     }
 
     @GET
     @Path("/{id}")
     public Object getById(@PathParam("id") Long id) {
-        Bank bank = bankService.getBankById(id);
-        if (bank == null) {
-            return com.opentms.common.model.Result.notFound("Bank not found");
+        ApprovalRule approvalRule = approvalRuleService.getApprovalRuleById(id);
+        if (approvalRule == null) {
+            return com.opentms.common.model.Result.notFound("Approval rule not found");
         }
-        return com.opentms.common.model.Result.success(bank);
+        return com.opentms.common.model.Result.success(approvalRule);
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Object save(Bank bank) {
+    public Object save(ApprovalRule approvalRule) {
         try {
-            bankService.saveBank(bank);
+            approvalRuleService.saveApprovalRule(approvalRule);
             return com.opentms.common.model.Result.success();
         } catch (Exception e) {
             return com.opentms.common.model.Result.error(e.getMessage());
@@ -52,21 +50,20 @@ public class BankResource {
 
     @POST
     @Path("/update")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Object update(Bank bank) {
+    public Object update(ApprovalRule approvalRule) {
         try {
-            bankService.updateBank(bank);
+            approvalRuleService.updateApprovalRule(approvalRule);
             return com.opentms.common.model.Result.success();
         } catch (Exception e) {
             return com.opentms.common.model.Result.error(e.getMessage());
         }
     }
 
-    @POST
-    @Path("/delete/{id}")
+    @DELETE
+    @Path("/{id}")
     public Object delete(@PathParam("id") Long id) {
         try {
-            bankService.deleteBank(id);
+            approvalRuleService.deleteApprovalRule(id);
             return com.opentms.common.model.Result.success();
         } catch (Exception e) {
             return com.opentms.common.model.Result.error(e.getMessage());

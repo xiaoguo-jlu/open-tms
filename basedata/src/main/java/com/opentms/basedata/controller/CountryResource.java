@@ -65,7 +65,8 @@ public class CountryResource {
         }
     }
 
-    @PUT
+    @POST
+    @Path("/update")
     @Consumes(jakarta.ws.rs.core.MediaType.APPLICATION_JSON)
     public Object update(Country country) {
         try {
@@ -76,8 +77,8 @@ public class CountryResource {
         }
     }
 
-    @DELETE
-    @Path("/{id}")
+    @POST
+    @Path("/delete/{id}")
     public Object delete(@PathParam("id") Long id) {
         try {
             countryService.deleteCountry(id);

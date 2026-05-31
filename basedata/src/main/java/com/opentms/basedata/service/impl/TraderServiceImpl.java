@@ -51,6 +51,9 @@ public class TraderServiceImpl extends ServiceImpl<TraderMapper, Trader> impleme
         if (checkCodeExists(trader.getCode(), null)) {
             throw new RuntimeException("Trader code already exists");
         }
+        trader.setCreatedBy("system");
+        trader.setCreatedAt(java.time.LocalDateTime.now());
+        trader.setStatus("1");
         return save(trader);
     }
 
@@ -66,6 +69,11 @@ public class TraderServiceImpl extends ServiceImpl<TraderMapper, Trader> impleme
         if (checkCodeExists(trader.getCode(), trader.getId())) {
             throw new RuntimeException("Trader code already exists");
         }
+        // Preserve created audit fields and copy them to the input trader
+        trader.setCreatedBy(existing.getCreatedBy());
+        trader.setCreatedAt(existing.getCreatedAt());
+        trader.setUpdatedBy("system");
+        trader.setUpdatedAt(java.time.LocalDateTime.now());
         return updateById(trader);
     }
 

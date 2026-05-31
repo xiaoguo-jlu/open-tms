@@ -62,7 +62,8 @@ public class HolidayResource {
         }
     }
 
-    @PUT
+    @POST
+    @Path("/update")
     @Consumes(MediaType.APPLICATION_JSON)
     public Object update(HolidayDTO dto) {
         try {
@@ -85,8 +86,8 @@ public class HolidayResource {
         }
     }
 
-    @DELETE
-    @Path("/{id}")
+    @POST
+    @Path("/delete/{id}")
     public Object delete(@PathParam("id") Long id) {
         try {
             if (id == null || id <= 0) {

@@ -49,6 +49,8 @@ public class CounterpartyAccountResource {
     }
 
     @POST
+    @Path("/update")
+    @Consumes(jakarta.ws.rs.core.MediaType.APPLICATION_JSON)
     public Object update(CounterpartyAccount account) {
         try {
             counterpartyAccountService.updateCounterpartyAccount(account);
@@ -58,8 +60,8 @@ public class CounterpartyAccountResource {
         }
     }
 
-    @DELETE
-    @Path("/{id}")
+    @POST
+    @Path("/delete/{id}")
     public Object delete(@PathParam("id") Long id) {
         try {
             counterpartyAccountService.deleteCounterpartyAccount(id);

@@ -77,7 +77,7 @@ public class CountryServiceImpl extends ServiceImpl<CountryMapper, Country> impl
             throw new RuntimeException("Country ID cannot be null");
         }
         Country existing = getById(country.getId());
-        if (existing == null) {
+        if (existing == null || "1".equals(existing.getDeleted())) {
             throw new RuntimeException("Country not found");
         }
         if (checkCodeExists(country.getCode(), country.getId())) {
@@ -85,15 +85,17 @@ public class CountryServiceImpl extends ServiceImpl<CountryMapper, Country> impl
         }
         // Set audit field explicitly
         country.setUpdatedAt(java.time.LocalDateTime.now());
+        country.setUpdatedBy("system");
         return updateById(country);
     }
 
     @Override
     public boolean deleteCountry(Long id) {
         Country existing = getById(id);
-        if (existing == null) {
+        if (existing == null || "1".equals(existing.getDeleted())) {
             throw new RuntimeException("Country not found");
         }
+        // Let @TableLogic handle soft delete - removeById with @TableLogic converts to UPDATE SET deleted='1'
         return removeById(id);
     }
 

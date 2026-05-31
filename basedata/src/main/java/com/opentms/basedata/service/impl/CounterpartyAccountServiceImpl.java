@@ -45,6 +45,9 @@ public class CounterpartyAccountServiceImpl extends ServiceImpl<CounterpartyAcco
         if (checkCodeExists(account.getAccountNo(), null)) {
             throw new RuntimeException("Account code already exists");
         }
+        account.setCreatedBy("system");
+        account.setCreatedAt(java.time.LocalDateTime.now());
+        account.setStatus("1");
         return save(account);
     }
 
@@ -60,6 +63,11 @@ public class CounterpartyAccountServiceImpl extends ServiceImpl<CounterpartyAcco
         if (checkCodeExists(account.getAccountNo(), account.getId())) {
             throw new RuntimeException("Account code already exists");
         }
+        // Preserve created audit fields
+        account.setCreatedBy(existing.getCreatedBy());
+        account.setCreatedAt(existing.getCreatedAt());
+        account.setUpdatedBy("system");
+        account.setUpdatedAt(java.time.LocalDateTime.now());
         return updateById(account);
     }
 

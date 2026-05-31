@@ -65,6 +65,9 @@ public class CounterpartyServiceImpl extends ServiceImpl<CounterpartyMapper, Cou
         if (checkCodeExists(counterparty.getCode(), null)) {
             throw new RuntimeException("Counterparty code already exists");
         }
+        counterparty.setCreatedBy("system");
+        counterparty.setCreatedAt(java.time.LocalDateTime.now());
+        counterparty.setStatus("1");
         return save(counterparty);
     }
 
@@ -80,6 +83,11 @@ public class CounterpartyServiceImpl extends ServiceImpl<CounterpartyMapper, Cou
         if (checkCodeExists(counterparty.getCode(), counterparty.getId())) {
             throw new RuntimeException("Counterparty code already exists");
         }
+        // Preserve created audit fields
+        counterparty.setCreatedBy(existing.getCreatedBy());
+        counterparty.setCreatedAt(existing.getCreatedAt());
+        counterparty.setUpdatedBy("system");
+        counterparty.setUpdatedAt(java.time.LocalDateTime.now());
         return updateById(counterparty);
     }
 
@@ -114,6 +122,10 @@ public class CounterpartyServiceImpl extends ServiceImpl<CounterpartyMapper, Cou
         vo.setCounterpartyType(entity.getCounterpartyType());
         vo.setCountryCode(entity.getCountryCode());
         vo.setSwiftCode(entity.getSwiftCode());
+        vo.setInternalRating(entity.getInternalRating());
+        vo.setExternalRating(entity.getExternalRating());
+        vo.setPhone(entity.getPhone());
+        vo.setAddress(entity.getAddress());
         vo.setStatus(entity.getStatus());
         vo.setRemark(entity.getRemark());
         vo.setCreatedAt(entity.getCreatedAt());

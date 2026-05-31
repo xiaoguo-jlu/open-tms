@@ -43,6 +43,8 @@ public class HolidayServiceImpl extends ServiceImpl<HolidayMapper, Holiday> impl
         if (checkDateExists(holiday.getHolidayDate(), holiday.getCountryCode(), null)) {
             throw new RuntimeException("Holiday date already exists for this country");
         }
+        holiday.setCreatedBy("system");
+        holiday.setCreatedAt(java.time.LocalDateTime.now());
         return save(holiday);
     }
     @Override
@@ -50,6 +52,8 @@ public class HolidayServiceImpl extends ServiceImpl<HolidayMapper, Holiday> impl
         if (checkDateExists(holiday.getHolidayDate(), holiday.getCountryCode(), holiday.getId())) {
             throw new RuntimeException("Holiday date already exists for this country");
         }
+        holiday.setUpdatedBy("system");
+        holiday.setUpdatedAt(java.time.LocalDateTime.now());
         return updateById(holiday);
     }
     @Override

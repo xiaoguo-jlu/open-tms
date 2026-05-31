@@ -55,7 +55,8 @@ public class TraderResource {
         }
     }
 
-    @PUT
+    @POST
+    @Path("/update")
     @Consumes(MediaType.APPLICATION_JSON)
     public Object update(Trader trader) {
         try {
@@ -66,8 +67,8 @@ public class TraderResource {
         }
     }
 
-    @DELETE
-    @Path("/{id}")
+    @POST
+    @Path("/delete/{id}")
     public Object delete(@PathParam("id") Long id) {
         try {
             if (id == null || id <= 0) {
