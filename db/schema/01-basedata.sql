@@ -2,14 +2,22 @@
 -- PostgreSQL
 -- 执行顺序: 1
 
--- 业务单元表
+-- 业务单元表(管理主体)
 CREATE TABLE tms_business_unit_t (
     id BIGSERIAL PRIMARY KEY,
     code VARCHAR(50) NOT NULL UNIQUE,
     name VARCHAR(200) NOT NULL,
     en_name VARCHAR(200),
+    entity_type VARCHAR(20) NOT NULL DEFAULT 'HEADQUARTER',
+    parent_code VARCHAR(50),
+    level_depth INT DEFAULT 1,
+    hierarchy_path VARCHAR(500),
     legal_person VARCHAR(50),
-    address VARCHAR(500),
+    registered_address VARCHAR(500),
+    office_address VARCHAR(500),
+    unified_social_credit_code VARCHAR(18),
+    business_license_no VARCHAR(50),
+    establishment_date DATE,
     tax_no VARCHAR(50),
     status CHAR(1) NOT NULL DEFAULT '1',
     created_by VARCHAR(50) NOT NULL DEFAULT 'system',
@@ -19,9 +27,11 @@ CREATE TABLE tms_business_unit_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-COMMENT ON TABLE tms_business_unit_t IS '业务单元表';
+COMMENT ON TABLE tms_business_unit_t IS '管理主体表';
 CREATE INDEX idx_bu_code ON tms_business_unit_t(code);
 CREATE INDEX idx_bu_status ON tms_business_unit_t(status);
+CREATE INDEX idx_bu_parent_code ON tms_business_unit_t(parent_code);
+CREATE INDEX idx_bu_entity_type ON tms_business_unit_t(entity_type);
 
 -- 交易员表
 CREATE TABLE tms_trader_t (
@@ -123,7 +133,7 @@ COMMENT ON TABLE tms_bank_t IS '银行表';
 CREATE INDEX idx_bank_code ON tms_bank_t(code);
 CREATE INDEX idx_bank_swift ON tms_bank_t(swift_code);
 
--- 交易对手表 (修复: cp_type -> counterparty_type)
+-- 交易对手表
 CREATE TABLE tms_counterparty_t (
     id BIGSERIAL PRIMARY KEY,
     code VARCHAR(50) NOT NULL UNIQUE,
@@ -132,6 +142,10 @@ CREATE TABLE tms_counterparty_t (
     counterparty_type VARCHAR(20),
     country_code VARCHAR(10),
     swift_code VARCHAR(20),
+    internal_rating VARCHAR(20),
+    external_rating VARCHAR(20),
+    phone VARCHAR(30),
+    address VARCHAR(500),
     remark VARCHAR(500),
     status CHAR(1) NOT NULL DEFAULT '1',
     created_by VARCHAR(50) NOT NULL DEFAULT 'system',

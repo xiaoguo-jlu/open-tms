@@ -14,6 +14,8 @@ public class InstrumentVO {
 
     private String name;
 
+    private String enName;
+
     private String status;
 
     private String instrumentCode;
@@ -23,6 +25,10 @@ public class InstrumentVO {
     private String instrumentType;
 
     private String underlyingType;
+
+    private String underlying;
+
+    private String exchange;
 
     private String currency;
 

@@ -30,11 +30,15 @@
         <el-table-column type="index" label="序号" width="60" align="center" />
         <el-table-column prop="instrumentCode" label="工具编码" width="140" />
         <el-table-column prop="instrumentName" label="工具名称" min-width="180" />
+        <el-table-column prop="enName" label="英文名称" min-width="180" />
         <el-table-column prop="instrumentType" label="类型" width="120">
           <template #default="{ row }">
             <el-tag>{{ getTypeLabel(row.instrumentType) }}</el-tag>
           </template>
         </el-table-column>
+        <el-table-column prop="underlying" label="标的资产" width="120" />
+        <el-table-column prop="exchange" label="交易所" width="120" />
+        <el-table-column prop="currency" label="币种" width="80" />
         <el-table-column prop="remark" label="描述" min-width="200" />
         <el-table-column prop="status" label="状态" width="80" align="center">
           <template #default="{ row }">
@@ -72,13 +76,25 @@
         <el-form-item label="工具名称" prop="instrumentName">
           <el-input v-model="formData.instrumentName" placeholder="请输入工具名称" maxlength="200" />
         </el-form-item>
+        <el-form-item label="英文名称" prop="enName">
+          <el-input v-model="formData.enName" placeholder="请输入英文名称" maxlength="200" />
+        </el-form-item>
         <el-form-item label="工具类型" prop="instrumentType">
           <el-select v-model="formData.instrumentType" placeholder="请选择" style="width: 100%;">
             <el-option v-for="item in typeList" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="描述" prop="description">
-          <el-input v-model="formData.description" type="textarea" :rows="3" placeholder="请输入描述" />
+        <el-form-item label="标的资产" prop="underlying">
+          <el-input v-model="formData.underlying" placeholder="请输入标的资产" maxlength="50" />
+        </el-form-item>
+        <el-form-item label="交易所" prop="exchange">
+          <el-input v-model="formData.exchange" placeholder="请输入交易所" maxlength="50" />
+        </el-form-item>
+        <el-form-item label="币种" prop="currency">
+          <el-input v-model="formData.currency" placeholder="请输入币种" maxlength="10" />
+        </el-form-item>
+        <el-form-item label="描述" prop="remark">
+          <el-input v-model="formData.remark" type="textarea" :rows="3" placeholder="请输入描述" />
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="formData.status">
@@ -109,25 +125,24 @@ const formRef = ref(null)
 const tableData = ref([])
 
 const typeList = [
-  { label: '定期存款', value: 'DEPOSIT' },
-  { label: '活期存款', value: 'CURRENT_ACCOUNT' },
-  { label: '大额存单', value: 'CD' },
-  { label: '通知存款', value: 'NOTICE_DEPOSIT' },
-  { label: '短期贷款', value: 'SHORT_TERM_LOAN' },
-  { label: '中长期贷款', value: 'LONG_TERM_LOAN' },
-  { label: '即期外汇', value: 'FX_SPOT' },
-  { label: '远期外汇', value: 'FX_FORWARD' },
-  { label: '外汇掉期', value: 'FX_SWAP' },
-  { label: '利率掉期', value: 'IRS' },
-  { label: '同业存放', value: 'INTERBANK_DEPOSIT' },
-  { label: '同业拆借', value: 'INTERBANK_CALL' }
+  { label: '股票', value: 'STOCK' },
+  { label: '债券', value: 'BOND' },
+  { label: '期权', value: 'OPTION' },
+  { label: '期货', value: 'FUTURE' },
+  { label: '互换', value: 'SWAP' },
+  { label: '远期', value: 'FORWARD' },
+  { label: '即期', value: 'SPOT' },
+  { label: '结构性产品', value: 'STRUCTURED' },
+  { label: 'ETF', value: 'ETF' },
+  { label: '其他', value: 'OTHER' }
 ]
 
 const queryForm = reactive({ keyword: '', instrumentType: '', status: '' })
 const pagination = reactive({ pageNum: 1, pageSize: 10, total: 0 })
 
 const formData = reactive({
-  id: null, instrumentCode: '', instrumentName: '', instrumentType: '', remark: '', status: '1'
+  id: null, instrumentCode: '', instrumentName: '', enName: '', instrumentType: '',
+  underlying: '', exchange: '', currency: '', remark: '', status: '1'
 })
 
 const rules = {
@@ -146,7 +161,7 @@ const fetchData = async () => {
   try {
     const params = { ...queryForm, pageNum: pagination.pageNum, pageSize: pagination.pageSize }
     const res = await listInstrument(params)
-    tableData.value = res.data.list || []
+    tableData.value = res.data.records || res.data.list || []
     pagination.total = res.data.total || 0
   } catch (e) { console.error(e) }
   finally { loading.value = false }
@@ -160,7 +175,8 @@ const handleReset = () => {
 }
 
 const handleAdd = () => {
-  Object.assign(formData, { id: null, instrumentCode: '', instrumentName: '', instrumentType: '', remark: '', status: '1' })
+  Object.assign(formData, { id: null, instrumentCode: '', instrumentName: '', enName: '',
+    instrumentType: '', underlying: '', exchange: '', currency: '', remark: '', status: '1' })
   formRef.value?.resetFields()
   drawerVisible.value = true
 }

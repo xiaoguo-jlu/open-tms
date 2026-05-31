@@ -1,65 +1,85 @@
 import request from '@/utils/request'
 
-export function listBusinessUnit(params) {
+// 资金管理主体 API
+// 路径: /api/v1/management-entities
+
+export function listManagementEntity(params) {
   return request({
-    url: '/api/v1/business-units/page',
+    url: '/api/v1/management-entities/page',
     method: 'get',
     params
   })
 }
 
-export function getBusinessUnit(id) {
+export function getManagementEntity(id) {
   return request({
-    url: `/api/v1/business-units/${id}`,
+    url: `/api/v1/management-entities/${id}`,
     method: 'get'
   })
 }
 
-export function saveBusinessUnit(data) {
+export function getManagementEntityTree() {
   return request({
-    url: '/api/v1/business-units',
+    url: '/api/v1/management-entities/tree',
+    method: 'get'
+  })
+}
+
+export function saveManagementEntity(data) {
+  return request({
+    url: '/api/v1/management-entities',
     method: 'post',
     data
   })
 }
 
-export function updateBusinessUnit(data) {
+export function updateManagementEntity(data) {
   return request({
-    url: '/api/v1/business-units',
+    url: '/api/v1/management-entities',
     method: 'put',
     data
   })
 }
 
-export function deleteBusinessUnit(id) {
+export function deleteManagementEntity(id) {
   return request({
-    url: `/api/v1/business-units/${id}`,
+    url: `/api/v1/management-entities/${id}`,
     method: 'delete'
   })
 }
 
-export function batchDeleteBusinessUnit(ids) {
+export function batchDeleteManagementEntity(ids) {
   return request({
-    url: '/api/v1/business-units/batch-delete',
+    url: '/api/v1/management-entities/batch-delete',
     method: 'post',
     data: { ids }
   })
 }
 
-export function exportBusinessUnit(params) {
+export function exportManagementEntity(params) {
   return request({
-    url: '/api/v1/business-units/export',
+    url: '/api/v1/management-entities/export',
     method: 'get',
     params,
     responseType: 'blob'
   })
 }
 
-export function importBusinessUnit(formData) {
+export function importManagementEntity(formData) {
   return request({
-    url: '/api/v1/business-units/import',
+    url: '/api/v1/management-entities/import',
     method: 'post',
     data: formData,
     headers: { 'Content-Type': 'multipart/form-data' }
   })
 }
+
+// 兼容旧API名称 (别名)
+export const listBusinessUnit = listManagementEntity
+export const getBusinessUnit = getManagementEntity
+export const saveBusinessUnit = saveManagementEntity
+export const updateBusinessUnit = updateManagementEntity
+export const deleteBusinessUnit = deleteManagementEntity
+export const batchDeleteBusinessUnit = batchDeleteManagementEntity
+export const exportBusinessUnit = exportManagementEntity
+export const importBusinessUnit = importManagementEntity

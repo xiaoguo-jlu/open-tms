@@ -16,4 +16,12 @@ public class Counterparty extends BasedataEntity {
     private String countryCode;
 
     private String swiftCode;
+
+    private String internalRating;
+
+    private String externalRating;
+
+    private String phone;
+
+    private String address;
 }

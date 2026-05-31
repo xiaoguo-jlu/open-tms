@@ -9,7 +9,6 @@
       "Bash(java -jar \"basedata/target/opentms-basedata-1.0.0-SNAPSHOT.jar\" --server.port=8081)",
       "Bash(curl -s \"http://localhost:8081/opentms/basedata/api/v1/countries/page?pageNum=1&pageSize=5\")",
       "Bash(psql *)",
-      "Bash(\"D:\\\\Program Files\\\\PostgreSQL\\\\17\\\\bin\\\\psql\" -U opentms -d opentms -c \"ALTER TABLE tms_country_t ADD COLUMN IF NOT EXISTS remark VARCHAR\\(500\\);\")",
       "Bash(curl *)",
       "Bash(pip show *)",
       "Bash(pip install *)",

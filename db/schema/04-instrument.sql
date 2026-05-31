@@ -2,13 +2,16 @@
 -- PostgreSQL
 -- 执行顺序: 4
 
--- 金融工具表 (修复: inst_code -> instrument_code)
+-- 金融工具表
 CREATE TABLE tms_instrument_t (
     id BIGSERIAL PRIMARY KEY,
     instrument_code VARCHAR(50) NOT NULL UNIQUE,
     instrument_name VARCHAR(200) NOT NULL,
+    en_name VARCHAR(200),
     instrument_type VARCHAR(20) NOT NULL,
     instrument_subtype VARCHAR(20),
+    underlying VARCHAR(50),
+    exchange VARCHAR(50),
     currency VARCHAR(10),
     face_value DECIMAL(24,4),
     issue_date DATE,

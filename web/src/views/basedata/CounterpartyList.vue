@@ -44,7 +44,11 @@
             <el-tag>{{ getTypeLabel(row.counterpartyType) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="countryName" label="所属国家" width="100" />
+        <el-table-column prop="countryCode" label="所属国家" width="100">
+          <template #default="{ row }">
+            {{ getCountryName(row.countryCode) }}
+          </template>
+        </el-table-column>
         <el-table-column prop="internalRating" label="内部评级" width="100" />
         <el-table-column prop="externalRating" label="外部评级" width="100" />
         <el-table-column prop="status" label="状态" width="80" align="center">
@@ -110,7 +114,7 @@
           <el-input v-model="formData.address" type="textarea" :rows="2" placeholder="请输入联系地址" />
         </el-form-item>
         <el-form-item label="联系电话" prop="phone">
-          <el-input v-model="formData.phone" placeholder="请输入联系电话" />
+          <el-input v-model="formData.phone" placeholder="请输入联系电话" maxlength="30" />
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="formData.status">
@@ -176,10 +180,15 @@ const getTypeLabel = (type) => {
   return map[type] || type
 }
 
+const getCountryName = (code) => {
+  const country = countryList.value.find(c => c.code === code)
+  return country ? country.name : code || '-'
+}
+
 const fetchCountryList = async () => {
   try {
     const res = await listCountry({ pageSize: 1000 })
-    countryList.value = res.data.list || []
+    countryList.value = res.data.records || res.data.list || []
   } catch (error) {
     console.error('Failed to fetch countries:', error)
   }

@@ -1,0 +1,250 @@
+<template>
+  <div class="subsidiary-list">
+    <el-card class="filter-card">
+      <el-form :inline="true" :model="queryForm">
+        <el-form-item label="关键字">
+          <el-input v-model="queryForm.keyword" placeholder="编码/名称" clearable @keyup.enter="handleQuery" />
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-select v-model="queryForm.status" placeholder="请选择" clearable>
+            <el-option label="启用" value="1" />
+            <el-option label="停用" value="0" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="handleQuery">查询</el-button>
+          <el-button @click="handleReset">重置</el-button>
+          <el-button type="success" @click="handleAdd">新增</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
+
+    <el-card class="table-card">
+      <el-table :data="tableData" v-loading="loading" stripe>
+        <el-table-column type="selection" width="50" align="center" />
+        <el-table-column type="index" label="序号" width="60" align="center" />
+        <el-table-column prop="code" label="子公司编码" width="140" />
+        <el-table-column prop="name" label="名称" min-width="150" />
+        <el-table-column prop="enName" label="英文名称" min-width="150" />
+        <el-table-column prop="businessUnitCode" label="资金管理主体" width="140" />
+        <el-table-column prop="legalPerson" label="法人代表" width="100" />
+        <el-table-column prop="phone" label="电话" width="120" />
+        <el-table-column prop="status" label="状态" width="80" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.status === '1' ? 'success' : 'danger'">
+              {{ row.status === '1' ? '启用' : '停用' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="createdAt" label="创建时间" width="180" />
+        <el-table-column label="操作" width="150" fixed="right">
+          <template #default="{ row }">
+            <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
+            <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <el-pagination
+        v-model:current-page="pagination.pageNum"
+        v-model:page-size="pagination.pageSize"
+        :page-sizes="[10, 20, 50, 100]"
+        :total="pagination.total"
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="fetchData"
+        @current-change="fetchData"
+        style="margin-top: 16px; justify-content: flex-end;"
+      />
+    </el-card>
+
+    <el-drawer v-model="drawerVisible" :title="drawerTitle" direction="rtl" size="560px">
+      <el-form ref="formRef" :model="formData" :rules="rules" label-width="120px">
+        <el-form-item label="子公司编码" prop="code">
+          <el-input v-model="formData.code" placeholder="唯一标识，支持字母数字" :disabled="isEdit" maxlength="20" show-word-limit />
+        </el-form-item>
+        <el-form-item label="名称" prop="name">
+          <el-input v-model="formData.name" placeholder="请输入子公司名称" maxlength="100" show-word-limit />
+        </el-form-item>
+        <el-form-item label="英文名称" prop="enName">
+          <el-input v-model="formData.enName" placeholder="English Name" maxlength="100" show-word-limit />
+        </el-form-item>
+        <el-form-item label="父级编码" prop="parentCode">
+          <el-input v-model="formData.parentCode" placeholder="请输入父级编码" maxlength="20" show-word-limit />
+        </el-form-item>
+        <el-form-item label="资金管理主体" prop="businessUnitCode">
+          <el-input v-model="formData.businessUnitCode" placeholder="请输入所属资金管理主体编码" maxlength="20" show-word-limit />
+        </el-form-item>
+        <el-form-item label="法人代表" prop="legalPerson">
+          <el-input v-model="formData.legalPerson" placeholder="请输入法人代表" maxlength="50" show-word-limit />
+        </el-form-item>
+        <el-form-item label="工商注册号" prop="registrationNo">
+          <el-input v-model="formData.registrationNo" placeholder="请输入工商注册号" maxlength="50" show-word-limit />
+        </el-form-item>
+        <el-form-item label="税号" prop="taxNo">
+          <el-input v-model="formData.taxNo" placeholder="请输入税号" maxlength="50" show-word-limit />
+        </el-form-item>
+        <el-form-item label="地址" prop="address">
+          <el-input v-model="formData.address" placeholder="请输入地址" maxlength="200" show-word-limit />
+        </el-form-item>
+        <el-form-item label="电话" prop="phone">
+          <el-input v-model="formData.phone" placeholder="请输入电话" maxlength="30" show-word-limit />
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="formData.email" placeholder="请输入邮箱" maxlength="100" show-word-limit />
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-radio-group v-model="formData.status">
+            <el-radio value="1">启用</el-radio>
+            <el-radio value="0">停用</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div style="padding: 16px;">
+          <el-button @click="drawerVisible = false">取消</el-button>
+          <el-button type="primary" @click="handleSubmit" :loading="submitLoading">保存</el-button>
+        </div>
+      </template>
+    </el-drawer>
+  </div>
+</template>
+
+<script setup>
+import { ref, reactive, computed, onMounted } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { listSubsidiary, saveSubsidiary, updateSubsidiary, deleteSubsidiary } from '@/api/basedata'
+
+const loading = ref(false)
+const drawerVisible = ref(false)
+const submitLoading = ref(false)
+const formRef = ref(null)
+const tableData = ref([])
+
+const queryForm = reactive({ keyword: '', status: '' })
+const pagination = reactive({ pageNum: 1, pageSize: 10, total: 0 })
+
+const formData = reactive({
+  id: null,
+  code: '',
+  name: '',
+  enName: '',
+  parentCode: '',
+  businessUnitCode: '',
+  legalPerson: '',
+  registrationNo: '',
+  taxNo: '',
+  address: '',
+  phone: '',
+  email: '',
+  status: '1'
+})
+
+const rules = {
+  code: [{ required: true, message: '请输入子公司编码', trigger: 'blur' }, { min: 1, max: 20, message: '最多20个字符', trigger: 'blur' }],
+  name: [{ required: true, message: '请输入名称', trigger: 'blur' }, { min: 1, max: 100, message: '最多100个字符', trigger: 'blur' }],
+  enName: [{ min: 0, max: 100, message: '最多100个字符', trigger: 'blur' }],
+  parentCode: [{ min: 0, max: 20, message: '最多20个字符', trigger: 'blur' }],
+  businessUnitCode: [{ min: 0, max: 20, message: '最多20个字符', trigger: 'blur' }],
+  legalPerson: [{ min: 0, max: 50, message: '最多50个字符', trigger: 'blur' }],
+  registrationNo: [{ min: 0, max: 50, message: '最多50个字符', trigger: 'blur' }],
+  taxNo: [{ min: 0, max: 50, message: '最多50个字符', trigger: 'blur' }],
+  address: [{ min: 0, max: 200, message: '最多200个字符', trigger: 'blur' }],
+  phone: [{ min: 0, max: 30, message: '最多30个字符', trigger: 'blur' }],
+  email: [{ min: 0, max: 100, message: '最多100个字符', trigger: 'blur' }],
+  status: [{ required: true, message: '请选择状态', trigger: 'change' }]
+}
+
+const drawerTitle = computed(() => (formData.id ? '编辑子公司' : '新增子公司'))
+const isEdit = computed(() => !!formData.id)
+
+const fetchData = async () => {
+  loading.value = true
+  try {
+    const params = {
+      keyword: queryForm.keyword,
+      status: queryForm.status,
+      pageNum: pagination.pageNum,
+      pageSize: pagination.pageSize
+    }
+    const res = await listSubsidiary(params)
+    tableData.value = res.data.records || res.data.list || []
+    pagination.total = res.data.total || 0
+  } catch (error) {
+    console.error('Failed to fetch data:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleQuery = () => {
+  pagination.pageNum = 1
+  fetchData()
+}
+
+const handleReset = () => {
+  queryForm.keyword = ''
+  queryForm.status = ''
+  handleQuery()
+}
+
+const handleAdd = () => {
+  Object.assign(formData, {
+    id: null, code: '', name: '', enName: '', parentCode: '', businessUnitCode: '',
+    legalPerson: '', registrationNo: '', taxNo: '', address: '', phone: '', email: '', status: '1'
+  })
+  formRef.value?.resetFields()
+  drawerVisible.value = true
+}
+
+const handleEdit = (row) => {
+  Object.assign(formData, { ...row })
+  drawerVisible.value = true
+}
+
+const handleDelete = async (row) => {
+  try {
+    await ElMessageBox.confirm('确定要删除该子公司吗?', '提示', { type: 'warning' })
+    await deleteSubsidiary(row.id)
+    ElMessage.success('删除成功')
+    fetchData()
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('Delete failed:', error)
+    }
+  }
+}
+
+const handleSubmit = async () => {
+  if (!formRef.value) return
+  await formRef.value.validate(async (valid) => {
+    if (valid) {
+      submitLoading.value = true
+      try {
+        if (formData.id) {
+          await updateSubsidiary(formData)
+          ElMessage.success('更新成功')
+        } else {
+          await saveSubsidiary(formData)
+          ElMessage.success('新增成功')
+        }
+        drawerVisible.value = false
+        fetchData()
+      } catch (error) {
+        console.error('Submit failed:', error)
+      } finally {
+        submitLoading.value = false
+      }
+    }
+  })
+}
+
+onMounted(() => {
+  fetchData()
+})
+</script>
+
+<style scoped>
+.subsidiary-list { }
+.filter-card { margin-bottom: 16px; }
+.table-card { }
+</style>

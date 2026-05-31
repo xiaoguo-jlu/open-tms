@@ -1,5 +1,7 @@
 import request from '@/utils/request'
 
+export * from './approvalRule'
+
 export function listWorkflowTemplate(params) {
   return request({
     url: '/approval/templates',

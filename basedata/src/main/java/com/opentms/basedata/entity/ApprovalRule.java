@@ -1,4 +1,4 @@
-package com.opentms.instrument.entity;
+package com.opentms.basedata.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -6,40 +6,29 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Data
-@TableName("tms_instrument_t")
-public class Instrument {
+@TableName("tms_approval_rule_t")
+public class ApprovalRule {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private String instrumentCode;
+    private String ruleCode;
 
-    private String instrumentName;
+    private String ruleName;
 
-    private String instrumentType;
+    private String bizType;
 
-    private String instrumentSubtype;
-
-    private String enName;
-
-    private String underlying;
-
-    private String exchange;
+    private BigDecimal amountLimit;
 
     private String currency;
 
-    private BigDecimal faceValue;
+    private Integer approvalLevel;
 
-    private LocalDate issueDate;
+    private String approverType;
 
-    private LocalDate maturityDate;
-
-    private BigDecimal interestRate;
-
-    private Long counterpartyId;
+    private String approverExpr;
 
     private String status;
 

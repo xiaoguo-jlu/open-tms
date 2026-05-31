@@ -13,6 +13,8 @@ public class InstrumentDTO {
 
     private String name;
 
+    private String enName;
+
     private String status;
 
     private String instrumentCode;
@@ -22,6 +24,10 @@ public class InstrumentDTO {
     private String instrumentType;
 
     private String underlyingType;
+
+    private String underlying;
+
+    private String exchange;
 
     private String currency;
 

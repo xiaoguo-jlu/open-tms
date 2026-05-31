@@ -9,9 +9,25 @@ public class BusinessUnitDTO extends BaseDTO {
 
     private String enName;
 
+    private String entityType;
+
+    private String parentCode;
+
+    private Integer levelDepth;
+
+    private String hierarchyPath;
+
     private String legalPerson;
 
-    private String address;
+    private String registeredAddress;
+
+    private String officeAddress;
+
+    private String unifiedSocialCreditCode;
+
+    private String businessLicenseNo;
+
+    private java.time.LocalDate establishmentDate;
 
     private String taxNo;
 }

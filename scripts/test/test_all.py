@@ -1,72 +1,51 @@
+#!/usr/bin/env python3
+"""
+Open-TMS 测试套件入口脚本
+整合API测试和UI测试
+
+使用方法:
+  python scripts/test/test_all.py              # 运行所有测试
+  python scripts/test/test_basedata_api.py     # 仅运行API测试
+  python scripts/test/test_basedata_ui.py      # 仅运行UI测试
+  python scripts/test/test_basedata_all.py     # 启动服务并运行所有测试
+"""
+
+import sys
 import subprocess
-import time
 
-jar_path = 'E:\\code-project\\open-tms\\open-tms\\basedata\\target\\opentms-basedata-1.0.0-SNAPSHOT.jar'
+def main():
+    print("""
+╔══════════════════════════════════════════════════════════════╗
+║            Open-TMS Test Suite                               ║
+║            基础数据模块自动化测试                              ║
+╚══════════════════════════════════════════════════════════════╝
+""")
 
-# Kill any existing process on port 8081
-try:
-    result = subprocess.run(['netstat', '-ano'], capture_output=True, text=True)
-    for line in result.stdout.splitlines():
-        if ':8081' in line and 'LISTENING' in line:
-            parts = line.split()
-            if parts and parts[-1].isdigit():
-                pid = int(parts[-1])
-                try:
-                    subprocess.run(['taskkill', '/F', '/PID', str(pid)], capture_output=True)
-                    print(f'Killed process {pid}')
-                except:
-                    pass
-except:
-    pass
+    print("Available test scripts:")
+    print("  1. test_basedata_api.py   - API测试 (需要后端运行)")
+    print("  2. test_basedata_ui.py    - UI测试 (需要后端+前端运行)")
+    print("  3. test_basedata_all.py   - 综合测试 (自动启动所有服务)")
+    print("")
+    print("Usage:")
+    print("  python scripts/test/test_basedata_api.py")
+    print("  python scripts/test/test_basedata_ui.py")
+    print("  python scripts/test/test_basedata_all.py")
+    print("")
 
-time.sleep(3)
+    # 如果传入参数，执行对应测试
+    if len(sys.argv) > 1:
+        cmd = sys.argv[1]
+        if cmd == "api":
+            subprocess.run([sys.executable, "scripts/test/test_basedata_api.py"])
+        elif cmd == "ui":
+            subprocess.run([sys.executable, "scripts/test/test_basedata_ui.py"])
+        elif cmd == "all":
+            subprocess.run([sys.executable, "scripts/test/test_basedata_all.py"])
+        else:
+            print(f"Unknown command: {cmd}")
+    else:
+        print("Run specific test: python scripts/test/test_all.py [api|ui|all]")
 
-# Start the backend
-print('Starting backend...')
-proc = subprocess.Popen(['java', '-jar', jar_path], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
-# Wait for startup
-for line in proc.stdout:
-    print(line.strip())
-    if 'Started BasedataApplication' in line:
-        print('Backend started!')
-        break
-
-print('Waiting 10 seconds...')
-time.sleep(10)
-
-# Test endpoints
-import urllib.request
-
-print('\nTesting /api/v1/test')
-try:
-    resp = urllib.request.urlopen('http://localhost:8081/opentms/basedata/api/v1/test', timeout=10)
-    print(f'  Status: {resp.status}')
-    print(f'  Response: {resp.read().decode("utf-8")[:500]}')
-except urllib.error.HTTPError as e:
-    print(f'  HTTP Error: {e.code}')
-    print(f'  Body: {e.read().decode("utf-8")[:500]}')
-except Exception as e:
-    print(f'  Error: {e}')
-
-print('\nTesting /api/v1/countries')
-try:
-    resp = urllib.request.urlopen('http://localhost:8081/opentms/basedata/api/v1/countries', timeout=10)
-    print(f'  Status: {resp.status}')
-    print(f'  Response: {resp.read().decode("utf-8")[:500]}')
-except urllib.error.HTTPError as e:
-    print(f'  HTTP Error: {e.code}')
-    print(f'  Body: {e.read().decode("utf-8")[:500]}')
-except Exception as e:
-    print(f'  Error: {e}')
-
-print('\nTesting /api/v1/holidays')
-try:
-    resp = urllib.request.urlopen('http://localhost:8081/opentms/basedata/api/v1/holidays', timeout=10)
-    print(f'  Status: {resp.status}')
-    print(f'  Response: {resp.read().decode("utf-8")[:500]}')
-except urllib.error.HTTPError as e:
-    print(f'  HTTP Error: {e.code}')
-    print(f'  Body: {e.read().decode("utf-8")[:500]}')
-except Exception as e:
-    print(f'  Error: {e}')
+if __name__ == "__main__":
+    main()

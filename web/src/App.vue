@@ -6,7 +6,9 @@
         <el-menu-item index="/dashboard"><el-icon><DataAnalysis /></el-icon><span>管理驾驶舱</span></el-menu-item>
         <el-sub-menu index="basedata">
           <template #title><el-icon><Grid /></el-icon><span>基础数据</span></template>
+          <el-menu-item index="/organization/management-entity">资金管理主体</el-menu-item>
           <el-menu-item index="/basedata/business-unit">业务单元管理</el-menu-item>
+          <el-menu-item index="/basedata/subsidiary">子公司管理</el-menu-item>
           <el-menu-item index="/basedata/trader">交易员管理</el-menu-item>
           <el-menu-item index="/basedata/currency">币种管理</el-menu-item>
           <el-menu-item index="/basedata/country">国家/地区管理</el-menu-item>
@@ -14,6 +16,7 @@
           <el-menu-item index="/basedata/bank">银行信息管理</el-menu-item>
           <el-menu-item index="/basedata/counterparty">交易对手管理</el-menu-item>
           <el-menu-item index="/basedata/counterparty-account">对手方银行账户</el-menu-item>
+          <el-menu-item index="/basedata/currency-pair">币种对管理</el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="dealing">
           <template #title><el-icon><Wallet /></el-icon><span>交易管理</span></template>
@@ -23,6 +26,7 @@
         </el-sub-menu>
         <el-sub-menu index="approval">
           <template #title><el-icon><CircleCheck /></el-icon><span>审批管理</span></template>
+          <el-menu-item index="/approval/rule">审批规则</el-menu-item>
           <el-menu-item index="/approval/template">审批流程配置</el-menu-item>
           <el-menu-item index="/approval/task">审批任务</el-menu-item>
         </el-sub-menu>

@@ -21,7 +21,9 @@ public class InstrumentServiceImpl extends ServiceImpl<InstrumentMapper, Instrum
         if (StringUtils.hasText(keyword)) {
             wrapper.like(Instrument::getInstrumentCode, keyword)
                    .or()
-                   .like(Instrument::getInstrumentName, keyword);
+                   .like(Instrument::getInstrumentName, keyword)
+                   .or()
+                   .like(Instrument::getEnName, keyword);
         }
 
         if (StringUtils.hasText(instrumentType)) {
