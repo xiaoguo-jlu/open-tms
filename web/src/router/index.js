@@ -15,6 +15,7 @@ const routes = [
       { path: 'country', name: 'Country', component: () => import('@/views/basedata/CountryList.vue') },
       { path: 'holiday', name: 'Holiday', component: () => import('@/views/basedata/HolidayList.vue') },
       { path: 'bank', name: 'Bank', component: () => import('@/views/basedata/BankList.vue') },
+      { path: 'bank-account', name: 'BankAccount', component: () => import('@/views/basedata/BankAccountList.vue') },
       { path: 'counterparty', name: 'Counterparty', component: () => import('@/views/basedata/CounterpartyList.vue') },
       { path: 'counterparty-account', name: 'CounterpartyAccount', component: () => import('@/views/basedata/CounterpartyAccountList.vue') },
       { path: 'currency-pair', name: 'CurrencyPair', component: () => import('@/views/basedata/CurrencyPairList.vue') },
@@ -24,8 +25,9 @@ const routes = [
   {
     path: '/dealing', name: 'Dealing', children: [
       { path: 'deal', name: 'DealList', component: () => import('@/views/dealing/DealList.vue') },
-      { path: 'deal/edit', name: 'DealEdit', component: () => import('@/views/dealing/DealEdit.vue') },
+      { path: 'deal/form', name: 'DealForm', component: () => import('@/views/dealing/DealForm.vue') },
       { path: 'deal/detail', name: 'DealDetail', component: () => import('@/views/dealing/DealDetail.vue') },
+      { path: 'action', name: 'ActionList', component: () => import('@/views/dealing/ActionList.vue') },
       { path: 'bank-account', name: 'BankAccount', component: () => import('@/views/dealing/BankAccountList.vue') },
       { path: 'instrument', name: 'Instrument', component: () => import('@/views/dealing/InstrumentList.vue') }
     ]

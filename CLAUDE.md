@@ -78,7 +78,7 @@ python scripts/db/db_tool.py -r db/schema/fix.sql
 ```
 opentms-parent (pom.xml)
 ├── common/          # Shared config, constants, utilities, Result class
-├── basedata/        # Foundation data (Bank, Country, Currency, Trader, etc.)
+├── basedata/        # Foundation data (Bank, Country, Currency, Trader, Subsidiary, CurrencyPair, ApprovalRule, etc.)
 ├── dealing/         # Transaction management
 ├── cashpool/        # Cash pool management
 ├── fundplan/        # Fund planning
@@ -126,9 +126,11 @@ All APIs return Result wrapper:
 GET    /api/v1/{resource}/page        # Pagination query
 GET    /api/v1/{resource}/{id}        # Get by ID
 POST   /api/v1/{resource}             # Create
-PUT    /api/v1/{resource}             # Update
-DELETE /api/v1/{resource}/{id}       # Delete
+POST   /api/v1/{resource}/update      # Update (统一POST)
+POST   /api/v1/{resource}/delete/{id} # Delete (统一POST)
 ```
+
+> **Note**: API methods for update/delete are unified to POST (2026-05-31)
 
 ### Entity Conventions
 - Country: `countryNo` field → database column `country_no` (MyBatis Plus auto-mapping)

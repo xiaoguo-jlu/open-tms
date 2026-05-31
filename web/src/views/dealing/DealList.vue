@@ -3,19 +3,19 @@
     <el-card class="filter-card">
       <el-form :inline="true" :model="queryForm">
         <el-form-item label="交易编号">
-          <el-input v-model="queryForm.dealNo" placeholder="请输入交易编号" clearable @keyup.enter="handleQuery" />
+          <el-input v-model="queryForm.dealNumber" placeholder="请输入交易编号" clearable @keyup.enter="handleQuery" />
         </el-form-item>
         <el-form-item label="交易类型">
           <el-select v-model="queryForm.dealType" placeholder="请选择" clearable>
+            <el-option label="AC交易" value="AC" />
             <el-option label="存款" value="DEPOSIT" />
             <el-option label="贷款" value="LOAN" />
             <el-option label="外汇" value="FX" />
-            <el-option label="同业" value="INTERBANK" />
           </el-select>
         </el-form-item>
         <el-form-item label="业务单元">
-          <el-select v-model="queryForm.entityId" placeholder="请选择" clearable filterable>
-            <el-option v-for="item in entityList" :key="item.id" :label="item.name" :value="item.id" />
+          <el-select v-model="queryForm.businessUnitId" placeholder="请选择" clearable filterable>
+            <el-option v-for="item in businessUnitList" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="交易对手">
@@ -25,14 +25,13 @@
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="queryForm.status" placeholder="请选择" clearable>
-            <el-option label="草稿" value="DRAFT" />
-            <el-option label="待审批" value="PENDING_APPROVE" />
-            <el-option label="审批中" value="APPROVING" />
-            <el-option label="已审批" value="APPROVED" />
-            <el-option label="已驳回" value="REJECTED" />
-            <el-option label="已执行" value="EXECUTED" />
-            <el-option label="已结算" value="SETTLED" />
-            <el-option label="已撤销" value="CANCELLED" />
+            <el-option label="新建" value="New" />
+            <el-option label="已提交" value="Submitted" />
+            <el-option label="已审批" value="Approved" />
+            <el-option label="已拒绝" value="Rejected" />
+            <el-option label="已执行" value="Executed" />
+            <el-option label="已结算" value="Settled" />
+            <el-option label="已取消" value="Canceled" />
           </el-select>
         </el-form-item>
         <el-form-item label="日期范围">
@@ -50,34 +49,41 @@
       <el-table :data="tableData" v-loading="loading" stripe>
         <el-table-column type="selection" width="50" align="center" />
         <el-table-column type="index" label="序号" width="60" align="center" />
-        <el-table-column prop="dealNo" label="交易编号" width="160" />
+        <el-table-column prop="dealNumber" label="交易编号" width="160" />
         <el-table-column prop="dealType" label="交易类型" width="100">
           <template #default="{ row }">
             <el-tag>{{ getTypeLabel(row.dealType) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="dealSubtype" label="交易子类型" width="120" />
-        <el-table-column prop="entityName" label="业务单元" width="120" />
-        <el-table-column prop="counterpartyName" label="交易对手" width="120" />
-        <el-table-column prop="amount" label="金额" align="right" width="150">
+        <el-table-column prop="businessUnit" label="业务单元" width="120" />
+        <el-table-column prop="direction" label="方向" width="100">
           <template #default="{ row }">
-            {{ formatAmount(row.amount, row.currencyCode) }}
+            <el-tag :type="row.direction === 'Inflow' ? 'success' : 'danger'">
+              {{ row.direction === 'Inflow' ? '流入' : '流出' }}
+            </el-tag>
           </template>
         </el-table-column>
+        <el-table-column prop="amount" label="金额" align="right" width="150">
+          <template #default="{ row }">
+            {{ formatAmount(row.amount, row.currency) }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="currency" label="币种" width="80" align="center" />
+        <el-table-column prop="dealDate" label="交易日期" width="120" />
         <el-table-column prop="valueDate" label="起息日" width="120" />
-        <el-table-column prop="maturityDate" label="到期日" width="120" />
         <el-table-column prop="status" label="状态" width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="getStatusType(row.status)">{{ getStatusLabel(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" label="创建时间" width="160" />
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="250" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleView(row)">查看</el-button>
             <el-button type="primary" link @click="handleEdit(row)" v-if="canEdit(row.status)">编辑</el-button>
             <el-button type="success" link @click="handleSubmit(row)" v-if="canSubmit(row.status)">提交</el-button>
-            <el-button type="warning" link @click="handleCancel(row)" v-if="canCancel(row.status)">撤销</el-button>
+            <el-button type="warning" link @click="handleApprove(row)" v-if="canApprove(row.status)">审批</el-button>
+            <el-button type="danger" link @click="handleReject(row)" v-if="canReject(row.status)">拒绝</el-button>
+            <el-button type="primary" link @click="handleExecute(row)" v-if="canExecute(row.status)">执行</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -100,19 +106,19 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { listDeal, submitDeal, cancelDeal } from '@/api/dealing'
+import { listDeal, submitDeal, approveDeal, rejectDeal, executeDeal } from '@/api/dealing'
 import { listBusinessUnit, listCounterparty } from '@/api/basedata'
 
 const router = useRouter()
 const loading = ref(false)
 const tableData = ref([])
-const entityList = ref([])
+const businessUnitList = ref([])
 const counterpartyList = ref([])
 
 const queryForm = reactive({
-  dealNo: '',
+  dealNumber: '',
   dealType: '',
-  entityId: '',
+  businessUnitId: '',
   counterpartyId: '',
   status: '',
   dateRange: []
@@ -120,24 +126,22 @@ const queryForm = reactive({
 const pagination = reactive({ pageNum: 1, pageSize: 10, total: 0 })
 
 const getTypeLabel = (type) => {
-  const map = { DEPOSIT: '存款', LOAN: '贷款', FX: '外汇', INTERBANK: '同业' }
+  const map = { AC: 'AC交易', DEPOSIT: '存款', LOAN: '贷款', FX: '外汇' }
   return map[type] || type
 }
 
 const getStatusLabel = (status) => {
   const map = {
-    DRAFT: '草稿', PENDING_APPROVE: '待审批', APPROVING: '审批中',
-    APPROVED: '已审批', REJECTED: '已驳回', EXECUTED: '已执行',
-    SETTLED: '已结算', CANCELLED: '已撤销'
+    New: '新建', Submitted: '已提交', Approved: '已审批',
+    Rejected: '已拒绝', Executed: '已执行', Settled: '已结算', Canceled: '已取消'
   }
   return map[status] || status
 }
 
 const getStatusType = (status) => {
   const map = {
-    DRAFT: 'info', PENDING_APPROVE: 'warning', APPROVING: 'warning',
-    APPROVED: 'success', REJECTED: 'danger', EXECUTED: 'success',
-    SETTLED: 'success', CANCELLED: 'info'
+    New: 'info', Submitted: 'warning', Approved: 'success',
+    Rejected: 'danger', Executed: 'success', Settled: 'success', Canceled: 'info'
   }
   return map[status] || 'info'
 }
@@ -147,21 +151,23 @@ const formatAmount = (amount, currency) => {
   return new Intl.NumberFormat('zh-CN', { minimumFractionDigits: 2 }).format(amount) + ' ' + (currency || '')
 }
 
-const canEdit = (status) => ['DRAFT', 'REJECTED'].includes(status)
-const canSubmit = (status) => status === 'DRAFT'
-const canCancel = (status) => ['PENDING_APPROVE', 'APPROVING', 'APPROVED'].includes(status)
+const canEdit = (status) => ['New', 'Rejected'].includes(status)
+const canSubmit = (status) => status === 'New'
+const canApprove = (status) => status === 'Submitted'
+const canReject = (status) => status === 'Submitted'
+const canExecute = (status) => status === 'Approved'
 
-const fetchEntityList = async () => {
+const fetchBusinessUnitList = async () => {
   try {
     const res = await listBusinessUnit({ pageSize: 1000 })
-    entityList.value = res.data.list || []
+    businessUnitList.value = res.data.records || res.data.list || []
   } catch (e) { console.error(e) }
 }
 
 const fetchCounterpartyList = async () => {
   try {
     const res = await listCounterparty({ pageSize: 1000 })
-    counterpartyList.value = res.data.list || []
+    counterpartyList.value = res.data.records || res.data.list || []
   } catch (e) { console.error(e) }
 }
 
@@ -169,9 +175,9 @@ const fetchData = async () => {
   loading.value = true
   try {
     const params = {
-      dealNo: queryForm.dealNo,
+      dealNumber: queryForm.dealNumber,
       dealType: queryForm.dealType,
-      entityId: queryForm.entityId,
+      businessUnitId: queryForm.businessUnitId,
       counterpartyId: queryForm.counterpartyId,
       status: queryForm.status,
       startDate: queryForm.dateRange?.[0],
@@ -180,7 +186,7 @@ const fetchData = async () => {
       pageSize: pagination.pageSize
     }
     const res = await listDeal(params)
-    tableData.value = res.data.list || []
+    tableData.value = res.data.records || res.data.list || []
     pagination.total = res.data.total || 0
   } catch (e) { console.error(e) }
   finally { loading.value = false }
@@ -189,15 +195,15 @@ const fetchData = async () => {
 const handleQuery = () => { pagination.pageNum = 1; fetchData() }
 
 const handleReset = () => {
-  Object.assign(queryForm, { dealNo: '', dealType: '', entityId: '', counterpartyId: '', status: '', dateRange: [] })
+  Object.assign(queryForm, { dealNumber: '', dealType: '', businessUnitId: '', counterpartyId: '', status: '', dateRange: [] })
   handleQuery()
 }
 
-const handleAdd = () => { router.push('/dealing/deal/edit') }
+const handleAdd = () => { router.push('/dealing/deal/form') }
 
 const handleView = (row) => { router.push(`/dealing/deal/detail?id=${row.id}`) }
 
-const handleEdit = (row) => { router.push(`/dealing/deal/edit?id=${row.id}`) }
+const handleEdit = (row) => { router.push(`/dealing/deal/form?id=${row.id}`) }
 
 const handleSubmit = async (row) => {
   try {
@@ -208,16 +214,34 @@ const handleSubmit = async (row) => {
   } catch (e) { if (e !== 'cancel') console.error(e) }
 }
 
-const handleCancel = async (row) => {
+const handleApprove = async (row) => {
   try {
-    await ElMessageBox.confirm('确认撤销该交易?', '提示', { type: 'warning' })
-    await cancelDeal(row.id, { reason: '' })
-    ElMessage.success('撤销成功')
+    await ElMessageBox.confirm('确认审批通过?', '提示', { type: 'warning' })
+    await approveDeal(row.id)
+    ElMessage.success('审批成功')
     fetchData()
   } catch (e) { if (e !== 'cancel') console.error(e) }
 }
 
-onMounted(() => { fetchEntityList(); fetchCounterpartyList(); fetchData() })
+const handleReject = async (row) => {
+  try {
+    await ElMessageBox.confirm('确认拒绝该交易?', '提示', { type: 'warning' })
+    await rejectDeal(row.id, { reason: '' })
+    ElMessage.success('拒绝成功')
+    fetchData()
+  } catch (e) { if (e !== 'cancel') console.error(e) }
+}
+
+const handleExecute = async (row) => {
+  try {
+    await ElMessageBox.confirm('确认执行该交易?', '提示', { type: 'warning' })
+    await executeDeal(row.id)
+    ElMessage.success('执行成功')
+    fetchData()
+  } catch (e) { if (e !== 'cancel') console.error(e) }
+}
+
+onMounted(() => { fetchBusinessUnitList(); fetchCounterpartyList(); fetchData() })
 </script>
 
 <style scoped>

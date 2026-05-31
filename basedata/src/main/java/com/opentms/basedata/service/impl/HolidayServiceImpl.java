@@ -29,7 +29,7 @@ public class HolidayServiceImpl extends ServiceImpl<HolidayMapper, Holiday> impl
             wrapper.eq(Holiday::getCountryCode, countryCode);
         }
         if (year != null) {
-            wrapper.apply("YEAR(holiday_date) = {0}", year);
+            wrapper.apply("EXTRACT(YEAR FROM holiday_date) = {0}", year);
         }
         wrapper.orderByAsc(Holiday::getHolidayDate);
         return page(new Page<>(pageNum, pageSize), wrapper);

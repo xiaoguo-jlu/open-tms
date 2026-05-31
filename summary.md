@@ -1,6 +1,6 @@
 # Open-TMS 项目概览清单
 
-> 文档版本: 2026-05-29
+> 文档版本: 2026-05-31
 > 最后更新: 每次项目结构、功能、代码变更时刷新
 
 ---
@@ -60,7 +60,7 @@
 | 模块 | 目录 | 状态 | 主要类 |
 |------|------|------|--------|
 | **common** | common/ | ✅ 已完成 | MybatisPlusConfig, GlobalConstants, Result, BaseCodeEntity |
-| **basedata** | basedata/ | 🔄 开发中 | Bank, BusinessUnit, Counterparty, CounterpartyAccount, Currency, Country, Holiday, Trader |
+| **basedata** | basedata/ | ✅ 开发中 | Bank, BusinessUnit, Counterparty, CounterpartyAccount, Currency, Country, Holiday, Trader, **Subsidiary, CurrencyPair, ApprovalRule** |
 | **dealing** | dealing/ | 🔄 开发中 | Deal, DealController |
 | **cashpool** | cashpool/ | 🔄 开发中 | CashPool, CashPoolController |
 | **fundplan** | fundplan/ | 🔄 开发中 | FundPlan, FundPlanController |
@@ -79,7 +79,7 @@
 
 | 模块 | 页面文件 |
 |------|----------|
-| **basedata** | BankList, BusinessUnitList, CounterpartyList, CounterpartyAccountList, CurrencyList, CountryList, HolidayList, TraderList |
+| **basedata** | BankList, BusinessUnitList, CounterpartyList, CounterpartyAccountList, CurrencyList, CountryList, HolidayList, TraderList, **SubsidiaryList, CurrencyPairList** |
 | **dealing** | DealList, DealEdit, DealDetail, BankAccountList, InstrumentList |
 | **cashpool** | CashPoolList, AutoRuleList, PositionOverview, PositionLimit |
 | **fundplan** | FundPlanList |
@@ -89,7 +89,7 @@
 | **loan** | LoanList |
 | **deposit** | DepositList |
 | **transfer** | TransferList |
-| **approval** | ApprovalTask, WorkflowTemplate |
+| **approval** | ApprovalTask, WorkflowTemplate, **ApprovalRuleList** |
 | **dashboard** | Cockpit |
 | **report** | ReportList |
 
@@ -256,11 +256,13 @@ python db_tool.py -r db/schema/fix.sql         # 执行SQL文件
 ## 十、最近提交记录 (Git)
 
 ```
+392c826 - feat: add Subsidiary, CurrencyPair, ApprovalRule modules with frontend
+ec92c7a - refactor: unify API methods (POST for update/delete) and add audit field conventions
+78245ef - refactor: update skill docs to reflect new script paths
+e745473 - refactor: organize scripts into proper directories
 5bc95e2 - fix: implement queryPage for Country and Trader services
 958879e - fix: improve error handling for Country/Trader delete operations
 ffd44a4 - fix: optimize skills and test scripts based on bug fixes
-3d7ae7b - feat(opentms-pm-lead): complete rewrite - 研发交付全流程管理体系
-aa7b4fd - feat(opentms-feature-dev): fix 4 major workflow gaps
 ```
 
 ---
@@ -297,7 +299,9 @@ aa7b4fd - feat(opentms-feature-dev): fix 4 major workflow gaps
 ✅ 完成: 项目规划、功能清单、技术选型、团队协作规范
 ✅ 完成: M1基础数据PRD全部完成
 ✅ 完成: Country模块后端CRUD + 分页查询 (已验证)
-✅ 完成: Country前端分页数据解析修复
+✅ 完成: 前端分页数据解析修复
+✅ 完成: 新增Subsidiary、CurrencyPair、ApprovalRule模块（后端+前端+数据库）
+✅ 完成: API方法统一改为POST（update/delete）
 📋 设计: M2-M5功能PRD框架
 📋 待启动: M2资金运营模块开发
 📋 待完成: Playwright UI自动化测试(浏览器安装中)
@@ -306,8 +310,9 @@ aa7b4fd - feat(opentms-feature-dev): fix 4 major workflow gaps
 **当前开发重点**:
 1. ✅ Country模块后端完成并验证通过
 2. ✅ 前端分页解析修复已部署到Vite开发服务器
-3. 📋 其他基础数据模块(Trader/Holiday/Currency)参考Country模式重构
-4. 📋 M2资金运营模块开发启动
+3. ✅ 新增Subsidiary、CurrencyPair、ApprovalRule模块（2026-05-31）
+4. 📋 其他基础数据模块参考Country模式重构
+5. 📋 M2资金运营模块开发启动
 
 ---
 

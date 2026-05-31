@@ -37,7 +37,8 @@
       "Bash(where mvn *)",
       "Bash(when \"D:/Program Files/JetBrains/IntelliJ IDEA 2026.1.2/plugins/maven/lib/maven3/bin/mvn.cmd\" *)",
       "Bash(\"D:/Program Files/JetBrains/IntelliJ IDEA 2026.1.2/plugins/maven/lib/maven3/bin/mvn.cmd\" package -pl basedata -am -DskipTests)",
-      "Bash(tasklist)"
+      "Bash(tasklist)",
+      "Skill(update-config)"
     ]
   }
 }

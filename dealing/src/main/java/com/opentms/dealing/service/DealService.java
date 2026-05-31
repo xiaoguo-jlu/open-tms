@@ -1,25 +1,28 @@
 package com.opentms.dealing.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.opentms.dealing.entity.Deal;
+import com.opentms.dealing.dto.DealDTO;
+import com.opentms.dealing.vo.DealVO;
 
 public interface DealService {
 
-    Page<Deal> queryPage(String keyword, String dealType, String status, String counterpartyId, int pageNum, int pageSize);
+    Page<DealVO> queryPage(String keyword, String dealType, String status, int pageNum, int pageSize);
 
-    Deal getDealById(Long id);
+    DealVO getDealById(Long id);
 
-    boolean saveDeal(Deal deal);
+    DealVO getDealByDealNumber(String dealNumber);
 
-    boolean updateDeal(Deal deal);
+    boolean saveDeal(DealDTO dealDTO);
+
+    boolean updateDeal(DealDTO dealDTO);
 
     boolean deleteDeal(Long id);
 
-    boolean submitDeal(Long id);
+    boolean submitDeal(Long id, String operator);
 
-    boolean approveDeal(Long id);
+    boolean approveDeal(Long id, String approver, String approvalRemark);
 
-    boolean rejectDeal(Long id);
+    boolean rejectDeal(Long id, String approver, String approvalRemark);
 
-    boolean batchDelete(String ids);
+    boolean executeDeal(Long id, String operator);
 }

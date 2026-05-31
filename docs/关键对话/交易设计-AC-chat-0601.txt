@@ -1,0 +1,189 @@
+================================================================================
+Open-TMS 交易设计对话记录 - AC交易与Deal架构
+日期: 2026-06-01
+================================================================================
+
+
+============================================================
+[1] 用户
+============================================================
+
+1. 金额需要使用38,18的精度类型  2. 交易的审批统一称为approve，而非authorized，且交易是否需要审批，需要几层审批，需要调用审批规则来确认   3.instrument需要按AC/AT交易类型区分不同的页面和接口  4. 后续还会有很多通用类型的交易，流程与AC/AT相似，需要针对交易通用的处理流程做一层抽象   5. 交易创建后，还需要生成对应的会计事件，需要考虑这部分的设计  6. 交易录入所依赖的基础数据，目前还未完全完成，还需要继续完善，同时交易录入的页面，需要使用弹出框供用户选择具体的主体、交易对手、instrument，参考FIS
+
+
+============================================================
+[2] 用户
+============================================================
+
+<local-command-stdout>Current Plan
+C:\Users\qingmu\.claude\plans\jolly-forging-flame.md
+
+# AC/AT Transaction Financial Instruments Implementation Plan
+
+**Date**: 2026-05-31
+**Updated**: 2026-05-31 (requirements updated)
+**Objective**: Implement AC (Actual Cashflow) and AT (Account Transfer) transaction financial instruments, aligned with FIS Quantum treasury management standards
+
+---
+
+## Context
+
+The Open-TMS project is in M1 (Foundation Data Module) and needs to develop AC/AT transaction capabilities. AC represents actual cashflows from bank operations, while AT represents account transfers between enterprise bank accounts. FIS Quantum's architecture emphasizes:
+- Transaction-Centric Data Model with configurable workflows
+- Bank-Agnostic Design for multi-bank integrations
+- Multi-Level Limit System with approval workflows
+
+**Key Requirements (Updated 2026-05-31)**:
+1. **Approval naming**: Use `approve` instead of `authorize` - workflow: submit → approve (N layers)
+2. **ApprovalRule integration**: Determine if approval needed + approval layers via ApprovalRule service
+3. **Amount precision**: `DECIMAL(38,18)` for all transaction amounts (38 total, 18 decimal)
+4. **Instrument separation**: AC instruments and AT instruments use different pages/APIs
+5. **UI reference**: Style reference FIS Quantum TMS - professional, financial-grade UI
+6. **Transaction abstraction**: Abstract common transaction workflow for future deal types (FX, IRS, etc.)
+7. **Accounting events**: On transaction creation, generate corresponding accounting events
+8. **基础数据选择**: Use dialog/popup for selecting BusinessUnit, Counterparty, Instrument (参考FIS)
+
+---
+
+## Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Frontend (Vue3) - FIS Style          │
+│  dealing/TransferList.vue   dealing/CashflowList.vue    │
+│  dealing/ACInstrumentList  dealing/ATInstrumentList    │
+└───────────────────────────┬─────────────────────────────┘
+                            │
+┌───────────────────────────┼─────────────────────────────┐
+│                 REST API Layer                           │
+│  /api/v1/dealing/transfers/* │  /api/v1/dealing/cashflows/*│
+│  /api/v1/dealing/ac-instruments/*                      │
+│  /api/v1/dealing/at-instruments/*                      │
+└───────────────────────────┼─────────────────────────────┘
+                            │
+┌───────────────────────────┴─────────────────────────────┐
+│              dealing/ Module Servi
+
+
+============================================================
+[3] 用户
+============================================================
+
+为我生成 AC交易和AC instrument两个特性的PRD文档
+
+
+============================================================
+[4] 用户
+============================================================
+
+<command-message>opentms-business-architect</command-message>
+<command-name>/opentms-business-architect</command-name>
+<command-args>我希望将opentms的AC交易与现金流的概念分开，拆分成交易和现金流两个不同的业务对象</command-args>
+
+
+============================================================
+[5] 用户
+============================================================
+
+这是我想要的架构。但我希望你将AC交易称为AC Deal（交易统一叫做deal），现金流称为Cashflow，证券流称为Stockflow。相关的业务编号称为dealNumber和cflowNumber
+
+
+============================================================
+[6] 用户
+============================================================
+
+AC交易是纯粹的资金收付交易，非常简单，不涉及外汇与计息，因此不要与货币市场、外汇、同业产品、内部转账产品混在一起。基于此，修正PRD
+
+
+============================================================
+[7] 用户
+============================================================
+
+开启一个subagent，进行银行账户和交易对手账户的特性研发工作，特性参考FIS，目前只需要做银行账户的增删改查，不需要做开变销审批流程，也不需要网银加挂等信息 /opentms-feature-dev
+
+
+============================================================
+[8] 用户
+============================================================
+
+AC交易的PRD需要做如下调整：1. 字段增加主体、交易员、instrument  2. 所有关联的基础数据，都需要通过弹框的形式供用户选择，且弹框只筛选有效的基础数据  3. 交易的创建、修改、删除都需要生成action（存储到tms_actions_t表中，通过交易号与交易关联，通过交易类型标记本次动作类型），标记对应的动作，交易审批时，实质审批的是action  4. 将交易的共性信息（主体、交易对手、instrument、交易类型、业务单元、交易员、交易日期、结算日期、金额、币种、状态、描述，审计字段）放到一张tms_deals_t的公共表中，这张表承载各类型交易的公共信息  5. 交易的修改和删除，都需要按照action编号记录审计日志（audit histor，记录每次交易字段的变化）和快照（image，记录每次变化前的交易完整信息）
+
+
+============================================================
+[9] 用户
+============================================================
+
+还需要增加镜像表，包括交易公共镜像表和个性化镜像表，以及审计日志表的设计，包括审计日志头记录交易号、action号以及审计日志行记录每个字段的变动明细
+
+
+============================================================
+[10] 用户
+============================================================
+
+This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.
+
+Summary:
+1. Primary Request and Intent:
+   - Understand and document project changes from today's code pull (Subsidiary, CurrencyPair, ApprovalRule modules)
+   - Update project documentation (summary.md, CLAUDE.md, m1研发计划.md)
+   - Configure session persistence for conversation archival
+   - Plan and implement AC/AT transaction financial instruments aligned with FIS Quantum TMS
+   - Multiple PRD updates for AC交易/AC Deal architecture:
+     - v2: Initial AC交易 and AC Instrument PRDs
+     - v3: Simplified AC/AT instruments (only id/code/name/description)
+     - v4: Add businessUnit, traderId, instrumentId fields, popup selectors, Action mechanism, tms_deals_t common table
+     - v5: Added image tables (tms_deals_image_t, tms_ac_deals_image_t) and audit tables (tms_audit_log_hdr_t, tms_audit_log_line_t)
+   - Fix frontend/backend bugs (Holiday YEAR function PostgreSQL issue, 304/404 errors)
+   - Develop BankAccount and CounterpartyAccount features (CRUD only, no approval/internet banking)
+   - Restart backend excluding bankaccount module, include BankAccount in basedata module
+
+2. Key Technical Concepts:
+   - FIS Quantum TMS architecture alignment
+   - Deal vs Cashflow separation (AC Deal = transaction, Cashflow = actual money movement)
+   - Action mechanism for transaction operations (CREATE/UPDATE/DELETE/APPROVE/REJECT/SUBMIT/EXECUTE)
+   - Image tables for historical snapshots
+   - Audit log with header (HDR) and line (LINE) structure for field-level change tracking
+   - tms_deals_t as common table for all transaction types (AC/AT/FX/ST)
+   - DECIMAL(38,18) precision for amounts
+   - Popup selectors for base data selection (only Active data)
+   - Standard audit fields: createdBy, createdAt, updatedBy, updatedAt, version, deleted
+
+3. Files and Code Sections:
+   - **docs/prd/M1/M1-Deal交易 PRD v5.md** - Comprehensive PRD with:
+     - tms_deals_t (common transaction table)
+     - tms_actions_t (action table)
+     - tms_deals_image_t (public image table)
+     - tms_ac_deals_image_t (AC-specific image table)
+     - tms_audit_log_hdr_t (audit header)
+     - tms_audit_log_line_t (audit line with field changes)
+   - **docs/prd/M1/M1-AC金融工具Instrument PRD v3.md** - Simplified AC instrument (id, code, name, description only)
+   - **docs/architecture/business/AC交易与现金流分离架构设计.md** - Business architecture for Deal/Cashflow sepa
+
+
+============================================================
+[11] 用户
+============================================================
+
+你对action和审批的理解仍然存在一定的偏差，审批的作用对象实际为action，所以action表也需要有审批人和审批状态的信息。交易上的审批人和审批状态，只是一种冗余。同时，为交易增加最新action的字段，标记这笔交易最新的action是什么。基于这些，更新你的prd
+
+
+============================================================
+[12] 用户
+============================================================
+
+再次纠正：提交审批、审批通过、审批拒绝、执行交易，只是对于action状态做更新，不应创建和生成action，另外，交易表上任何字段有新增，image表也需一并新增
+
+
+============================================================
+[13] 用户
+============================================================
+
+很好。交易的设计非常复杂，我们后续还需要完成10种以上其他类型交易的设计，请你总结一下交易设计的核心理念、设计方法、标准处理流程与注意事项，沉淀为交易产品设计的skill，并存放到.agents\skills目录下
+
+
+============================================================
+[14] 用户
+============================================================
+
+将我们今天关于交易设计的对话过程，存储到docs/关键对话/交易设计-AC-chat-0601.txt中
+

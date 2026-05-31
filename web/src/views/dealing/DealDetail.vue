@@ -9,76 +9,70 @@
       </template>
 
       <el-descriptions :column="2" border class="info-section">
-        <el-descriptions-item label="交易编号">{{ detail.dealNo }}</el-descriptions-item>
+        <el-descriptions-item label="交易编号">{{ detail.dealNumber }}</el-descriptions-item>
         <el-descriptions-item label="状态">
           <el-tag :type="getStatusType(detail.status)">{{ getStatusLabel(detail.status) }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="交易类型">{{ getTypeLabel(detail.dealType) }}</el-descriptions-item>
-        <el-descriptions-item label="交易子类型">{{ detail.dealSubtype }}</el-descriptions-item>
-        <el-descriptions-item label="业务单元">{{ detail.entityName }}</el-descriptions-item>
-        <el-descriptions-item label="交易员">{{ detail.dealerName }}</el-descriptions-item>
+        <el-descriptions-item label="业务单元">{{ detail.businessUnit }}</el-descriptions-item>
         <el-descriptions-item label="交易对手">{{ detail.counterpartyName }}</el-descriptions-item>
         <el-descriptions-item label="对手方账户">{{ detail.counterpartyAccountName }}</el-descriptions-item>
         <el-descriptions-item label="金融工具">{{ detail.instrumentName }}</el-descriptions-item>
-        <el-descriptions-item label="结算币种">{{ detail.currencyCode }}</el-descriptions-item>
-        <el-descriptions-item label="结算金额">{{ formatAmount(detail.amount) }}</el-descriptions-item>
+        <el-descriptions-item label="交易员">{{ detail.traderName }}</el-descriptions-item>
+        <el-descriptions-item label="方向">
+          <el-tag :type="detail.direction === 'Inflow' ? 'success' : 'danger'">
+            {{ detail.direction === 'Inflow' ? '流入' : '流出' }}
+          </el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="本方账户">{{ detail.bankAccountName }}</el-descriptions-item>
+        <el-descriptions-item label="交易金额" align="right">
+          {{ formatAmount(detail.amount, detail.currency) }}
+        </el-descriptions-item>
+        <el-descriptions-item label="币种">{{ detail.currency }}</el-descriptions-item>
+        <el-descriptions-item label="交易日期">{{ detail.dealDate }}</el-descriptions-item>
         <el-descriptions-item label="起息日">{{ detail.valueDate }}</el-descriptions-item>
-        <el-descriptions-item label="到期日">{{ detail.maturityDate }}</el-descriptions-item>
-        <el-descriptions-item label="年利率" v-if="detail.interestRate">{{ detail.interestRate }}%</el-descriptions-item>
-        <el-descriptions-item label="描述" :span="2">{{ detail.description }}</el-descriptions-item>
-        <el-descriptions-item label="备注" :span="2">{{ detail.remarks }}</el-descriptions-item>
+        <el-descriptions-item label="付款方式">{{ detail.paymentMethod }}</el-descriptions-item>
+        <el-descriptions-item label="描述" :span="2">{{ detail.description || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="备注" :span="2">{{ detail.remark || '-' }}</el-descriptions-item>
       </el-descriptions>
 
       <el-tabs v-model="activeTab" class="tabs-container">
-        <el-tab-pane label="现金流" name="cashflow">
-          <el-table :data="cashflowList" stripe>
+        <el-tab-pane label="Action历史" name="action">
+          <el-table :data="actionList" stripe>
             <el-table-column type="index" label="序号" width="60" align="center" />
-            <el-table-column prop="cfDate" label="现金流日期" width="120" />
-            <el-table-column prop="cfType" label="类型" width="100">
+            <el-table-column prop="actionType" label="Action类型" width="120">
               <template #default="{ row }">
-                {{ getCfTypeLabel(row.cfType) }}
+                {{ getActionTypeLabel(row.actionType) }}
               </template>
             </el-table-column>
-            <el-table-column prop="amount" label="金额" align="right">
-              <template #default="{ row }">
-                {{ formatAmount(row.amount) }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="currencyCode" label="币种" width="80" />
+            <el-table-column prop="operatorName" label="操作人" width="120" />
+            <el-table-column prop="operationTime" label="操作时间" width="180" />
             <el-table-column prop="status" label="状态" width="100">
               <template #default="{ row }">
-                <el-tag :type="row.status === 'PAID' ? 'success' : 'warning'">
-                  {{ row.status === 'PAID' ? '已付' : '待付' }}
-                </el-tag>
+                <el-tag :type="getActionStatusType(row.status)">{{ getActionStatusLabel(row.status) }}</el-tag>
               </template>
             </el-table-column>
+            <el-table-column prop="remark" label="备注" />
           </el-table>
         </el-tab-pane>
 
-        <el-tab-pane label="Deal Map" name="dealmap">
-          <el-table :data="dealmapList" stripe>
+        <el-tab-pane label="镜像版本" name="image">
+          <el-table :data="imageList" stripe>
             <el-table-column type="index" label="序号" width="60" align="center" />
-            <el-table-column prop="acType" label="AC类型" width="120" />
-            <el-table-column prop="acNo" label="AC编号" width="150" />
-            <el-table-column prop="cfNo" label="现金流编号" width="150" />
-            <el-table-column prop="amount" label="金额" align="right">
+            <el-table-column prop="version" label="版本号" width="100" />
+            <el-table-column prop="createdBy" label="创建人" width="120" />
+            <el-table-column prop="createdAt" label="创建时间" width="180" />
+            <el-table-column prop="status" label="状态" width="100">
               <template #default="{ row }">
-                {{ formatAmount(row.amount) }}
+                <el-tag :type="getImageStatusType(row.status)">{{ getImageStatusLabel(row.status) }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="120" fixed="right">
+              <template #default="{ row }">
+                <el-button type="primary" link @click="handleViewImage(row)">查看</el-button>
               </template>
             </el-table-column>
           </el-table>
-        </el-tab-pane>
-
-        <el-tab-pane label="审批历史" name="history">
-          <el-timeline>
-            <el-timeline-item v-for="item in historyList" :key="item.id" :timestamp="item.operationTime" placement="top">
-              <el-card>
-                <h4>{{ item.operationType === 'SUBMIT' ? '提交审批' : item.operationType === 'APPROVE' ? '审批通过' : item.operationType === 'REJECT' ? '审批驳回' : item.operationType }}</h4>
-                <p>操作人: {{ item.operatorName }}</p>
-                <p v-if="item.remark">备注: {{ item.remark }}</p>
-              </el-card>
-            </el-timeline-item>
-          </el-timeline>
         </el-tab-pane>
       </el-tabs>
     </el-card>
@@ -88,39 +82,68 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getDeal, getDealCashflow, getDealDealmap, getDealHistory } from '@/api/dealing'
+import { getDeal, listActionByDeal, listImageByDeal } from '@/api/dealing'
 
 const route = useRoute()
 const router = useRouter()
 const detail = ref({})
-const cashflowList = ref([])
-const dealmapList = ref([])
-const historyList = ref([])
-const activeTab = ref('cashflow')
+const actionList = ref([])
+const imageList = ref([])
+const activeTab = ref('action')
 
 const getTypeLabel = (type) => {
-  const map = { DEPOSIT: '存款', LOAN: '贷款', FX: '外汇', INTERBANK: '同业' }
+  const map = { AC: 'AC交易', DEPOSIT: '存款', LOAN: '贷款', FX: '外汇' }
   return map[type] || type
 }
 
 const getStatusLabel = (status) => {
-  const map = { DRAFT: '草稿', PENDING_APPROVE: '待审批', APPROVING: '审批中', APPROVED: '已审批', REJECTED: '已驳回', EXECUTED: '已执行', SETTLED: '已结算', CANCELLED: '已撤销' }
+  const map = {
+    New: '新建', Submitted: '已提交', Approved: '已审批',
+    Rejected: '已拒绝', Executed: '已执行', Settled: '已结算', Canceled: '已取消'
+  }
   return map[status] || status
 }
 
 const getStatusType = (status) => {
-  const map = { DRAFT: 'info', PENDING_APPROVE: 'warning', APPROVING: 'warning', APPROVED: 'success', REJECTED: 'danger', EXECUTED: 'success', SETTLED: 'success', CANCELLED: 'info' }
+  const map = {
+    New: 'info', Submitted: 'warning', Approved: 'success',
+    Rejected: 'danger', Executed: 'success', Settled: 'success', Canceled: 'info'
+  }
   return map[status] || 'info'
 }
 
-const getCfTypeLabel = (type) => {
-  const map = { PRINCIPAL: '本金', INTEREST: '利息', FEE: '费用' }
+const getActionTypeLabel = (type) => {
+  const map = { SUBMIT: '提交', APPROVE: '审批通过', REJECT: '审批拒绝', EXECUTE: '执行', CANCEL: '取消' }
   return map[type] || type
 }
 
-const formatAmount = (amount) => {
+const getActionStatusLabel = (status) => {
+  const map = { PENDING: '待处理', APPROVED: '已通过', REJECTED: '已拒绝' }
+  return map[status] || status
+}
+
+const getActionStatusType = (status) => {
+  const map = { PENDING: 'warning', APPROVED: 'success', REJECTED: 'danger' }
+  return map[status] || 'info'
+}
+
+const getImageStatusLabel = (status) => {
+  const map = { ACTIVE: '当前版本', ARCHIVED: '归档' }
+  return map[status] || status
+}
+
+const getImageStatusType = (status) => {
+  const map = { ACTIVE: 'success', ARCHIVED: 'info' }
+  return map[status] || 'info'
+}
+
+const formatAmount = (amount, currency) => {
   if (!amount) return '-'
-  return new Intl.NumberFormat('zh-CN', { minimumFractionDigits: 2 }).format(amount)
+  return new Intl.NumberFormat('zh-CN', { minimumFractionDigits: 2 }).format(amount) + ' ' + (currency || '')
+}
+
+const handleViewImage = (row) => {
+  router.push(`/dealing/deal/image?dealNumber=${detail.value.dealNumber}&version=${row.version}`)
 }
 
 const handleBack = () => { router.push('/dealing/deal') }
@@ -128,10 +151,14 @@ const handleBack = () => { router.push('/dealing/deal') }
 onMounted(async () => {
   const id = route.query.id
   if (id) {
-    detail.value = (await getDeal(id)).data
-    cashflowList.value = (await getDealCashflow(id)).data || []
-    dealmapList.value = (await getDealDealmap(id)).data || []
-    historyList.value = (await getDealHistory(id)).data || []
+    try {
+      detail.value = (await getDeal(id)).data
+      // 加载Action历史
+      if (detail.value.dealNumber) {
+        actionList.value = (await listActionByDeal(detail.value.dealNumber)).data || []
+        imageList.value = (await listImageByDeal(detail.value.dealNumber)).data || []
+      }
+    } catch (e) { console.error(e) }
   }
 })
 </script>

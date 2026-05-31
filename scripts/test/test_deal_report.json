@@ -1,0 +1,371 @@
+{
+  "total": 10,
+  "passed": 10,
+  "failed": 0,
+  "results": [
+    {
+      "name": "创建交易",
+      "status": "passed",
+      "response": {
+        "code": 200,
+        "message": "success",
+        "data": null,
+        "timestamp": 1780250231859
+      },
+      "deal_id": 23,
+      "deal_number": "DEAL202606010002"
+    },
+    {
+      "name": "查询交易列表",
+      "status": "passed",
+      "response": {
+        "code": 200,
+        "message": "success",
+        "data": {
+          "records": [
+            {
+              "id": 23,
+              "dealNumber": "DEAL202606010002",
+              "dealType": "AC",
+              "businessUnit": "BU001",
+              "counterpartyId": 1,
+              "instrumentId": 1,
+              "traderId": 1000,
+              "direction": "BUY",
+              "amount": 100000.0,
+              "currency": "USD",
+              "dealDate": "2026-06-01",
+              "valueDate": "2026-06-03",
+              "status": "New",
+              "description": "Test AC Deal",
+              "remark": "API Test",
+              "latestActionNumber": "ACT202606010002",
+              "createdBy": "test_user",
+              "createdAt": "2026-06-01T01:57:11.521702",
+              "updatedBy": "test_user",
+              "updatedAt": "2026-06-01T01:57:11.521702",
+              "version": 1,
+              "bankAccountId": 1,
+              "counterpartyAccountId": 1,
+              "paymentMethod": "SWIFT"
+            },
+            {
+              "id": 22,
+              "dealNumber": "DEAL202606010001",
+              "dealType": "AC",
+              "businessUnit": "BU001",
+              "counterpartyId": 1,
+              "instrumentId": 1,
+              "traderId": 1,
+              "direction": "BUY",
+              "amount": 1000.0,
+              "currency": "USD",
+              "dealDate": "2026-06-01",
+              "valueDate": "2026-06-03",
+              "status": "New",
+              "description": null,
+              "remark": null,
+              "latestActionNumber": "ACT202606010001",
+              "createdBy": "test",
+              "createdAt": "2026-06-01T01:56:15.245095",
+              "updatedBy": "test",
+              "updatedAt": "2026-06-01T01:56:15.245095",
+              "version": 1,
+              "bankAccountId": 1,
+              "counterpartyAccountId": 2,
+              "paymentMethod": "SWIFT"
+            }
+          ],
+          "total": 2,
+          "size": 10,
+          "current": 1,
+          "pages": 1
+        },
+        "timestamp": 1780250233073
+      },
+      "data": {
+        "total": 2,
+        "count": 2
+      }
+    },
+    {
+      "name": "获取交易详情",
+      "status": "passed",
+      "response": {
+        "code": 200,
+        "message": "success",
+        "data": {
+          "id": 23,
+          "dealNumber": "DEAL202606010002",
+          "dealType": "AC",
+          "businessUnit": "BU001",
+          "counterpartyId": 1,
+          "instrumentId": 1,
+          "traderId": 1000,
+          "direction": "BUY",
+          "amount": 100000.0,
+          "currency": "USD",
+          "dealDate": "2026-06-01",
+          "valueDate": "2026-06-03",
+          "status": "New",
+          "description": "Test AC Deal",
+          "remark": "API Test",
+          "latestActionNumber": "ACT202606010002",
+          "createdBy": "test_user",
+          "createdAt": "2026-06-01T01:57:11.521702",
+          "updatedBy": "test_user",
+          "updatedAt": "2026-06-01T01:57:11.521702",
+          "version": 1,
+          "bankAccountId": 1,
+          "counterpartyAccountId": 1,
+          "paymentMethod": "SWIFT"
+        },
+        "timestamp": 1780250233097
+      },
+      "data": {
+        "id": 23,
+        "dealNumber": "DEAL202606010002",
+        "dealType": "AC",
+        "businessUnit": "BU001",
+        "counterpartyId": 1,
+        "instrumentId": 1,
+        "traderId": 1000,
+        "direction": "BUY",
+        "amount": 100000.0,
+        "currency": "USD",
+        "dealDate": "2026-06-01",
+        "valueDate": "2026-06-03",
+        "status": "New",
+        "description": "Test AC Deal",
+        "remark": "API Test",
+        "latestActionNumber": "ACT202606010002",
+        "createdBy": "test_user",
+        "createdAt": "2026-06-01T01:57:11.521702",
+        "updatedBy": "test_user",
+        "updatedAt": "2026-06-01T01:57:11.521702",
+        "version": 1,
+        "bankAccountId": 1,
+        "counterpartyAccountId": 1,
+        "paymentMethod": "SWIFT"
+      }
+    },
+    {
+      "name": "提交审批",
+      "status": "passed",
+      "response": {
+        "code": 200,
+        "message": "success",
+        "data": null,
+        "timestamp": 1780250233139
+      }
+    },
+    {
+      "name": "审批通过",
+      "status": "passed",
+      "response": {
+        "code": 200,
+        "message": "success",
+        "data": null,
+        "timestamp": 1780250233150
+      }
+    },
+    {
+      "name": "更新交易",
+      "status": "passed",
+      "response": {
+        "code": 200,
+        "message": "success",
+        "data": null,
+        "timestamp": 1780250234257
+      }
+    },
+    {
+      "name": "审批拒绝",
+      "status": "passed",
+      "response": {
+        "code": 200,
+        "message": "success",
+        "data": null,
+        "timestamp": 1780250235386
+      }
+    },
+    {
+      "name": "执行交易",
+      "status": "passed",
+      "response": {
+        "code": 200,
+        "message": "success",
+        "data": null,
+        "timestamp": 1780250236494
+      }
+    },
+    {
+      "name": "查询Action列表",
+      "status": "passed",
+      "response": {
+        "code": 200,
+        "message": "success",
+        "data": {
+          "records": [
+            {
+              "id": 13,
+              "actionNumber": "ACT202606010005",
+              "dealNumber": "DEAL202606010005",
+              "dealType": "AC",
+              "actionType": "EXECUTE",
+              "actionStatus": "Executed",
+              "operator": "operator_user",
+              "operateAt": "2026-06-01T01:57:16.489902",
+              "remark": null,
+              "approver1": "approver_user",
+              "approver2": null,
+              "approvalStatus1": "Approved",
+              "approvalStatus2": "Pending",
+              "approvalRemark": "Approved by API test",
+              "createdBy": "test_user",
+              "createdAt": "2026-06-01T01:57:15.41218",
+              "updatedBy": "operator_user",
+              "updatedAt": "2026-06-01T01:57:16.489902",
+              "version": 4
+            },
+            {
+              "id": 12,
+              "actionNumber": "ACT202606010004",
+              "dealNumber": "DEAL202606010004",
+              "dealType": "AC",
+              "actionType": "REJECT",
+              "actionStatus": "Rejected",
+              "operator": "approver_user",
+              "operateAt": "2026-06-01T01:57:15.382053",
+              "remark": null,
+              "approver1": "approver_user",
+              "approver2": null,
+              "approvalStatus1": "Rejected",
+              "approvalStatus2": "Pending",
+              "approvalRemark": "Rejected by API test",
+              "createdBy": "test_user",
+              "createdAt": "2026-06-01T01:57:14.285804",
+              "updatedBy": "approver_user",
+              "updatedAt": "2026-06-01T01:57:15.382053",
+              "version": 3
+            },
+            {
+              "id": 11,
+              "actionNumber": "ACT202606010003",
+              "dealNumber": "DEAL202606010003",
+              "dealType": "AC",
+              "actionType": "UPDATE",
+              "actionStatus": "Pending",
+              "operator": "test_user",
+              "operateAt": "2026-06-01T01:57:14.241512",
+              "remark": null,
+              "approver1": null,
+              "approver2": null,
+              "approvalStatus1": "Pending",
+              "approvalStatus2": "Pending",
+              "approvalRemark": null,
+              "createdBy": "test_user",
+              "createdAt": "2026-06-01T01:57:13.17035",
+              "updatedBy": "test_user",
+              "updatedAt": "2026-06-01T01:57:14.241512",
+              "version": 2
+            },
+            {
+              "id": 10,
+              "actionNumber": "ACT202606010002",
+              "dealNumber": "DEAL202606010002",
+              "dealType": "AC",
+              "actionType": "APPROVE",
+              "actionStatus": "Approved",
+              "operator": "approver_user",
+              "operateAt": "2026-06-01T01:57:13.146507",
+              "remark": null,
+              "approver1": "approver_user",
+              "approver2": null,
+              "approvalStatus1": "Approved",
+              "approvalStatus2": "Pending",
+              "approvalRemark": "Approved by API test",
+              "createdBy": "test_user",
+              "createdAt": "2026-06-01T01:57:11.521702",
+              "updatedBy": "approver_user",
+              "updatedAt": "2026-06-01T01:57:13.146507",
+              "version": 3
+            },
+            {
+              "id": 9,
+              "actionNumber": "ACT202606010001",
+              "dealNumber": "DEAL202606010001",
+              "dealType": "AC",
+              "actionType": "SUBMIT",
+              "actionStatus": "Pending",
+              "operator": "test",
+              "operateAt": "2026-06-01T01:57:14.147337",
+              "remark": null,
+              "approver1": null,
+              "approver2": null,
+              "approvalStatus1": "Pending",
+              "approvalStatus2": "Pending",
+              "approvalRemark": null,
+              "createdBy": "test",
+              "createdAt": "2026-06-01T01:56:15.245095",
+              "updatedBy": "test",
+              "updatedAt": "2026-06-01T01:57:14.147337",
+              "version": 2
+            }
+          ],
+          "total": 5,
+          "size": 10,
+          "current": 1,
+          "pages": 1
+        },
+        "timestamp": 1780250236509
+      },
+      "data": {
+        "total": 5,
+        "count": 5
+      }
+    },
+    {
+      "name": "查询镜像列表",
+      "status": "passed",
+      "response": {
+        "code": 200,
+        "message": "success",
+        "data": [
+          {
+            "id": 10,
+            "imageNumber": "IMG202606010002",
+            "dealNumber": "DEAL202606010002",
+            "dealType": "AC",
+            "version": 1,
+            "businessUnit": "BU001",
+            "counterpartyId": 1,
+            "instrumentId": 1,
+            "traderId": 1000,
+            "direction": "BUY",
+            "amount": 100000.0,
+            "currency": "USD",
+            "dealDate": "2026-06-01",
+            "valueDate": "2026-06-03",
+            "status": "New",
+            "description": "Test AC Deal",
+            "remark": "API Test",
+            "latestActionNumber": null,
+            "imageType": "CREATE",
+            "operator": "test_user",
+            "operateAt": "2026-06-01T01:57:11.521702",
+            "createdBy": "test_user",
+            "createdAt": "2026-06-01T01:57:11.521702",
+            "bankAccountId": 1,
+            "counterpartyAccountId": 1,
+            "paymentMethod": "SWIFT"
+          }
+        ],
+        "timestamp": 1780250236535
+      },
+      "data": {
+        "count": 1
+      }
+    }
+  ]
+}

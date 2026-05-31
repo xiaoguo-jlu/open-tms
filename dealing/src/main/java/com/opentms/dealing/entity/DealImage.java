@@ -11,17 +11,22 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("tms_deals_t")
-public class Deal {
+@TableName("tms_deals_image_t")
+public class DealImage {
 
     @TableId(type = IdType.AUTO)
     private Long id;
+
+    @TableField("image_number")
+    private String imageNumber;
 
     @TableField("deal_number")
     private String dealNumber;
 
     @TableField("deal_type")
     private String dealType;
+
+    private Integer version;
 
     @TableField("business_unit")
     private String businessUnit;
@@ -56,15 +61,17 @@ public class Deal {
     @TableField("latest_action_number")
     private String latestActionNumber;
 
+    @TableField("image_type")
+    private String imageType;
+
+    private String operator;
+
+    @TableField("operate_at")
+    private LocalDateTime operateAt;
+
     private String createdBy;
 
     private LocalDateTime createdAt;
-
-    private String updatedBy;
-
-    private LocalDateTime updatedAt;
-
-    private Integer version;
 
     private String deleted;
 }

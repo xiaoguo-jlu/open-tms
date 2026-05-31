@@ -16,6 +16,18 @@ export default defineConfig({
         target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
+      '/api/v1/management-entities': {
+        target: 'http://localhost:8081/opentms/basedata',
+        changeOrigin: true
+      },
+      '/api/v1/subsidiaries': {
+        target: 'http://localhost:8081/opentms/basedata',
+        changeOrigin: true
+      },
+      '/api/v1/currency-pairs': {
+        target: 'http://localhost:8081/opentms/basedata',
+        changeOrigin: true
+      },
       '/api/v1/traders': {
         target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true

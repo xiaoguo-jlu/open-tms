@@ -11,11 +11,35 @@ public class DealVO {
 
     private Long id;
 
-    private String code;
+    private String dealNumber;
 
-    private String name;
+    private String dealType;
+
+    private String businessUnit;
+
+    private Long counterpartyId;
+
+    private Long instrumentId;
+
+    private Long traderId;
+
+    private String direction;
+
+    private BigDecimal amount;
+
+    private String currency;
+
+    private LocalDate dealDate;
+
+    private LocalDate valueDate;
 
     private String status;
+
+    private String description;
+
+    private String remark;
+
+    private String latestActionNumber;
 
     private String createdBy;
 
@@ -25,25 +49,12 @@ public class DealVO {
 
     private LocalDateTime updatedAt;
 
-    private String dealNo;
+    private Integer version;
 
-    private String dealType;
+    // AC交易个性化字段
+    private Long bankAccountId;
 
-    private String dealSubtype;
+    private Long counterpartyAccountId;
 
-    private Long instrumentId;
-
-    private Long counterpartyId;
-
-    private Long businessUnitId;
-
-    private BigDecimal amount;
-
-    private String currency;
-
-    private LocalDate valueDate;
-
-    private LocalDate maturityDate;
-
-    private BigDecimal interestRate;
+    private String paymentMethod;
 }

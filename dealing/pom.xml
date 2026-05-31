@@ -15,7 +15,7 @@
     <name>Dealing Module</name>
     <description>Trading Management Module</description>
 
-    <dependencies>
+        <dependencies>
         <dependency>
             <groupId>com.opentms</groupId>
             <artifactId>opentms-common</artifactId>
@@ -43,4 +43,13 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>
