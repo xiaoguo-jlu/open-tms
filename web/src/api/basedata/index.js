@@ -7,6 +7,7 @@ export * from './counterparty'
 export * from './counterpartyAccount'
 export * from './subsidiary'
 export * from './currencyPair'
+export * from './instrument'
 
 // 单独导出bankAccount避免listCurrency冲突
 export { listBankAccount, getBankAccount, saveBankAccount, updateBankAccount, deleteBankAccount } from './bankAccount'

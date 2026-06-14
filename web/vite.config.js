@@ -20,14 +20,6 @@ export default defineConfig({
         target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
-      '/api/v1/management-entities': {
-        target: 'http://localhost:8081/opentms/basedata',
-        changeOrigin: true
-      },
-      '/api/v1/subsidiaries': {
-        target: 'http://localhost:8081/opentms/basedata',
-        changeOrigin: true
-      },
       '/api/v1/currency-pairs': {
         target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
@@ -52,10 +44,6 @@ export default defineConfig({
         target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
-      '/api/v1/currency-pairs': {
-        target: 'http://localhost:8081/opentms/basedata',
-        changeOrigin: true
-      },
       '/api/v1/holidays': {
         target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
@@ -69,7 +57,7 @@ export default defineConfig({
         changeOrigin: true
       },
       '/api/v1/instruments': {
-        target: 'http://localhost:8084',
+        target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
       '/api/v1/fund-plans': {
