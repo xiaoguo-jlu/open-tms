@@ -15,7 +15,7 @@ import os
 BACKEND_URL = "http://localhost:8082"
 BASEDATA_URL = "http://localhost:8081/opentms/basedata"
 
-jar_path = 'E:\\code-project\\open-tms\\open-tms\\dealing\\target\\dealing-1.0.0-SNAPSHOT.jar'
+jar_path = 'F:/code/opencode/opentrm/dealing/target/dealing-1.0.0-SNAPSHOT.jar'
 
 
 def curl_cmd(method, path, data=None, base_url=BACKEND_URL):
@@ -710,7 +710,7 @@ def main():
         print(f"  {status_icon} {r['name']}")
 
     # 保存JSON报告
-    report_file = "E:\\code-project\\open-tms\\open-tms\\scripts\\test\\test_deal_report.json"
+    report_file = "F:/code/opencode/opentrm/scripts/test/test_deal_report.json"
     with open(report_file, 'w', encoding='utf-8') as f:
         json.dump(report, f, ensure_ascii=False, indent=2)
     print(f"\n[INFO] Report saved to: {report_file}")

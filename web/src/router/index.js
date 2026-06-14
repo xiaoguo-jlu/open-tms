@@ -9,7 +9,6 @@ const routes = [
       { path: 'currency', name: 'Currency', component: () => import('@/views/basedata/CurrencyList.vue') },
       { path: 'country', name: 'Country', component: () => import('@/views/basedata/CountryList.vue') },
       { path: 'holiday', name: 'Holiday', component: () => import('@/views/basedata/HolidayList.vue') },
-      { path: 'bank', name: 'Bank', component: () => import('@/views/basedata/BankList.vue') },
       { path: 'bank-account', name: 'BankAccount', component: () => import('@/views/basedata/BankAccountList.vue') },
       { path: 'counterparty', name: 'Counterparty', component: () => import('@/views/basedata/CounterpartyList.vue') },
       { path: 'counterparty-account', name: 'CounterpartyAccount', component: () => import('@/views/basedata/CounterpartyAccountList.vue') },
