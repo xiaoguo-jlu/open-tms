@@ -6,22 +6,20 @@
         <el-menu-item index="/dashboard"><el-icon><DataAnalysis /></el-icon><span>管理驾驶舱</span></el-menu-item>
         <el-sub-menu index="basedata">
           <template #title><el-icon><Grid /></el-icon><span>基础数据</span></template>
-          <el-menu-item index="/organization/management-entity">资金管理主体</el-menu-item>
-          <el-menu-item index="/basedata/business-unit">业务单元管理</el-menu-item>
           <el-menu-item index="/basedata/subsidiary">子公司管理</el-menu-item>
+          <el-menu-item index="/basedata/business-unit">资金管理主体</el-menu-item>
           <el-menu-item index="/basedata/trader">交易员管理</el-menu-item>
           <el-menu-item index="/basedata/currency">币种管理</el-menu-item>
           <el-menu-item index="/basedata/country">国家/地区管理</el-menu-item>
           <el-menu-item index="/basedata/holiday">节假日管理</el-menu-item>
-          <el-menu-item index="/basedata/bank">银行信息管理</el-menu-item>
           <el-menu-item index="/basedata/counterparty">交易对手管理</el-menu-item>
           <el-menu-item index="/basedata/counterparty-account">对手方银行账户</el-menu-item>
           <el-menu-item index="/basedata/currency-pair">币种对管理</el-menu-item>
+          <el-menu-item index="/dealing/bank-account">银行账户管理</el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="dealing">
           <template #title><el-icon><Wallet /></el-icon><span>交易管理</span></template>
           <el-menu-item index="/dealing/deal">交易录入</el-menu-item>
-          <el-menu-item index="/dealing/bank-account">银行账户管理</el-menu-item>
           <el-menu-item index="/dealing/instrument">金融工具管理</el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="approval">

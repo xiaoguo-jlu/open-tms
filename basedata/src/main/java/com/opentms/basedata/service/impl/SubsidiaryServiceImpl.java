@@ -1,6 +1,7 @@
 package com.opentms.basedata.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.opentms.basedata.dto.SubsidiaryDTO;
@@ -93,27 +94,27 @@ public class SubsidiaryServiceImpl extends ServiceImpl<SubsidiaryMapper, Subsidi
             throw new RuntimeException("子公司编码已存在: " + dto.getCode());
         }
 
-        // 更新字段
-        existing.setName(dto.getName());
-        existing.setEnName(dto.getEnName());
-        existing.setParentCode(dto.getParentCode());
-        existing.setBusinessUnitCode(dto.getBusinessUnitCode());
-        existing.setLegalPerson(dto.getLegalPerson());
-        existing.setRegistrationNo(dto.getRegistrationNo());
-        existing.setTaxNo(dto.getTaxNo());
-        existing.setAddress(dto.getAddress());
-        existing.setPhone(dto.getPhone());
-        existing.setEmail(dto.getEmail());
-        existing.setStatus(dto.getStatus());
-        existing.setRemark(dto.getRemark());
-        existing.setUpdatedAt(LocalDateTime.now());
-        existing.setUpdatedBy("system");
+        // Use LambdaUpdateWrapper to avoid optimistic lock issues with @Version
+        LambdaUpdateWrapper<Subsidiary> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(Subsidiary::getId, dto.getId());
+        wrapper.set(Subsidiary::getName, dto.getName());
+        wrapper.set(Subsidiary::getEnName, dto.getEnName());
+        wrapper.set(Subsidiary::getParentCode, dto.getParentCode());
+        wrapper.set(Subsidiary::getBusinessUnitCode, dto.getBusinessUnitCode());
+        wrapper.set(Subsidiary::getLegalPerson, dto.getLegalPerson());
+        wrapper.set(Subsidiary::getRegistrationNo, dto.getRegistrationNo());
+        wrapper.set(Subsidiary::getTaxNo, dto.getTaxNo());
+        wrapper.set(Subsidiary::getAddress, dto.getAddress());
+        wrapper.set(Subsidiary::getPhone, dto.getPhone());
+        wrapper.set(Subsidiary::getEmail, dto.getEmail());
+        wrapper.set(Subsidiary::getStatus, dto.getStatus());
+        wrapper.set(Subsidiary::getRemark, dto.getRemark());
+        wrapper.set(Subsidiary::getUpdatedAt, LocalDateTime.now());
+        wrapper.set(Subsidiary::getUpdatedBy, "system");
+        this.update(wrapper);
 
-        // Use update with version check disabled to avoid optimistic lock issues with null fields
-        this.updateById(existing);
-
-        log.info("[更新子公司] success id={}", existing.getId());
-        return convertToVO(existing);
+        log.info("[更新子公司] success id={}", dto.getId());
+        return convertToVO(getById(dto.getId()));
     }
 
     @Override

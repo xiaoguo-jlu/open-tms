@@ -137,7 +137,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { listPositionLimit, savePositionLimit, updatePositionLimit, deletePositionLimit } from '@/api/cashpool'
-import { listBusinessUnit, listBank, listCurrency } from '@/api/basedata'
+import { listBusinessUnit, listCurrency } from '@/api/basedata'
 
 const loading = ref(false)
 const drawerVisible = ref(false)
@@ -179,8 +179,6 @@ const handleTypeChange = async () => {
   formData.limitName = ''
   if (formData.limitType === 'ENTITY') {
     subjectList.value = (await listBusinessUnit({ pageSize: 1000 })).data.list || []
-  } else if (formData.limitType === 'BANK') {
-    subjectList.value = (await listBank({ pageSize: 1000 })).data.list || []
   } else if (formData.limitType === 'CURRENCY') {
     subjectList.value = (await listCurrency({ pageSize: 1000 })).data.list || []
   }

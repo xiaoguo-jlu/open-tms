@@ -5,11 +5,6 @@
         <el-form-item label="账户名称">
           <el-input v-model="queryForm.accountName" placeholder="请输入账户名称" clearable @keyup.enter="handleQuery" />
         </el-form-item>
-        <el-form-item label="开户银行">
-          <el-select v-model="queryForm.bankId" placeholder="请选择" clearable filterable>
-            <el-option v-for="item in bankList" :key="item.id" :label="item.name" :value="item.id" />
-          </el-select>
-        </el-form-item>
         <el-form-item label="业务单元">
           <el-select v-model="queryForm.entityId" placeholder="请选择" clearable filterable>
             <el-option v-for="item in entityList" :key="item.id" :label="item.name" :value="item.id" />
@@ -90,9 +85,7 @@
           <el-input v-model="formData.account" placeholder="银行账号" />
         </el-form-item>
         <el-form-item label="开户银行" prop="bankId">
-          <el-select v-model="formData.bankId" placeholder="请选择" style="width: 100%;" filterable>
-            <el-option v-for="item in bankList" :key="item.id" :label="item.name" :value="item.id" />
-          </el-select>
+          <el-input v-model="formData.bankId" placeholder="请输入开户银行ID" />
         </el-form-item>
         <el-form-item label="所属业务单元" prop="entityId">
           <el-select v-model="formData.entityId" placeholder="请选择" style="width: 100%;" filterable>
@@ -173,7 +166,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { listBankAccount, saveBankAccount, updateBankAccount, deleteBankAccount, getAccountBalance, syncBankAccount } from '@/api/dealing'
-import { listBank, listBusinessUnit, listCurrency } from '@/api/basedata'
+import { listBusinessUnit, listCurrency } from '@/api/basedata'
 
 const loading = ref(false)
 const drawerVisible = ref(false)
@@ -182,12 +175,11 @@ const submitLoading = ref(false)
 const formRef = ref(null)
 const tableData = ref([])
 const detailData = ref({})
-const bankList = ref([])
 const entityList = ref([])
 const currencyList = ref([])
 const mainAccountList = ref([])
 
-const queryForm = reactive({ accountName: '', bankId: '', entityId: '', status: '' })
+const queryForm = reactive({ accountName: '', entityId: '', status: '' })
 const pagination = reactive({ pageNum: 1, pageSize: 10, total: 0 })
 
 const formData = reactive({
@@ -221,10 +213,9 @@ const formatAmount = (amount) => {
 }
 
 const fetchLists = async () => {
-  bankList.value = (await listBank({ pageSize: 1000 })).data.list || []
-  entityList.value = (await listBusinessUnit({ pageSize: 1000 })).data.list || []
-  currencyList.value = (await listCurrency({ pageSize: 1000 })).data.list || []
-  mainAccountList.value = (await listBankAccount({ pageSize: 1000, isCollected: '1' })).data.list || []
+  entityList.value = (await listBusinessUnit({ pageSize: 1000 })).data.records || []
+  currencyList.value = (await listCurrency({ pageSize: 1000 })).data.records || []
+  mainAccountList.value = (await listBankAccount({ pageSize: 1000, isCollected: '1' })).data.records || []
 }
 
 const fetchData = async () => {
@@ -232,7 +223,7 @@ const fetchData = async () => {
   try {
     const params = { ...queryForm, pageNum: pagination.pageNum, pageSize: pagination.pageSize }
     const res = await listBankAccount(params)
-    tableData.value = res.data.list || []
+    tableData.value = res.data.records || []
     pagination.total = res.data.total || 0
   } catch (e) { console.error(e) }
   finally { loading.value = false }
@@ -241,7 +232,7 @@ const fetchData = async () => {
 const handleQuery = () => { pagination.pageNum = 1; fetchData() }
 
 const handleReset = () => {
-  Object.assign(queryForm, { accountName: '', bankId: '', entityId: '', status: '' })
+  Object.assign(queryForm, { accountName: '', entityId: '', status: '' })
   handleQuery()
 }
 

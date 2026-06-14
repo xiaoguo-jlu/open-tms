@@ -19,11 +19,9 @@ public class BankAccountServiceImpl extends ServiceImpl<BankAccountMapper, BankA
         LambdaQueryWrapper<BankAccount> wrapper = new LambdaQueryWrapper<>();
 
         if (StringUtils.hasText(keyword)) {
-            wrapper.like(BankAccount::getCode, keyword)
+            wrapper.like(BankAccount::getAccountNo, keyword)
                    .or()
-                   .like(BankAccount::getName, keyword)
-                   .or()
-                   .like(BankAccount::getAccountNo, keyword);
+                   .like(BankAccount::getAccountName, keyword);
         }
 
         if (bankId != null) {
@@ -50,7 +48,7 @@ public class BankAccountServiceImpl extends ServiceImpl<BankAccountMapper, BankA
 
     @Override
     public boolean saveBankAccount(BankAccount bankAccount) {
-        if (checkCodeExists(bankAccount.getCode(), null)) {
+        if (checkCodeExists(bankAccount.getAccountNo(), null)) {
             throw new RuntimeException("Bank account code already exists");
         }
         if (bankAccount.getBalance() == null) {
@@ -67,7 +65,7 @@ public class BankAccountServiceImpl extends ServiceImpl<BankAccountMapper, BankA
 
     @Override
     public boolean updateBankAccount(BankAccount bankAccount) {
-        if (checkCodeExists(bankAccount.getCode(), bankAccount.getId())) {
+        if (checkCodeExists(bankAccount.getAccountNo(), bankAccount.getId())) {
             throw new RuntimeException("Bank account code already exists");
         }
         return updateById(bankAccount);
@@ -89,7 +87,7 @@ public class BankAccountServiceImpl extends ServiceImpl<BankAccountMapper, BankA
             return false;
         }
         LambdaQueryWrapper<BankAccount> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(BankAccount::getCode, code);
+        wrapper.eq(BankAccount::getAccountNo, code);
         if (excludeId != null) {
             wrapper.ne(BankAccount::getId, excludeId);
         }

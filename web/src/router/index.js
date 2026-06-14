@@ -4,11 +4,6 @@ const routes = [
   { path: '/', redirect: '/dashboard' },
   { path: '/dashboard', name: 'Dashboard', component: () => import('@/views/dashboard/Cockpit.vue') },
   {
-    path: '/organization', name: 'Organization', children: [
-      { path: 'management-entity', name: 'ManagementEntity', component: () => import('@/views/basedata/BusinessUnitList.vue') }
-    ]
-  },
-  {
     path: '/basedata', name: 'Basedata', children: [
       { path: 'trader', name: 'Trader', component: () => import('@/views/basedata/TraderList.vue') },
       { path: 'currency', name: 'Currency', component: () => import('@/views/basedata/CurrencyList.vue') },
@@ -19,7 +14,8 @@ const routes = [
       { path: 'counterparty', name: 'Counterparty', component: () => import('@/views/basedata/CounterpartyList.vue') },
       { path: 'counterparty-account', name: 'CounterpartyAccount', component: () => import('@/views/basedata/CounterpartyAccountList.vue') },
       { path: 'currency-pair', name: 'CurrencyPair', component: () => import('@/views/basedata/CurrencyPairList.vue') },
-      { path: 'subsidiary', name: 'Subsidiary', component: () => import('@/views/basedata/SubsidiaryList.vue') }
+      { path: 'subsidiary', name: 'Subsidiary', component: () => import('@/views/basedata/SubsidiaryList.vue') },
+      { path: 'business-unit', name: 'BusinessUnit', component: () => import('@/views/basedata/BusinessUnitList.vue') }
     ]
   },
   {

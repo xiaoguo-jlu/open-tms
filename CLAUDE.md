@@ -51,6 +51,12 @@ python scripts/test/test_country_ui.py
 python scripts/test/start_test.py
 ```
 
+### 测试质量要求
+- UI测试必须执行功能验证，不只是元素检查
+- API测试必须验证响应数据正确性
+- 任何操作后检查错误提示
+- 慢请求（>1s）需要记录
+
 ### Database Tool (scripts/db/)
 ```bash
 # List all tables

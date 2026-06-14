@@ -113,25 +113,6 @@ COMMENT ON TABLE tms_holiday_t IS '节假日表';
 CREATE INDEX idx_holiday_date ON tms_holiday_t(holiday_date);
 CREATE INDEX idx_holiday_country ON tms_holiday_t(country_code);
 
--- 银行表
-CREATE TABLE tms_bank_t (
-    id BIGSERIAL PRIMARY KEY,
-    code VARCHAR(50) NOT NULL UNIQUE,
-    name VARCHAR(200) NOT NULL,
-    en_name VARCHAR(200),
-    swift_code VARCHAR(20),
-    country_code VARCHAR(10),
-    status CHAR(1) NOT NULL DEFAULT '1',
-    created_by VARCHAR(50) NOT NULL DEFAULT 'system',
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_by VARCHAR(50),
-    updated_at TIMESTAMP,
-    version INT DEFAULT 0,
-    deleted CHAR(1) DEFAULT '0'
-);
-COMMENT ON TABLE tms_bank_t IS '银行表';
-CREATE INDEX idx_bank_code ON tms_bank_t(code);
-CREATE INDEX idx_bank_swift ON tms_bank_t(swift_code);
 
 -- 交易对手表
 CREATE TABLE tms_counterparty_t (

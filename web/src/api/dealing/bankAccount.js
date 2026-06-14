@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function listBankAccount(params) {
   return request({
-    url: '/api/v1/bank-accounts',
+    url: '/api/v1/bank-accounts/page',
     method: 'get',
     params
   })

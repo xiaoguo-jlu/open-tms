@@ -22,6 +22,7 @@
         <module>fx</module>
         <module>irs</module>
         <module>var</module>
+        <module>bankaccount</module>
     </modules>
 
     <parent>

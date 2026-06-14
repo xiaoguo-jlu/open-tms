@@ -12,7 +12,11 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      '/api/v1/business-units': {
+      '/api/v1/management-entities': {
+        target: 'http://localhost:8081/opentms/basedata',
+        changeOrigin: true
+      },
+      '/api/v1/subsidiaries': {
         target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
@@ -40,15 +44,15 @@ export default defineConfig({
         target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
-      '/api/v1/banks': {
-        target: 'http://localhost:8081/opentms/basedata',
-        changeOrigin: true
-      },
       '/api/v1/counterparties': {
         target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
       '/api/v1/counterparty-accounts': {
+        target: 'http://localhost:8081/opentms/basedata',
+        changeOrigin: true
+      },
+      '/api/v1/currency-pairs': {
         target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
@@ -61,7 +65,7 @@ export default defineConfig({
         changeOrigin: true
       },
       '/api/v1/bank-accounts': {
-        target: 'http://localhost:8083',
+        target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
       '/api/v1/instruments': {

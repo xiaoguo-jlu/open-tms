@@ -3,7 +3,6 @@
 -- 执行: psql -U opentms -d opentms -f fix_add_remark.sql
 
 
-ALTER TABLE tms_bank_t ADD COLUMN remark VARCHAR(500);
 ALTER TABLE tms_counterparty_t ADD COLUMN remark VARCHAR(500);
 ALTER TABLE tms_counterparty_account_t ADD COLUMN remark VARCHAR(500);
 

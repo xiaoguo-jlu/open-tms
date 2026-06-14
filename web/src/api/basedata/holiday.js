@@ -25,16 +25,16 @@ export function saveHoliday(data) {
 
 export function updateHoliday(data) {
   return request({
-    url: '/api/v1/holidays',
-    method: 'put',
+    url: '/api/v1/holidays/update',
+    method: 'post',
     data
   })
 }
 
 export function deleteHoliday(id) {
   return request({
-    url: `/api/v1/holidays/${id}`,
-    method: 'delete'
+    url: `/api/v1/holidays/delete/${id}`,
+    method: 'post'
   })
 }
 
