@@ -24,7 +24,9 @@ const routes = [
       { path: 'deal/form', name: 'DealForm', component: () => import('@/views/dealing/DealForm.vue') },
       { path: 'deal/detail', name: 'DealDetail', component: () => import('@/views/dealing/DealDetail.vue') },
       { path: 'action', name: 'ActionList', component: () => import('@/views/dealing/ActionList.vue') },
-      { path: 'bank-account', name: 'BankAccount', component: () => import('@/views/dealing/BankAccountList.vue') }
+      { path: 'bank-account', name: 'BankAccount', component: () => import('@/views/dealing/BankAccountList.vue') },
+      { path: 'ac-deal', name: 'AcDealList', component: () => import('@/views/dealing/AcDealList.vue') },
+      { path: 'ac-deal/detail/:dealNumber', name: 'AcDealDetail', component: () => import('@/views/dealing/AcDealDetail.vue') }
     ]
   },
   {

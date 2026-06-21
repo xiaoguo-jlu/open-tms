@@ -1,0 +1,144 @@
+{
+  "feature": "AT交易 (Account Transfer)",
+  "version": "v2.0",
+  "start_time": "2026-06-21 17:25:07",
+  "total": 18,
+  "passed": 1,
+  "failed": 9,
+  "skipped": 8,
+  "results": [
+    {
+      "id": "TC-AT-001",
+      "name": "创建同公司同币种 AT",
+      "status": "failed",
+      "note": "创建失败: None",
+      "expected": "code=200"
+    },
+    {
+      "id": "TC-AT-002",
+      "name": "查询 AT 列表",
+      "status": "passed",
+      "note": "total=0, count=0",
+      "expected": "code=200",
+      "actual": 200
+    },
+    {
+      "id": "TC-AT-003",
+      "name": "查询 AT 详情",
+      "status": "skipped",
+      "note": "无 created deal"
+    },
+    {
+      "id": "TC-AT-004",
+      "name": "审批通过",
+      "status": "skipped",
+      "note": "无 created deal"
+    },
+    {
+      "id": "TC-AT-005",
+      "name": "创建跨币种 AT",
+      "status": "failed",
+      "note": "响应: None",
+      "expected": "code=200"
+    },
+    {
+      "id": "TC-AT-006",
+      "name": "汇率计算校验",
+      "status": "skipped",
+      "note": "无跨币种 deal"
+    },
+    {
+      "id": "TC-AT-007",
+      "name": "创建跨公司 AT",
+      "status": "failed",
+      "note": "响应: None",
+      "expected": "code=200"
+    },
+    {
+      "id": "TC-AT-008",
+      "name": "创建跨公司跨币种 AT",
+      "status": "failed",
+      "note": "响应: None",
+      "expected": "code=200"
+    },
+    {
+      "id": "TC-AT-009",
+      "name": "创建跨境 AT",
+      "status": "failed",
+      "note": "响应: None",
+      "expected": "code=200"
+    },
+    {
+      "id": "TC-AT-010",
+      "name": "修改 AT",
+      "status": "skipped",
+      "note": "无 created deal"
+    },
+    {
+      "id": "TC-AT-011",
+      "name": "修改跨币种 AT 的汇率",
+      "status": "skipped",
+      "note": "无跨币种 deal"
+    },
+    {
+      "id": "TC-AT-012",
+      "name": "删除 AT",
+      "status": "skipped",
+      "note": "无 created deal"
+    },
+    {
+      "id": "TC-AT-013",
+      "name": "双账户相同校验",
+      "status": "failed",
+      "note": "未拒绝: None",
+      "expected": "code=400"
+    },
+    {
+      "id": "TC-AT-014",
+      "name": "跨币种未填汇率",
+      "status": "failed",
+      "note": "服务端未拒绝未填汇率的跨币种 AT",
+      "expected": "code=400"
+    },
+    {
+      "id": "TC-AT-015",
+      "name": "source_amount=0",
+      "status": "failed",
+      "note": "服务端未拒绝 source_amount=0",
+      "expected": "code=400"
+    },
+    {
+      "id": "TC-AT-016",
+      "name": "dest_amount=0",
+      "status": "failed",
+      "note": "服务端未拒绝 dest_amount=0",
+      "expected": "code=400"
+    },
+    {
+      "id": "TC-AT-017",
+      "name": "Action 多对一",
+      "status": "skipped",
+      "note": "无 created deal"
+    },
+    {
+      "id": "TC-AT-019",
+      "name": "驳回 Action",
+      "status": "skipped",
+      "note": "无 created deal"
+    }
+  ],
+  "validation_points": {
+    "create_generates_4_dealmap_2_cashflow": null,
+    "create_no_image": null,
+    "update_soft_delete_old_dealmap": null,
+    "update_create_new_dealmap": null,
+    "update_update_cashflow_dealmap_number": null,
+    "update_image_v_plus_1": null,
+    "delete_cascade_soft_delete": null,
+    "delete_image_v_plus_1": null,
+    "approval_does_not_change_dealmap_event_status": null,
+    "approval_does_not_change_cashflow_status": null,
+    "action_many_to_one": null
+  },
+  "end_time": "2026-06-21 17:29:48"
+}

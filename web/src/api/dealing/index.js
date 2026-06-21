@@ -1,3 +1,5 @@
 export * from './deal'
+export * from './atDeal'
+export * from './acDeal'
 export * from './bankAccount'
 export * from './instrument'

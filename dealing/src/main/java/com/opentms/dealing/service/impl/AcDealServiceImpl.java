@@ -1,0 +1,688 @@
+package com.opentms.dealing.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.opentms.dealing.dto.AcDealDTO;
+import com.opentms.dealing.dto.AcDealDetailVO;
+import com.opentms.dealing.entity.*;
+import com.opentms.dealing.mapper.*;
+import com.opentms.dealing.service.AcDealService;
+import com.opentms.dealing.service.CashflowService;
+import com.opentms.dealing.service.DealMapService;
+import com.opentms.dealing.vo.ActionVO;
+import com.opentms.dealing.vo.CashflowVO;
+import com.opentms.dealing.vo.DealMapVO;
+import com.opentms.dealing.vo.DealVO;
+import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * AC 交易 Service 实现（v2.0 - DealMap 字段精简 + Action 多对一 + 审批仅作用于 Action）
+ */
+@Service
+public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements AcDealService {
+
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+    private static final String DEAL_TYPE_AC = "AC";
+
+    private static final String DEAL_STATUS_NEW = "New";
+    private static final String DEAL_STATUS_CANCELED = "Canceled";
+
+    private static final String ACTION_TYPE_CREATE = "CREATE";
+    private static final String ACTION_TYPE_UPDATE = "UPDATE";
+    private static final String ACTION_TYPE_DELETE = "DELETE";
+
+    private static final String APPROVAL_STATUS_PENDING = "Pending";
+    private static final String APPROVAL_STATUS_APPROVED = "Approved";
+    private static final String APPROVAL_STATUS_REJECTED = "Rejected";
+
+    private static final String EVENT_TYPE_ACTUAL_CASHFLOW = "ActualCashflow";
+
+    private static final String IMAGE_TYPE_UPDATE = "UPDATE";
+    private static final String IMAGE_TYPE_DELETE = "DELETE";
+
+    private final AcDealMapper acDealMapper;
+    private final ActionMapper actionMapper;
+    private final DealImageMapper dealImageMapper;
+    private final AcDealImageMapper acDealImageMapper;
+    private final DealMapService dealMapService;
+    private final CashflowService cashflowService;
+
+    public AcDealServiceImpl(AcDealMapper acDealMapper,
+                             ActionMapper actionMapper,
+                             DealImageMapper dealImageMapper,
+                             AcDealImageMapper acDealImageMapper,
+                             @Lazy DealMapService dealMapService,
+                             @Lazy CashflowService cashflowService) {
+        this.acDealMapper = acDealMapper;
+        this.actionMapper = actionMapper;
+        this.dealImageMapper = dealImageMapper;
+        this.acDealImageMapper = acDealImageMapper;
+        this.dealMapService = dealMapService;
+        this.cashflowService = cashflowService;
+    }
+
+    // ==================== Query ====================
+
+    @Override
+    public Page<DealVO> queryPage(String keyword, String status, String direction,
+                                  String businessUnit, int pageNum, int pageSize) {
+        LambdaQueryWrapper<Deal> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Deal::getDealType, DEAL_TYPE_AC);
+
+        if (StringUtils.hasText(keyword)) {
+            wrapper.like(Deal::getDealNumber, keyword);
+        }
+        if (StringUtils.hasText(status)) {
+            wrapper.eq(Deal::getStatus, status);
+        }
+        if (StringUtils.hasText(direction)) {
+            wrapper.eq(Deal::getDirection, direction);
+        }
+        if (StringUtils.hasText(businessUnit)) {
+            wrapper.eq(Deal::getBusinessUnit, businessUnit);
+        }
+
+        wrapper.orderByDesc(Deal::getCreatedAt);
+
+        Page<Deal> page = page(new Page<>(pageNum, pageSize), wrapper);
+        Page<DealVO> voPage = new Page<>(page.getCurrent(), page.getSize(), page.getTotal());
+
+        List<DealVO> voList = page.getRecords().stream().map(this::convertToVO).toList();
+        voPage.setRecords(voList);
+        return voPage;
+    }
+
+    @Override
+    public AcDealDetailVO getDetail(Long id) {
+        Deal deal = getById(id);
+        if (deal == null) {
+            return null;
+        }
+        return buildDetail(deal);
+    }
+
+    @Override
+    public AcDealDetailVO getDetailByDealNumber(String dealNumber) {
+        Deal deal = getByDealNumber(dealNumber);
+        if (deal == null) {
+            return null;
+        }
+        return buildDetail(deal);
+    }
+
+    private AcDealDetailVO buildDetail(Deal deal) {
+        AcDealDetailVO vo = new AcDealDetailVO();
+        BeanUtils.copyProperties(deal, vo);
+
+        // AC Deal
+        AcDeal acDeal = getAcDealByDealNumber(deal.getDealNumber());
+        if (acDeal != null) {
+            vo.setBankAccountId(acDeal.getBankAccountId());
+            vo.setCounterpartyAccountId(acDeal.getCounterpartyAccountId());
+            vo.setPaymentMethod(acDeal.getPaymentMethod());
+        }
+
+        // DealMap 时间线
+        List<DealMapVO> dealMapList = dealMapService.listByDealNumber(deal.getDealNumber());
+        vo.setDealMapList(dealMapList);
+
+        // Cashflow 列表（按 deal_number 查询，因为 v2.0 通过 dealmap_number 关联，但用户可从 deal 视角查询）
+        List<CashflowVO> cashflowList = cashflowService.listByDealNumber(deal.getDealNumber());
+        vo.setCashflowList(cashflowList);
+
+        // Action 列表（v2.0 多 Action/Deal）
+        List<ActionVO> actionList = listActionsByDealNumber(deal.getDealNumber());
+        vo.setActionList(actionList);
+
+        return vo;
+    }
+
+    // ==================== v2.0 Create ====================
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean createAcDeal(AcDealDTO dto) {
+        validateAcDealDTO(dto);
+
+        LocalDateTime now = LocalDateTime.now();
+        String dealNumber = generateDealNumber();
+        String actionNumber = generateActionNumber();
+
+        // ① INSERT Action(CREATE)
+        Action action = new Action();
+        action.setActionNumber(actionNumber);
+        action.setDealNumber(dealNumber);
+        action.setDealType(DEAL_TYPE_AC);
+        action.setActionType(ACTION_TYPE_CREATE);
+        action.setActionStatus(APPROVAL_STATUS_PENDING);
+        action.setOperator(dto.getOperator());
+        action.setOperateAt(now);
+        action.setApprovalStatus1(APPROVAL_STATUS_PENDING);
+        action.setApprovalStatus2(APPROVAL_STATUS_PENDING);
+        action.setCreatedBy(dto.getOperator());
+        action.setCreatedAt(now);
+        action.setVersion(1);
+        actionMapper.insert(action);
+
+        // ② INSERT Deal
+        Deal deal = new Deal();
+        BeanUtils.copyProperties(dto, deal);
+        deal.setDealNumber(dealNumber);
+        deal.setDealType(DEAL_TYPE_AC);
+        deal.setStatus(DEAL_STATUS_NEW);
+        deal.setLatestActionNumber(actionNumber);
+        deal.setVersion(1);
+        deal.setCreatedBy(dto.getOperator());
+        deal.setCreatedAt(now);
+        deal.setUpdatedBy(dto.getOperator());
+        deal.setUpdatedAt(now);
+        save(deal);
+
+        // ③ INSERT AcDeal
+        AcDeal acDeal = new AcDeal();
+        acDeal.setDealNumber(dealNumber);
+        acDeal.setBankAccountId(dto.getBankAccountId());
+        acDeal.setCounterpartyAccountId(dto.getCounterpartyAccountId());
+        acDeal.setPaymentMethod(dto.getPaymentMethod());
+        acDeal.setCreatedBy(dto.getOperator());
+        acDeal.setCreatedAt(now);
+        acDeal.setUpdatedBy(dto.getOperator());
+        acDeal.setUpdatedAt(now);
+        acDeal.setVersion(1);
+        acDealMapper.insert(acDeal);
+
+        // ④ ✅ INSERT DealMap(ActualCashflow) - 自动创建
+        String dealMapNumber = dealMapService.generateDealMapNumber();
+        DealMap dealMap = new DealMap();
+        dealMap.setDealmapNumber(dealMapNumber);
+        dealMap.setDealNumber(dealNumber);
+        dealMap.setActionNumber(actionNumber);
+        dealMap.setEventType(EVENT_TYPE_ACTUAL_CASHFLOW);
+        dealMap.setEventStatus("Active");
+        dealMap.setAmount(dto.getAmount());
+        dealMap.setCurrency(dto.getCurrency());
+        dealMap.setDirection(dto.getDirection());
+        dealMap.setEventDate(dto.getValueDate() != null ? dto.getValueDate() : dto.getDealDate());
+        dealMap.setValueDate(dto.getValueDate());
+        dealMap.setIsReversal("0");
+        dealMap.setDescription("AC Deal created - actual cashflow event");
+        dealMap.setCreatedBy(dto.getOperator());
+        dealMap.setCreatedAt(now);
+        dealMap.setVersion(1);
+        dealMapService.save(dealMap);
+
+        // ⑤ ✅ INSERT Cashflow - 自动创建（dealmap_number 关联）
+        String cflowNumber = cashflowService.generateCflowNumber();
+        Cashflow cashflow = new Cashflow();
+        cashflow.setCflowNumber(cflowNumber);
+        cashflow.setDealNumber(dealNumber);
+        cashflow.setDealmapNumber(dealMapNumber);
+        cashflow.setBusinessUnit(dto.getBusinessUnit());
+        cashflow.setBankAccount(dto.getBankAccountId() != null ? String.valueOf(dto.getBankAccountId()) : null);
+        cashflow.setCounterpartyAccount(dto.getCounterpartyAccountId() != null ? String.valueOf(dto.getCounterpartyAccountId()) : null);
+        cashflow.setDirection(dto.getDirection());
+        cashflow.setAmount(dto.getAmount());
+        cashflow.setCurrency(dto.getCurrency());
+        cashflow.setCflowDate(dto.getValueDate() != null ? dto.getValueDate() : dto.getDealDate());
+        cashflow.setValueDate(dto.getValueDate());
+        cashflow.setSourceType("AC_DEAL");
+        cashflow.setSourceRef(dealNumber);
+        cashflow.setStatus("Created");
+        cashflow.setCreatedBy(dto.getOperator());
+        cashflow.setCreatedAt(now);
+        cashflow.setVersion(1);
+        cashflowService.save(cashflow);
+
+        // ⑥ ❌ CREATE 不生成 DealImage
+
+        return true;
+    }
+
+    // ==================== v2.0 Update ====================
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateAcDeal(AcDealDTO dto) {
+        if (!StringUtils.hasText(dto.getDealNumber())) {
+            throw new IllegalArgumentException("dealNumber 不能为空");
+        }
+        validateAcDealDTO(dto);
+
+        LocalDateTime now = LocalDateTime.now();
+        String dealNumber = dto.getDealNumber();
+
+        Deal existingDeal = getByDealNumber(dealNumber);
+        if (existingDeal == null) {
+            throw new RuntimeException("Deal not found: " + dealNumber);
+        }
+        AcDeal existingAcDeal = getAcDealByDealNumber(dealNumber);
+        if (existingAcDeal == null) {
+            throw new RuntimeException("AC Deal not found: " + dealNumber);
+        }
+
+        int newVersion = existingDeal.getVersion() + 1;
+
+        // ① INSERT Action(UPDATE) - 新独立 Action
+        String actionNumber = generateActionNumber();
+        Action action = new Action();
+        action.setActionNumber(actionNumber);
+        action.setDealNumber(dealNumber);
+        action.setDealType(DEAL_TYPE_AC);
+        action.setActionType(ACTION_TYPE_UPDATE);
+        action.setActionStatus(APPROVAL_STATUS_PENDING);
+        action.setOperator(dto.getOperator());
+        action.setOperateAt(now);
+        action.setApprovalStatus1(APPROVAL_STATUS_PENDING);
+        action.setApprovalStatus2(APPROVAL_STATUS_PENDING);
+        action.setRemark(dto.getRemark());
+        action.setCreatedBy(dto.getOperator());
+        action.setCreatedAt(now);
+        action.setVersion(1);
+        actionMapper.insert(action);
+
+        // ② INSERT DealImage(v+1) - 记录修改前旧值
+        String oldImageNumber = generateImageNumber();
+        DealImage oldImage = new DealImage();
+        oldImage.setImageNumber(oldImageNumber);
+        oldImage.setDealNumber(dealNumber);
+        oldImage.setDealType(existingDeal.getDealType());
+        oldImage.setVersion(newVersion);
+        BeanUtils.copyProperties(existingDeal, oldImage);
+        oldImage.setId(null); // 避免主键冲突
+        oldImage.setImageType(IMAGE_TYPE_UPDATE);
+        oldImage.setOperator(dto.getOperator());
+        oldImage.setOperateAt(now);
+        oldImage.setCreatedBy(dto.getOperator());
+        oldImage.setCreatedAt(now);
+        dealImageMapper.insert(oldImage);
+
+        // ③ INSERT AcDealImage(v+1) - 记录修改前旧值
+        String oldAcImageNumber = generateImageNumber();
+        AcDealImage oldAcImage = new AcDealImage();
+        oldAcImage.setImageNumber(oldAcImageNumber);
+        oldAcImage.setDealNumber(dealNumber);
+        oldAcImage.setVersion(newVersion);
+        BeanUtils.copyProperties(existingAcDeal, oldAcImage);
+        oldAcImage.setId(null); // 避免主键冲突
+        oldAcImage.setImageType(IMAGE_TYPE_UPDATE);
+        oldAcImage.setOperator(dto.getOperator());
+        oldAcImage.setOperateAt(now);
+        oldAcImage.setCreatedBy(dto.getOperator());
+        oldAcImage.setCreatedAt(now);
+        acDealImageMapper.insert(oldAcImage);
+
+        // ④ UPDATE Deal
+        BeanUtils.copyProperties(dto, existingDeal);
+        existingDeal.setUpdatedBy(dto.getOperator());
+        existingDeal.setUpdatedAt(now);
+        existingDeal.setVersion(newVersion);
+        existingDeal.setLatestActionNumber(actionNumber);
+        updateById(existingDeal);
+
+        // ⑤ UPDATE AcDeal
+        BeanUtils.copyProperties(dto, existingAcDeal);
+        existingAcDeal.setUpdatedBy(dto.getOperator());
+        existingAcDeal.setUpdatedAt(now);
+        existingAcDeal.setVersion(newVersion);
+        acDealMapper.updateById(existingAcDeal);
+
+        // ⑥ 步骤A：先获取旧 DealMap 的编号（在软删之前）
+        String oldDealMapNumber = getLatestActiveDealMapNumber(dealNumber);
+
+        // ⑦ ✅ 软删除旧 DealMap
+        dealMapService.softDeleteByDealNumber(dealNumber);
+
+        // ⑧ ✅ INSERT 新 DealMap(ActualCashflow) - 关联新 Action
+        String newDealMapNumber = dealMapService.generateDealMapNumber();
+        DealMap newDealMap = new DealMap();
+        newDealMap.setDealmapNumber(newDealMapNumber);
+        newDealMap.setDealNumber(dealNumber);
+        newDealMap.setActionNumber(actionNumber);
+        newDealMap.setEventType(EVENT_TYPE_ACTUAL_CASHFLOW);
+        newDealMap.setEventStatus("Active");
+        newDealMap.setAmount(dto.getAmount());
+        newDealMap.setCurrency(dto.getCurrency());
+        newDealMap.setDirection(dto.getDirection());
+        newDealMap.setEventDate(dto.getValueDate() != null ? dto.getValueDate() : dto.getDealDate());
+        newDealMap.setValueDate(dto.getValueDate());
+        newDealMap.setIsReversal("0");
+        newDealMap.setDescription("AC Deal updated - new actual cashflow event");
+        newDealMap.setCreatedBy(dto.getOperator());
+        newDealMap.setCreatedAt(now);
+        newDealMap.setVersion(1);
+        dealMapService.save(newDealMap);
+
+        // ⑨ ✅ UPDATE Cashflow - 指向新 DealMap
+        if (StringUtils.hasText(oldDealMapNumber)) {
+            cashflowService.updateDealMapNumber(oldDealMapNumber, newDealMapNumber);
+        }
+
+        return true;
+    }
+
+    /**
+     * 获取 Deal 当前最新 Active DealMap 的编号
+     */
+    private String getLatestActiveDealMapNumber(String dealNumber) {
+        LambdaQueryWrapper<DealMap> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(DealMap::getDealNumber, dealNumber)
+               .eq(DealMap::getDeleted, "0")
+               .orderByDesc(DealMap::getCreatedAt)
+               .last("LIMIT 1");
+        DealMap latest = dealMapService.getOne(wrapper);
+        return latest != null ? latest.getDealmapNumber() : null;
+    }
+
+    // ==================== v2.0 Delete ====================
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deleteAcDeal(Long id) {
+        Deal deal = getById(id);
+        if (deal == null) {
+            throw new RuntimeException("Deal not found: " + id);
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        String dealNumber = deal.getDealNumber();
+        int newVersion = deal.getVersion() + 1;
+
+        // ① INSERT Action(DELETE) - 独立 Action
+        String actionNumber = generateActionNumber();
+        Action action = new Action();
+        action.setActionNumber(actionNumber);
+        action.setDealNumber(dealNumber);
+        action.setDealType(DEAL_TYPE_AC);
+        action.setActionType(ACTION_TYPE_DELETE);
+        action.setActionStatus(APPROVAL_STATUS_PENDING);
+        action.setOperator("system");
+        action.setOperateAt(now);
+        action.setApprovalStatus1(APPROVAL_STATUS_PENDING);
+        action.setApprovalStatus2(APPROVAL_STATUS_PENDING);
+        action.setCreatedBy("system");
+        action.setCreatedAt(now);
+        action.setVersion(1);
+        actionMapper.insert(action);
+
+        // ② INSERT DealImage(v+1) - 记录删除前完整状态
+        String imageNumber = generateImageNumber();
+        DealImage image = new DealImage();
+        image.setImageNumber(imageNumber);
+        image.setDealNumber(dealNumber);
+        image.setDealType(deal.getDealType());
+        image.setVersion(newVersion);
+        BeanUtils.copyProperties(deal, image);
+        image.setId(null); // 避免主键冲突，让 DB 自增
+        image.setImageType(IMAGE_TYPE_DELETE);
+        image.setOperator("system");
+        image.setOperateAt(now);
+        image.setCreatedBy("system");
+        image.setCreatedAt(now);
+        dealImageMapper.insert(image);
+
+        // ③ 软删除 Deal
+        deal.setDeleted("1");
+        deal.setStatus(DEAL_STATUS_CANCELED);
+        deal.setUpdatedBy("system");
+        deal.setUpdatedAt(now);
+        deal.setVersion(newVersion);
+        deal.setLatestActionNumber(actionNumber);
+        updateById(deal);
+
+        // ④ 软删除 AcDeal
+        AcDeal acDeal = getAcDealByDealNumber(dealNumber);
+        if (acDeal != null) {
+            acDeal.setDeleted("1");
+            acDeal.setUpdatedBy("system");
+            acDeal.setUpdatedAt(now);
+            acDeal.setVersion(newVersion);
+            acDealMapper.updateById(acDeal);
+        }
+
+        // ⑤ ✅ 级联软删除 DealMap
+        List<DealMapVO> activeDealMaps = dealMapService.listByDealNumber(dealNumber);
+        dealMapService.softDeleteByDealNumber(dealNumber);
+
+        // ⑥ ✅ 级联软删除 Cashflow
+        for (DealMapVO dm : activeDealMaps) {
+            cashflowService.softDeleteByDealMapNumber(dm.getDealmapNumber());
+        }
+
+        return true;
+    }
+
+    // ==================== v2.0 Approve / Reject ====================
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean approveAction(String actionNumber, String approver, String approvalRemark) {
+        if (!StringUtils.hasText(actionNumber)) {
+            throw new IllegalArgumentException("actionNumber 不能为空");
+        }
+        if (!StringUtils.hasText(approver)) {
+            throw new IllegalArgumentException("approver 不能为空");
+        }
+
+        Action action = getActionByActionNumber(actionNumber);
+        if (action == null) {
+            throw new RuntimeException("Action not found: " + actionNumber);
+        }
+
+        // ⚠️ 关键：审批仅作用于 Action，DealMap / Cashflow 状态不变
+        action.setApprover1(approver);
+        action.setApprovalStatus1(APPROVAL_STATUS_APPROVED);
+        if (StringUtils.hasText(approvalRemark)) {
+            action.setApprovalRemark(approvalRemark);
+        }
+        action.setOperator(approver);
+        action.setUpdatedBy(approver);
+        action.setUpdatedAt(LocalDateTime.now());
+        action.setVersion(action.getVersion() + 1);
+        actionMapper.updateById(action);
+
+        // 更新 Deal 的 latestActionNumber 与版本号
+        Deal deal = getByDealNumber(action.getDealNumber());
+        if (deal != null) {
+            deal.setLatestActionNumber(action.getActionNumber());
+            deal.setUpdatedBy(approver);
+            deal.setUpdatedAt(LocalDateTime.now());
+            deal.setVersion(deal.getVersion() + 1);
+            updateById(deal);
+        }
+
+        return true;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean rejectAction(String actionNumber, String approver, String approvalRemark) {
+        if (!StringUtils.hasText(actionNumber)) {
+            throw new IllegalArgumentException("actionNumber 不能为空");
+        }
+        if (!StringUtils.hasText(approver)) {
+            throw new IllegalArgumentException("approver 不能为空");
+        }
+        if (!StringUtils.hasText(approvalRemark)) {
+            throw new IllegalArgumentException("驳回时审批意见必填");
+        }
+
+        Action action = getActionByActionNumber(actionNumber);
+        if (action == null) {
+            throw new RuntimeException("Action not found: " + actionNumber);
+        }
+
+        // ⚠️ 关键：审批仅作用于 Action，DealMap / Cashflow 状态不变
+        action.setApprover1(approver);
+        action.setApprovalStatus1(APPROVAL_STATUS_REJECTED);
+        action.setApprovalRemark(approvalRemark);
+        action.setOperator(approver);
+        action.setUpdatedBy(approver);
+        action.setUpdatedAt(LocalDateTime.now());
+        action.setVersion(action.getVersion() + 1);
+        actionMapper.updateById(action);
+
+        Deal deal = getByDealNumber(action.getDealNumber());
+        if (deal != null) {
+            deal.setLatestActionNumber(action.getActionNumber());
+            deal.setUpdatedBy(approver);
+            deal.setUpdatedAt(LocalDateTime.now());
+            deal.setVersion(deal.getVersion() + 1);
+            updateById(deal);
+        }
+
+        return true;
+    }
+
+    // ==================== Helper Methods ====================
+
+    private void validateAcDealDTO(AcDealDTO dto) {
+        if (dto == null) {
+            throw new IllegalArgumentException("DTO 不能为空");
+        }
+        if (!StringUtils.hasText(dto.getBusinessUnit())) {
+            throw new IllegalArgumentException("businessUnit 不能为空");
+        }
+        if (dto.getAmount() == null || dto.getAmount().signum() <= 0) {
+            throw new IllegalArgumentException("amount 必须大于 0");
+        }
+        if (!StringUtils.hasText(dto.getCurrency())) {
+            throw new IllegalArgumentException("currency 不能为空");
+        }
+        if (!StringUtils.hasText(dto.getDirection())) {
+            throw new IllegalArgumentException("direction 不能为空");
+        }
+        if (!"Inflow".equals(dto.getDirection()) && !"Outflow".equals(dto.getDirection())) {
+            throw new IllegalArgumentException("direction 必须为 Inflow / Outflow");
+        }
+        if (dto.getDealDate() == null) {
+            throw new IllegalArgumentException("dealDate 不能为空");
+        }
+        if (dto.getValueDate() == null) {
+            throw new IllegalArgumentException("valueDate 不能为空");
+        }
+        if (dto.getValueDate().isBefore(dto.getDealDate())) {
+            throw new IllegalArgumentException("valueDate 不能早于 dealDate");
+        }
+        if (dto.getBankAccountId() == null) {
+            throw new IllegalArgumentException("bankAccountId 不能为空");
+        }
+        if (!StringUtils.hasText(dto.getOperator())) {
+            throw new IllegalArgumentException("operator 不能为空");
+        }
+    }
+
+    private Deal getByDealNumber(String dealNumber) {
+        LambdaQueryWrapper<Deal> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Deal::getDealNumber, dealNumber);
+        return getOne(wrapper);
+    }
+
+    private AcDeal getAcDealByDealNumber(String dealNumber) {
+        LambdaQueryWrapper<AcDeal> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(AcDeal::getDealNumber, dealNumber);
+        return acDealMapper.selectOne(wrapper);
+    }
+
+    private Action getActionByActionNumber(String actionNumber) {
+        LambdaQueryWrapper<Action> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Action::getActionNumber, actionNumber);
+        return actionMapper.selectOne(wrapper);
+    }
+
+    private List<ActionVO> listActionsByDealNumber(String dealNumber) {
+        LambdaQueryWrapper<Action> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Action::getDealNumber, dealNumber)
+               .orderByAsc(Action::getCreatedAt);
+        return actionMapper.selectList(wrapper).stream().map(this::convertActionToVO).toList();
+    }
+
+    private ActionVO convertActionToVO(Action action) {
+        ActionVO vo = new ActionVO();
+        BeanUtils.copyProperties(action, vo);
+        return vo;
+    }
+
+    private DealVO convertToVO(Deal deal) {
+        DealVO vo = new DealVO();
+        BeanUtils.copyProperties(deal, vo);
+        AcDeal acDeal = getAcDealByDealNumber(deal.getDealNumber());
+        if (acDeal != null) {
+            vo.setBankAccountId(acDeal.getBankAccountId());
+            vo.setCounterpartyAccountId(acDeal.getCounterpartyAccountId());
+            vo.setPaymentMethod(acDeal.getPaymentMethod());
+        }
+        return vo;
+    }
+
+    private String generateDealNumber() {
+        String dateStr = LocalDateTime.now().format(DATE_FORMATTER);
+        String prefix = "AC" + dateStr;
+        LambdaQueryWrapper<Deal> wrapper = new LambdaQueryWrapper<>();
+        wrapper.likeRight(Deal::getDealNumber, prefix)
+               .orderByDesc(Deal::getDealNumber)
+               .last("LIMIT 1");
+        Deal last = getOne(wrapper);
+        int seq = 1;
+        if (last != null && last.getDealNumber() != null
+                && last.getDealNumber().length() > prefix.length()) {
+            try {
+                String lastSeqStr = last.getDealNumber().substring(prefix.length());
+                seq = Integer.parseInt(lastSeqStr) + 1;
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return prefix + String.format("%04d", seq);
+    }
+
+    private String generateActionNumber() {
+        String dateStr = LocalDateTime.now().format(DATE_FORMATTER);
+        String prefix = "ACT" + dateStr;
+        LambdaQueryWrapper<Action> wrapper = new LambdaQueryWrapper<>();
+        wrapper.likeRight(Action::getActionNumber, prefix)
+               .orderByDesc(Action::getActionNumber)
+               .last("LIMIT 1");
+        Action last = actionMapper.selectOne(wrapper);
+        int seq = 1;
+        if (last != null && last.getActionNumber() != null
+                && last.getActionNumber().length() > prefix.length()) {
+            try {
+                String lastSeqStr = last.getActionNumber().substring(prefix.length());
+                seq = Integer.parseInt(lastSeqStr) + 1;
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return prefix + String.format("%04d", seq);
+    }
+
+    private String generateImageNumber() {
+        String dateStr = LocalDateTime.now().format(DATE_FORMATTER);
+        String prefix = "IMG" + dateStr;
+        LambdaQueryWrapper<DealImage> wrapper = new LambdaQueryWrapper<>();
+        wrapper.likeRight(DealImage::getImageNumber, prefix)
+               .orderByDesc(DealImage::getImageNumber)
+               .last("LIMIT 1");
+        DealImage last = dealImageMapper.selectOne(wrapper);
+        int seq = 1;
+        if (last != null && last.getImageNumber() != null
+                && last.getImageNumber().length() > prefix.length()) {
+            try {
+                String lastSeqStr = last.getImageNumber().substring(prefix.length());
+                seq = Integer.parseInt(lastSeqStr) + 1;
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return prefix + String.format("%04d", seq);
+    }
+}
