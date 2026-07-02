@@ -25,7 +25,8 @@ public class CounterpartyAccountResource {
             @QueryParam("status") String status,
             @QueryParam("pageNum") @DefaultValue("1") int pageNum,
             @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
-        return counterpartyAccountService.queryPage(counterpartyId, keyword, status, pageNum, pageSize);
+        return com.opentms.common.model.Result.success(
+                counterpartyAccountService.queryPage(counterpartyId, keyword, status, pageNum, pageSize));
     }
 
     @GET

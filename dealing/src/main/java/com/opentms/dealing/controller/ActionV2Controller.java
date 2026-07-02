@@ -60,6 +60,39 @@ public class ActionV2Controller {
     }
 
     /**
+     * Action 分页查询（供 ActionList 页面使用）
+     * 支持按 dealNumber / approvalStatus / keyword 过滤
+     */
+    @GetMapping("/page")
+    public Result<Page<ActionVO>> page(
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "20") int pageSize,
+            @RequestParam(required = false) String dealNumber,
+            @RequestParam(required = false) String approvalStatus,
+            @RequestParam(required = false) String keyword) {
+        com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Action> wrapper =
+                new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<>();
+        if (dealNumber != null && !dealNumber.isEmpty()) {
+            wrapper.eq(Action::getDealNumber, dealNumber);
+        }
+        if (approvalStatus != null && !approvalStatus.isEmpty()) {
+            wrapper.eq(Action::getApprovalStatus1, approvalStatus);
+        }
+        if (keyword != null && !keyword.isEmpty()) {
+            wrapper.and(w -> w.like(Action::getActionNumber, keyword)
+                    .or().like(Action::getDealNumber, keyword)
+                    .or().like(Action::getActionType, keyword));
+        }
+        wrapper.orderByDesc(Action::getCreatedAt);
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<Action> page =
+                actionMapper.selectPage(new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNum, pageSize), wrapper);
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<ActionVO> voPage =
+                new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(page.getCurrent(), page.getSize(), page.getTotal());
+        voPage.setRecords(page.getRecords().stream().map(this::toVO).collect(Collectors.toList()));
+        return Result.success(voPage);
+    }
+
+    /**
      * 审批通过 Action（v2.0 关键 - 仅更新 Action 状态，DealMap/Cashflow 状态不变）
      */
     @PostMapping("/{actionNumber}/approve")

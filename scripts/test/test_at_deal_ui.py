@@ -7,7 +7,7 @@ Open-TMS AT交易(Account Transfer) UI自动化测试
 执行前置条件：
   1. 后端 dealing 已启动（port=8082）：java -jar dealing/target/dealing-1.0.0-SNAPSHOT.jar --server.port=8082
   2. 后端 basedata 已启动（port=8081）
-  3. 前端 dev server 已启动：cd web && npm run dev（默认 http://localhost:5173）
+  3. 前端 dev server 已启动：cd web && npm run dev（默认 http://localhost:3000）
   4. 已安装 playwright：pip install playwright && playwright install chromium
   5. 数据库已执行 db/schema/20-at-deal.sql
   6. 运行：python scripts/test/test_at_deal_ui.py
@@ -18,7 +18,7 @@ import time
 import json
 from playwright.async_api import async_playwright, expect
 
-FRONTEND_URL = "http://localhost:5173"
+FRONTEND_URL = "http://localhost:3000"
 BACKEND_DEALING_URL = "http://localhost:8082"
 BACKEND_BASEDATA_URL = "http://localhost:8081/opentms/basedata"
 
@@ -50,14 +50,14 @@ async def test_u01_open_at_list(page):
     """TC-AT-U001: 打开 AT 列表页"""
     print("\n[U01] 打开 AT 列表页...")
     try:
-        await page.goto(f"{FRONTEND_URL}/#/dealing/at-deal", wait_until="networkidle",
+        await page.goto(f"{FRONTEND_URL}/dealing/at-deal", wait_until="networkidle",
                         timeout=30000)
         await page.wait_for_timeout(2000)
         filter_card = page.locator(".filter-card")
         await expect(filter_card).to_be_visible(timeout=5000)
         table = page.locator(".table-card .el-table")
         await expect(table).to_be_visible(timeout=5000)
-        add_btn = page.locator("button:has-text('新建AT'), button:has-text('新建 AT')")
+        add_btn = page.locator("button:has-text('新建 AT')")
         await expect(add_btn.first).to_be_visible(timeout=5000)
         screenshot_path = "/tmp/at_deal_ui_U01_list.png"
         await page.screenshot(path=screenshot_path, full_page=True)
@@ -74,7 +74,7 @@ async def test_u02_create_drawer(page):
     """TC-AT-U002: 打开创建抽屉 + 填写 + 提交"""
     print("\n[U02] 创建 AT 抽屉...")
     try:
-        add_btn = page.locator("button:has-text('新建AT'), button:has-text('新建 AT')").first
+        add_btn = page.locator("button:has-text('新建 AT')").first
         await add_btn.click()
         await page.wait_for_timeout(1500)
         drawer = page.locator(".el-drawer:visible, .el-dialog:visible")
@@ -129,7 +129,7 @@ async def test_u03_detail_dealmap_timeline(page):
     print("\n[U03] 详情页双腿 DealMap 时间线...")
     try:
         # 返回列表
-        await page.goto(f"{FRONTEND_URL}/#/dealing/at-deal", wait_until="networkidle",
+        await page.goto(f"{FRONTEND_URL}/dealing/at-deal", wait_until="networkidle",
                         timeout=30000)
         await page.wait_for_timeout(2000)
         # 点击第一行的查看按钮
@@ -205,11 +205,11 @@ async def test_u05_cross_currency_exchange_rate(page):
     print("\n[U05] 跨币种汇率输入框联动...")
     try:
         # 返回列表
-        await page.goto(f"{FRONTEND_URL}/#/dealing/at-deal", wait_until="networkidle",
+        await page.goto(f"{FRONTEND_URL}/dealing/at-deal", wait_until="networkidle",
                         timeout=30000)
         await page.wait_for_timeout(1500)
         # 新建
-        add_btn = page.locator("button:has-text('新建AT'), button:has-text('新建 AT')").first
+        add_btn = page.locator("button:has-text('新建 AT')").first
         await add_btn.click()
         await page.wait_for_timeout(1500)
 
@@ -310,8 +310,12 @@ async def main():
         page = await context.new_page()
 
         errors = []
+        page_errors = []
+        failed_requests = []
         page.on("console", lambda msg: errors.append(f"[{msg.type}] {msg.text}")
                 if msg.type == "error" else None)
+        page.on("pageerror", lambda err: page_errors.append(str(err)))
+        page.on("requestfailed", lambda req: failed_requests.append(f"{req.method} {req.url} - {req.failure}"))
 
         print("\n" + "=" * 60)
         print("[P0 UI 冒烟测试]")
@@ -323,12 +327,34 @@ async def main():
         await test_u04_approval_dialog(page)
         await test_u05_cross_currency_exchange_rate(page)
 
-        if errors:
+        # 过滤 Vite HMR 自身消息
+        real_console_errors = [e for e in errors if "[vite]" not in e]
+        # 汇总诊断信息
+        if real_console_errors:
             print("\n[Console Errors]:")
-            for err in errors[:10]:
-                print(f"  {err}")
+            for err in real_console_errors[:10]:
+                print(f"  {err[:200]}")
         else:
             print("\n[OK] 无控制台错误")
+
+        if page_errors:
+            print("\n[Page JS Errors]:")
+            for err in page_errors[:10]:
+                print(f"  {err[:200]}")
+
+        if failed_requests:
+            print("\n[Failed Requests]:")
+            for r in failed_requests[:10]:
+                print(f"  {r[:200]}")
+
+        # 关键断言:任何错误都 FAIL
+        if real_console_errors or page_errors or failed_requests:
+            add_result("U_CONSOLE", "FAIL",
+                       f"console={len(real_console_errors)} page_error={len(page_errors)} failed_req={len(failed_requests)}")
+            print(f"\n[FAIL] U_CONSOLE: 页面存在错误")
+        else:
+            add_result("U_CONSOLE", "PASS", "无 console error / page error / failed request")
+            print(f"\n[PASS] U_CONSOLE: 页面无错误")
 
         await browser.close()
 

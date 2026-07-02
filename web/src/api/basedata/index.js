@@ -10,4 +10,12 @@ export * from './currencyPair'
 export * from './instrument'
 
 // 单独导出bankAccount避免listCurrency冲突
-export { listBankAccount, getBankAccount, saveBankAccount, updateBankAccount, deleteBankAccount } from './bankAccount'
+export {
+  listBankAccount,
+  getBankAccount,
+  saveBankAccount,
+  updateBankAccount,
+  deleteBankAccount,
+  getAccountBalance,
+  syncBankAccount
+} from './bankAccount'

@@ -38,3 +38,21 @@ setup-maven.ps1
 # Root temp files
 /package.json
 /web/node_modules/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Runtime logs
+logs/
+*.log
+
+# Claude local cache
+.claude/archive/
+.claude/sessions/
+
+# IDE
+.idea/
+*.iml
+.vscode/

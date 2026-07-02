@@ -260,7 +260,7 @@ import { ElMessage } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import { createDeal, updateDeal, getDeal } from '@/api/dealing'
 import { listBusinessUnit, listCounterparty, listCurrency, listBankAccount } from '@/api/basedata'
-import { listInstrument } from '@/api/dealing'
+import { listInstrument } from '@/api/basedata'
 import { listCounterpartyAccount } from '@/api/basedata'
 import { listTrader } from '@/api/basedata'
 

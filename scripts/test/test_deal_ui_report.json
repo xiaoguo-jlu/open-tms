@@ -1,0 +1,112 @@
+{
+  "total": 10,
+  "passed": 4,
+  "failed": 7,
+  "screenshots": [
+    {
+      "name": "T01",
+      "path": "/tmp/deal_ui_T01_list.png"
+    },
+    {
+      "name": "T02",
+      "path": "/tmp/deal_ui_T02_form.png"
+    },
+    {
+      "name": "T03",
+      "path": "/tmp/deal_ui_T03_error.png"
+    },
+    {
+      "name": "T04",
+      "path": "/tmp/deal_ui_T04_list.png"
+    },
+    {
+      "name": "T05",
+      "path": "/tmp/deal_ui_T05_list.png"
+    },
+    {
+      "name": "T06",
+      "path": "/tmp/deal_ui_T06_approve.png"
+    },
+    {
+      "name": "T07",
+      "path": "/tmp/deal_ui_T07_error.png"
+    },
+    {
+      "name": "T08",
+      "path": "/tmp/deal_ui_T08_error.png"
+    },
+    {
+      "name": "T09",
+      "path": "/tmp/deal_ui_T09_execute.png"
+    },
+    {
+      "name": "T10",
+      "path": "/tmp/deal_ui_T10_status.png"
+    }
+  ],
+  "results": [
+    {
+      "id": "T01",
+      "name": "打开交易列表页",
+      "status": "passed"
+    },
+    {
+      "id": "T02",
+      "name": "点击新建交易按钮",
+      "status": "passed"
+    },
+    {
+      "id": "T03",
+      "name": "填写交易表单并保存",
+      "status": "failed",
+      "note": "Locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator(\".el-dialog:visible\").locator(\".el-table__body tr\").first\n"
+    },
+    {
+      "id": "T04",
+      "name": "在列表中找到新建的交易",
+      "status": "passed",
+      "note": "Found 6 rows"
+    },
+    {
+      "id": "T05",
+      "name": "提交审批",
+      "status": "failed",
+      "note": "Status is AC交易, expected 新建"
+    },
+    {
+      "id": "T06",
+      "name": "审批通过",
+      "status": "failed",
+      "note": "No '已提交' status deal found"
+    },
+    {
+      "id": "T07",
+      "name": "打开交易详情页，查看Action历史",
+      "status": "failed",
+      "note": "Locator expected to be visible\nActual value: None\nError: element(s) not found \nCall log:\n  - Expect \"to_be_visible\" with timeout 5000ms\n  - waiting for locator(\".el-tab-pane:has-text('Action历史') .el-table\")\n"
+    },
+    {
+      "id": "T08",
+      "name": "查看镜像版本历史",
+      "status": "failed",
+      "note": "Locator expected to be visible\nActual value: None\nError: element(s) not found \nCall log:\n  - Expect \"to_be_visible\" with timeout 5000ms\n  - waiting for locator(\".el-tab-pane:has-text('镜像版本') .el-table\")\n"
+    },
+    {
+      "id": "T09",
+      "name": "执行交易",
+      "status": "failed",
+      "note": "No '已审批' status deal found"
+    },
+    {
+      "id": "T10",
+      "name": "交易状态检查",
+      "status": "passed",
+      "note": "Settled status check - found=False"
+    },
+    {
+      "id": "T_CONSOLE",
+      "name": "PASS",
+      "status": "无 console error / page error / failed request"
+    }
+  ]
+}

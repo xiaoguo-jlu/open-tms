@@ -11,7 +11,7 @@ import time
 import json
 from playwright.async_api import async_playwright, expect
 
-FRONTEND_URL = "http://localhost:5173"
+FRONTEND_URL = "http://localhost:3000"
 BACKEND_DEALING_URL = "http://localhost:8082"
 BACKEND_BASEDATA_URL = "http://localhost:8081/opentms/basedata"
 
@@ -44,7 +44,7 @@ async def test_t01_open_deal_list(page):
     print("\n[T01] 打开交易列表页...")
 
     try:
-        await page.goto(f"{FRONTEND_URL}/#/dealing/deal", wait_until="networkidle", timeout=30000)
+        await page.goto(f"{FRONTEND_URL}/dealing/deal", wait_until="networkidle", timeout=30000)
         await page.wait_for_timeout(2000)
 
         # 检查筛选区域
@@ -257,7 +257,7 @@ async def test_t05_submit_deal(page):
     try:
         # 找到状态为"新建"的交易，点击提交按钮
         # 首先获取第一行交易的状态
-        first_status_tag = page.locator(".table-card .el-table__body tr").first.locator(".el-tag")
+        first_status_tag = page.locator(".table-card .el-table__body tr").first.locator(".el-tag").first
         status_text = await first_status_tag.text_content()
 
         if "新建" in status_text:
@@ -306,7 +306,7 @@ async def test_t06_approve_deal(page):
         found = False
         for i in range(row_count):
             row = rows.nth(i)
-            status_tag = row.locator(".el-tag")
+            status_tag = row.locator(".el-tag").first
             status_text = await status_tag.text_content()
 
             if "已提交" in status_text:
@@ -412,7 +412,7 @@ async def test_t09_execute_deal(page):
 
     try:
         # 返回列表页
-        await page.goto(f"{FRONTEND_URL}/#/dealing/deal", wait_until="networkidle", timeout=30000)
+        await page.goto(f"{FRONTEND_URL}/dealing/deal", wait_until="networkidle", timeout=30000)
         await page.wait_for_timeout(2000)
 
         # 找到状态为"已审批"的交易
@@ -422,7 +422,7 @@ async def test_t09_execute_deal(page):
         found = False
         for i in range(row_count):
             row = rows.nth(i)
-            status_tag = row.locator(".el-tag")
+            status_tag = row.locator(".el-tag").first
             status_text = await status_tag.text_content()
 
             if "已审批" in status_text:
@@ -473,7 +473,7 @@ async def test_t10_check_settled_status(page):
         found_settled = False
         for i in range(row_count):
             row = rows.nth(i)
-            status_tag = row.locator(".el-tag")
+            status_tag = row.locator(".el-tag").first
             status_text = await status_tag.text_content()
 
             if "已结算" in status_text:
@@ -524,7 +524,7 @@ async def test_backend_api():
 
     # 检查basedata后端
     try:
-        url = f"{BACKEND_BASEDATA_URL}/api/v1/business-units/page?pageNum=1&pageSize=1"
+        url = f"{BACKEND_BASEDATA_URL}/api/v1/management-entities/page?pageNum=1&pageSize=1"
         resp = urllib.request.urlopen(url, timeout=5)
         data = json.loads(resp.read().decode())
         if data.get('code') == 200:
@@ -558,7 +558,11 @@ async def main():
         page = await context.new_page()
 
         errors = []
+        page_errors = []
+        failed_requests = []
         page.on("console", lambda msg: errors.append(f"[{msg.type}] {msg.text}") if msg.type == "error" else None)
+        page.on("pageerror", lambda err: page_errors.append(str(err)))
+        page.on("requestfailed", lambda req: failed_requests.append(f"{req.method} {req.url} - {req.failure}"))
 
         print("\n" + "="*60)
         print("[P0 冒烟测试]")
@@ -577,7 +581,7 @@ async def main():
             print(f"[T03] Skipping subsequent tests due to form fill failure: {e}")
             # 仍然尝试返回列表页继续测试
             try:
-                await page.goto(f"{FRONTEND_URL}/#/dealing/deal", wait_until="networkidle", timeout=30000)
+                await page.goto(f"{FRONTEND_URL}/dealing/deal", wait_until="networkidle", timeout=30000)
                 await page.wait_for_timeout(2000)
             except:
                 pass
@@ -608,12 +612,32 @@ async def main():
         await test_t10_check_settled_status(page)
 
         # 输出控制台错误
-        if errors:
+        real_console_errors = [e for e in errors if "[vite]" not in e]
+        if real_console_errors:
             print("\n[Console Errors]:")
-            for err in errors[:10]:
-                print(f"  {err}")
+            for err in real_console_errors[:10]:
+                print(f"  {err[:200]}")
         else:
             print("\n[OK] 无控制台错误")
+
+        if page_errors:
+            print("\n[Page JS Errors]:")
+            for err in page_errors[:10]:
+                print(f"  {err[:200]}")
+
+        if failed_requests:
+            print("\n[Failed Requests]:")
+            for r in failed_requests[:10]:
+                print(f"  {r[:200]}")
+
+        # 关键断言:任何错误都 FAIL
+        if real_console_errors or page_errors or failed_requests:
+            add_result("T_CONSOLE", "FAIL",
+                       f"console={len(real_console_errors)} page_error={len(page_errors)} failed_req={len(failed_requests)}")
+            print(f"\n[FAIL] T_CONSOLE: 页面存在错误")
+        else:
+            add_result("T_CONSOLE", "PASS", "无 console error / page error / failed request")
+            print(f"\n[PASS] T_CONSOLE: 页面无错误")
 
         await browser.close()
 

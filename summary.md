@@ -60,7 +60,7 @@
 | 模块 | 目录 | 状态 | 主要类 |
 |------|------|------|--------|
 | **common** | common/ | ✅ 已完成 | MybatisPlusConfig, GlobalConstants, Result, BaseCodeEntity |
-| **basedata** | basedata/ | ✅ 开发中 | Bank, BusinessUnit, Counterparty, CounterpartyAccount, Currency, Country, Holiday, Trader, **Subsidiary, CurrencyPair, ApprovalRule** |
+| **basedata** | basedata/ | ✅ 开发中 | Bank, BusinessUnit, Counterparty, CounterpartyAccount, Currency, Country, Holiday, Trader, **Subsidiary, CurrencyPair, ApprovalRule, BankAccount(2026-06-29 从独立 bankaccount 模块合并)** |
 | **dealing** | dealing/ | 🔄 开发中 | Deal, DealController |
 | **cashpool** | cashpool/ | 🔄 开发中 | CashPool, CashPoolController |
 | **fundplan** | fundplan/ | 🔄 开发中 | FundPlan, FundPlanController |
@@ -68,7 +68,6 @@
 | **irs** | irs/ | 🔄 开发中 | IrsDeal, IrsDealController |
 | **valuation** | valuation/ | 🔄 开发中 | ValuationController |
 | **var** | var/ | 🔄 开发中 | VarReportController |
-| **bankaccount** | bankaccount/ | 🔄 开发中 | BankAccount, BankAccountController |
 | **hedge** | hedge/ | 🔄 开发中 | HedgeRelation, HedgeRelationController |
 | **impairment** | impairment/ | 🔄 开发中 | Impairment, ImpairmentController |
 | **limit** | limit/ | 🔄 开发中 | Limit, LimitController |

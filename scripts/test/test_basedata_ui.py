@@ -104,11 +104,17 @@ async def test_page_list_ui(page_name, path, api_name):
 
         console_errors = []
         network_errors = []
+        page_errors = []
+        failed_requests = []
 
         # 捕获控制台错误
         page.on("console", lambda msg: console_errors.append(f"[{msg.type}] {msg.text}") if msg.type == "error" else None)
-        # 捕获网络请求失败
+        # 捕获网络响应 >= 400
         page.on("response", lambda resp: network_errors.append(f"{resp.status} {resp.url}") if resp.status >= 400 else None)
+        # 捕获页面 JS 异常
+        page.on("pageerror", lambda err: page_errors.append(str(err)))
+        # 捕获网络层失败(连接超时、DNS 失败)
+        page.on("requestfailed", lambda req: failed_requests.append(f"{req.method} {req.url} - {req.failure}"))
 
         print(f"\n  [Page: {page_name}]")
         test_passed = True
@@ -224,17 +230,35 @@ async def test_page_list_ui(page_name, path, api_name):
             test_passed = False
             TEST_RESULTS["failed"] += 1
 
-        # 打印控制台错误
-        print_console_errors(console_errors)
+        # 打印控制台错误(过滤 Vite HMR 自身)
+        real_console_errors = [e for e in console_errors if "[vite]" not in e]
+        print_console_errors(real_console_errors)
 
         # 打印网络错误
         if network_errors:
-            print(f"    [ERROR] 网络请求失败:")
+            print(f"    [ERROR] 网络请求失败(>=400):")
             for err in network_errors[:5]:
                 print(f"      - {err[:100]}")
 
+        if page_errors:
+            print(f"    [ERROR] 页面 JS 异常:")
+            for err in page_errors[:5]:
+                print(f"      - {err[:200]}")
+
+        if failed_requests:
+            print(f"    [ERROR] 网络层失败:")
+            for r in failed_requests[:5]:
+                print(f"      - {r[:200]}")
+
+        # 关键断言:任何错误都让 test_failed
+        if real_console_errors or page_errors or failed_requests:
+            test_passed = False
+            print(f"    [FAIL_CONSOLE] console={len(real_console_errors)} page_error={len(page_errors)} failed_req={len(failed_requests)}")
+
         if test_passed:
             TEST_RESULTS["passed"] += 1
+        else:
+            TEST_RESULTS["failed"] += 1
         await browser.close()
         return test_passed
 
@@ -247,7 +271,11 @@ async def test_add_dialog_ui(page_name, path, api_name):
         page = await context.new_page()
 
         console_errors = []
+        page_errors = []
+        failed_requests = []
         page.on("console", lambda msg: console_errors.append(f"[{msg.type}] {msg.text}") if msg.type == "error" else None)
+        page.on("pageerror", lambda err: page_errors.append(str(err)))
+        page.on("requestfailed", lambda req: failed_requests.append(f"{req.method} {req.url} - {req.failure}"))
 
         print(f"\n  [Add Dialog: {page_name}]")
         test_passed = True
@@ -323,8 +351,25 @@ async def test_add_dialog_ui(page_name, path, api_name):
 
         print_console_errors(console_errors)
 
+        if page_errors:
+            print(f"    [ERROR] 页面 JS 异常:")
+            for err in page_errors[:5]:
+                print(f"      - {err[:200]}")
+
+        if failed_requests:
+            print(f"    [ERROR] 网络层失败:")
+            for r in failed_requests[:5]:
+                print(f"      - {r[:200]}")
+
+        # 关键断言
+        if console_errors or page_errors or failed_requests:
+            test_passed = False
+            print(f"    [FAIL_CONSOLE] console={len(console_errors)} page_error={len(page_errors)} failed_req={len(failed_requests)}")
+
         if test_passed:
             TEST_RESULTS["passed"] += 1
+        else:
+            TEST_RESULTS["failed"] += 1
         await browser.close()
         return test_passed
 
@@ -337,7 +382,11 @@ async def test_pagination_ui():
         page = await context.new_page()
 
         console_errors = []
+        page_errors = []
+        failed_requests = []
         page.on("console", lambda msg: console_errors.append(f"[{msg.type}] {msg.text}") if msg.type == "error" else None)
+        page.on("pageerror", lambda err: page_errors.append(str(err)))
+        page.on("requestfailed", lambda req: failed_requests.append(f"{req.method} {req.url} - {req.failure}"))
 
         print(f"\n  [Pagination Test]")
         test_passed = True
@@ -391,8 +440,24 @@ async def test_pagination_ui():
 
         print_console_errors(console_errors)
 
+        if page_errors:
+            print(f"    [ERROR] 页面 JS 异常:")
+            for err in page_errors[:5]:
+                print(f"      - {err[:200]}")
+
+        if failed_requests:
+            print(f"    [ERROR] 网络层失败:")
+            for r in failed_requests[:5]:
+                print(f"      - {r[:200]}")
+
+        if console_errors or page_errors or failed_requests:
+            test_passed = False
+            print(f"    [FAIL_CONSOLE] console={len(console_errors)} page_error={len(page_errors)} failed_req={len(failed_requests)}")
+
         if test_passed:
             TEST_RESULTS["passed"] += 1
+        else:
+            TEST_RESULTS["failed"] += 1
         await browser.close()
         return test_passed
 

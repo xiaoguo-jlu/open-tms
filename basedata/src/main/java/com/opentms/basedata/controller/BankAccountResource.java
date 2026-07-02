@@ -9,6 +9,16 @@ import jakarta.ws.rs.core.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 银行账户 Resource(统一规范版 — 2026-06-29)
+ * <p>
+ * 写操作一律 POST:/update 和 POST:/delete/{id},禁用 @PUT/@DELETE。
+ * 新增 /balance(余额查询)与 /sync(银企同步 stub)端点。
+ * </p>
+ */
 @Component
 @Path("/api/v1/bank-accounts")
 public class BankAccountResource {
@@ -40,6 +50,20 @@ public class BankAccountResource {
         return Result.success(account);
     }
 
+    @GET
+    @Path("/{id}/balance")
+    public Object getBalance(@PathParam("id") Long id) {
+        BankAccount account = bankAccountService.getBankAccountById(id);
+        if (account == null) {
+            return Result.notFound("Bank account not found");
+        }
+        Map<String, Object> data = new HashMap<>();
+        data.put("balance", account.getBalance());
+        data.put("availableBalance", account.getAvailableBalance());
+        data.put("frozenBalance", account.getFrozenBalance());
+        return Result.success(data);
+    }
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Object save(BankAccount account) {
@@ -51,7 +75,8 @@ public class BankAccountResource {
         }
     }
 
-    @PUT
+    @POST
+    @Path("/update")
     @Consumes(MediaType.APPLICATION_JSON)
     public Object update(BankAccount account) {
         try {
@@ -62,8 +87,8 @@ public class BankAccountResource {
         }
     }
 
-    @DELETE
-    @Path("/{id}")
+    @POST
+    @Path("/delete/{id}")
     public Object delete(@PathParam("id") Long id) {
         try {
             bankAccountService.deleteBankAccount(id);
@@ -71,5 +96,20 @@ public class BankAccountResource {
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
+    }
+
+    @POST
+    @Path("/{id}/sync")
+    public Object sync(@PathParam("id") Long id) {
+        // Stub:实际对接银企接口异步同步
+        BankAccount account = bankAccountService.getBankAccountById(id);
+        if (account == null) {
+            return Result.notFound("Bank account not found");
+        }
+        Map<String, Object> data = new HashMap<>();
+        data.put("accountId", id);
+        data.put("accountNo", account.getAccountNo());
+        data.put("message", "同步任务已提交(Stub)");
+        return Result.success(data);
     }
 }

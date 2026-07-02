@@ -24,9 +24,11 @@ const routes = [
       { path: 'deal/form', name: 'DealForm', component: () => import('@/views/dealing/DealForm.vue') },
       { path: 'deal/detail', name: 'DealDetail', component: () => import('@/views/dealing/DealDetail.vue') },
       { path: 'action', name: 'ActionList', component: () => import('@/views/dealing/ActionList.vue') },
-      { path: 'bank-account', name: 'BankAccount', component: () => import('@/views/dealing/BankAccountList.vue') },
       { path: 'ac-deal', name: 'AcDealList', component: () => import('@/views/dealing/AcDealList.vue') },
-      { path: 'ac-deal/detail/:dealNumber', name: 'AcDealDetail', component: () => import('@/views/dealing/AcDealDetail.vue') }
+      { path: 'ac-deal/detail/:dealNumber', name: 'AcDealDetail', component: () => import('@/views/dealing/AcDealDetail.vue') },
+      { path: 'at-deal', name: 'AtDealList', component: () => import('@/views/dealing/AtDealList.vue') },
+      { path: 'at-deal/form', name: 'AtDealForm', component: () => import('@/views/dealing/AtDealForm.vue') },
+      { path: 'at-deal/detail', name: 'AtDealDetail', component: () => import('@/views/dealing/AtDealDetail.vue') }
     ]
   },
   {
@@ -61,28 +63,8 @@ const routes = [
     ]
   },
   {
-    path: '/fx', name: 'Fx', children: [
-      { path: 'list', name: 'FxList', component: () => import('@/views/fx/FxDealList.vue') }
-    ]
-  },
-  {
-    path: '/irs', name: 'Irs', children: [
-      { path: 'list', name: 'IrsList', component: () => import('@/views/irs/IrsDealList.vue') }
-    ]
-  },
-  {
-    path: '/cashpool', name: 'Cashpool', children: [
-      { path: 'overview', name: 'PositionOverview', component: () => import('@/views/cashpool/PositionOverview.vue') },
-      { path: 'limit', name: 'PositionLimit', component: () => import('@/views/cashpool/PositionLimit.vue') },
-      { path: 'pool', name: 'CashPoolList', component: () => import('@/views/cashpool/CashPoolList.vue') },
-      { path: 'auto-rule', name: 'AutoRuleList', component: () => import('@/views/cashpool/AutoRuleList.vue') }
-    ]
-  },
-  {
     path: '/risk', name: 'Risk', children: [
-      { path: 'exposure', name: 'ExposureList', component: () => import('@/views/risk/ExposureList.vue') },
-      { path: 'var', name: 'VarReportList', component: () => import('@/views/risk/VarReportList.vue') },
-      { path: 'hedge', name: 'HedgeList', component: () => import('@/views/risk/HedgeList.vue') }
+      { path: 'var', name: 'VarReportList', component: () => import('@/views/risk/VarReportList.vue') }
     ]
   },
   {
