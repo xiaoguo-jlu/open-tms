@@ -1,0 +1,82 @@
+{
+  "total": 15,
+  "passed": 14,
+  "failed": 1,
+  "results": [
+    {
+      "name": "API GET /api/v1/bank-accounts/page?pageNum=1&pageSize=1",
+      "status": "PASS",
+      "note": "HTTP=200 data={'code': 200, 'message': 'success', 'data': {'records': [{'id': 1, 'accountNo': 'TEST001', 'accountN"
+    },
+    {
+      "name": "API GET /api/v1/bank-accounts/1",
+      "status": "PASS",
+      "note": "HTTP=200 data={'code': 200, 'message': 'success', 'data': {'id': 1, 'accountNo': 'TEST001', 'accountName': 'UI-测试-"
+    },
+    {
+      "name": "API GET /api/v1/bank-accounts/1/balance",
+      "status": "PASS",
+      "note": "HTTP=200 data={'code': 200, 'message': 'success', 'data': {'balance': 10000.0, 'frozenBalance': 0.0, 'availableBal"
+    },
+    {
+      "name": "POST /{id}/sync (新增 stub)",
+      "status": "PASS",
+      "note": "{'code': 200, 'message': 'success', 'data': {'accountId': 1, 'accountNo': 'TEST001', 'message': '同步任务已提交(Stub)'}, 'timestamp': 1782923140746}"
+    },
+    {
+      "name": "POST /update (新规范)",
+      "status": "PASS",
+      "note": "{'code': 200, 'message': 'success', 'data': None, 'timestamp': 1782923140763}"
+    },
+    {
+      "name": "POST /delete/{id} (新规范)",
+      "status": "PASS",
+      "note": "{'code': 500, 'message': 'Account not found', 'data': None, 'timestamp': 1782923140778}"
+    },
+    {
+      "name": "旧 PUT 路径 405",
+      "status": "PASS",
+      "note": "HTTP=405"
+    },
+    {
+      "name": "旧 DELETE 路径 405",
+      "status": "PASS",
+      "note": "HTTP=405"
+    },
+    {
+      "name": "UI 打开银行账户列表页",
+      "status": "PASS",
+      "note": "table=1"
+    },
+    {
+      "name": "UI 搜索框可见",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "UI 表格加载数据",
+      "status": "PASS",
+      "note": "行数=1"
+    },
+    {
+      "name": "UI 新增按钮可见",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "UI 新增对话框",
+      "status": "FAIL",
+      "note": "dialog=0"
+    },
+    {
+      "name": "UI 截图",
+      "status": "PASS",
+      "note": "/tmp/bankaccount_ui.png"
+    },
+    {
+      "name": "UI 页面无 console error / 无失败请求",
+      "status": "PASS",
+      "note": "console_errors=0 failed_requests=0 page_errors=0"
+    }
+  ]
+}

@@ -1,5 +1,11 @@
 import request from '@/utils/request'
 
+/**
+ * 银行账户 API(基于 basedata 模块,统一 POST 规范 — 2026-06-29)
+ * 用于 dealing 模块的本方账户下拉选择,功能等同 basedata/bankAccount.js
+ * 仅保留 dealing 业务实际调用的方法
+ */
+
 export function listBankAccount(params) {
   return request({
     url: '/api/v1/bank-accounts/page',
@@ -15,49 +21,10 @@ export function getBankAccount(id) {
   })
 }
 
-export function saveBankAccount(data) {
-  return request({
-    url: '/api/v1/bank-accounts',
-    method: 'post',
-    data
-  })
-}
-
-export function updateBankAccount(data) {
-  return request({
-    url: '/api/v1/bank-accounts',
-    method: 'post',
-    data
-  })
-}
-
-export function deleteBankAccount(id) {
-  return request({
-    url: `/api/v1/bank-accounts/${id}`,
-    method: 'delete'
-  })
-}
-
 export function getAccountBalance(id) {
   return request({
     url: `/api/v1/bank-accounts/${id}/balance`,
     method: 'get'
-  })
-}
-
-export function getAccountTransactions(id, params) {
-  return request({
-    url: `/api/v1/bank-accounts/${id}/transactions`,
-    method: 'get',
-    params
-  })
-}
-
-export function batchDeleteBankAccount(ids) {
-  return request({
-    url: '/api/v1/bank-accounts/batch-delete',
-    method: 'post',
-    data: { ids }
   })
 }
 
@@ -68,31 +35,25 @@ export function syncBankAccount(id) {
   })
 }
 
-export function reconcileAccount(id) {
+export function saveBankAccount(data) {
   return request({
-    url: `/api/v1/bank-accounts/${id}/reconcile`,
-    method: 'post'
-  })
-}
-
-export function testEbankingConnection(data) {
-  return request({
-    url: '/api/v1/bank-accounts/ebanking/test',
+    url: '/api/v1/bank-accounts',
     method: 'post',
     data
   })
 }
 
-export function enableBankAccount(id) {
+export function updateBankAccount(data) {
   return request({
-    url: `/api/v1/bank-accounts/${id}/enable`,
-    method: 'post'
+    url: '/api/v1/bank-accounts/update',
+    method: 'post',
+    data
   })
 }
 
-export function disableBankAccount(id) {
+export function deleteBankAccount(id) {
   return request({
-    url: `/api/v1/bank-accounts/${id}/disable`,
+    url: `/api/v1/bank-accounts/delete/${id}`,
     method: 'post'
   })
 }

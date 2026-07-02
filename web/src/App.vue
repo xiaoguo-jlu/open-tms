@@ -36,18 +36,9 @@
           <template #title><el-icon><Coin /></el-icon><span>现金流管理</span></template>
           <el-menu-item index="/ac/list">AC交易</el-menu-item>
         </el-sub-menu>
-        <el-sub-menu index="cashpool">
-          <template #title><el-icon><Money /></el-icon><span>资金管理</span></template>
-          <el-menu-item index="/cashpool/overview">头寸概览</el-menu-item>
-          <el-menu-item index="/cashpool/limit">限额管理</el-menu-item>
-          <el-menu-item index="/cashpool/pool">现金池管理</el-menu-item>
-          <el-menu-item index="/cashpool/auto-rule">自动调拨规则</el-menu-item>
-        </el-sub-menu>
         <el-sub-menu index="risk">
           <template #title><el-icon><Warning /></el-icon><span>风险管理</span></template>
-          <el-menu-item index="/risk/exposure">敞口管理</el-menu-item>
           <el-menu-item index="/risk/var">VaR报告</el-menu-item>
-          <el-menu-item index="/risk/hedge">套期保值</el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="report">
           <template #title><el-icon><DataLine /></el-icon><span>报表管理</span></template>

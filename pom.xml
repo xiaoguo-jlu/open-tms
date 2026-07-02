@@ -14,15 +14,10 @@
     <modules>
         <module>common</module>
         <module>basedata</module>
-        <module>instrument</module>
         <module>dealing</module>
         <module>fundplan</module>
-        <module>cashpool</module>
         <module>valuation</module>
-        <module>fx</module>
-        <module>irs</module>
         <module>var</module>
-        <module>bankaccount</module>
     </modules>
 
     <parent>

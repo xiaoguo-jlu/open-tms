@@ -25,7 +25,7 @@ public class ApprovalRuleResource {
             @QueryParam("status") String status,
             @QueryParam("pageNum") @DefaultValue("1") int pageNum,
             @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
-        return approvalRuleService.queryPage(keyword, bizType, status, pageNum, pageSize);
+        return com.opentms.common.model.Result.success(approvalRuleService.queryPage(keyword, bizType, status, pageNum, pageSize));
     }
 
     @GET
@@ -59,8 +59,8 @@ public class ApprovalRuleResource {
         }
     }
 
-    @DELETE
-    @Path("/{id}")
+    @POST
+    @Path("/delete/{id}")
     public Object delete(@PathParam("id") Long id) {
         try {
             approvalRuleService.deleteApprovalRule(id);

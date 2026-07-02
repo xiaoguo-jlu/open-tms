@@ -264,7 +264,7 @@ import { ElMessage } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import { createDeal, updateDeal, getDeal } from '@/api/dealing'
 import { listBusinessUnit, listTrader, listCounterparty, listCounterpartyAccount, listCurrency } from '@/api/basedata'
-import { listInstrument } from '@/api/dealing'
+import { listInstrument } from '@/api/basedata'
 
 const route = useRoute()
 const router = useRouter()

@@ -12,6 +12,10 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
+      '/api/v1/business-units': {
+        target: 'http://localhost:8081/opentms/basedata',
+        changeOrigin: true
+      },
       '/api/v1/management-entities': {
         target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
@@ -36,6 +40,10 @@ export default defineConfig({
         target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
+      '/api/v1/banks': {
+        target: 'http://localhost:8081/opentms/basedata',
+        changeOrigin: true
+      },
       '/api/v1/counterparties': {
         target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
@@ -48,7 +56,7 @@ export default defineConfig({
         target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
-      '/api/v1/deals': {
+      '/api/v1/dealing': {
         target: 'http://localhost:8082',
         changeOrigin: true
       },
@@ -64,40 +72,12 @@ export default defineConfig({
         target: 'http://localhost:8085',
         changeOrigin: true
       },
-      '/api/v1/cash-pools': {
-        target: 'http://localhost:8086',
-        changeOrigin: true
-      },
       '/api/v1/settlements': {
         target: 'http://localhost:8087',
         changeOrigin: true
       },
-      '/api/v1/limits': {
-        target: 'http://localhost:8088',
-        changeOrigin: true
-      },
-      '/api/v1/fx-deals': {
-        target: 'http://localhost:8089',
-        changeOrigin: true
-      },
-      '/api/v1/irs-deals': {
-        target: 'http://localhost:8090',
-        changeOrigin: true
-      },
       '/api/v1/valuations': {
         target: 'http://localhost:8091',
-        changeOrigin: true
-      },
-      '/api/v1/exposures': {
-        target: 'http://localhost:8092',
-        changeOrigin: true
-      },
-      '/api/v1/hedge-relations': {
-        target: 'http://localhost:8093',
-        changeOrigin: true
-      },
-      '/api/v1/impairments': {
-        target: 'http://localhost:8094',
         changeOrigin: true
       },
       '/api/v1/var-reports': {
