@@ -39,7 +39,7 @@
 
 | 字段区域 | 字段名 | 类型 | 必填 | 说明 |
 |----------|--------|------|------|------|
-| **公共区域** | Company | VARCHAR(50) | Y | 业务单元 |
+| **公共区域** | Company | VARCHAR(50) | Y | 管理主体 |
 | | Counterparty | VARCHAR(50) | Y | 交易对手 |
 | | Currency | VARCHAR(10) | Y | 币种 |
 | | Day Count Basis | VARCHAR(20) | Y | 计息天数基准 |
@@ -65,7 +65,7 @@
 
 | 字段名 | 类型 | 必填 | 说明 |
 |--------|------|------|------|
-| Company | VARCHAR(50) | Y | 业务单元 |
+| Company | VARCHAR(50) | Y | 管理主体 |
 | Counterparty | VARCHAR(50) | Y | 交易对手 |
 | Client | VARCHAR(50) | N | 客户 |
 | Portfolio | VARCHAR(50) | N | 组合 |
@@ -86,7 +86,7 @@
 
 | 字段名 | 类型 | 必填 | 说明 |
 |--------|------|------|------|
-| Company | VARCHAR(50) | Y | 业务单元 |
+| Company | VARCHAR(50) | Y | 管理主体 |
 | Counterparty | VARCHAR(50) | Y | 交易对手 |
 | Client | VARCHAR(50) | N | 客户 |
 | Portfolio | VARCHAR(50) | N | 组合 |
@@ -113,7 +113,7 @@
 |--------|------|------|------|
 | Deal Type | VARCHAR(20) | Y | 交易类型(FX) |
 | Deal Subtype | VARCHAR(20) | Y | 子类型(Spot/Forward/NDF/Swap) |
-| Company | VARCHAR(50) | Y | 业务单元 |
+| Company | VARCHAR(50) | Y | 管理主体 |
 | Counterparty | VARCHAR(50) | Y | 交易对手 |
 | Buy Currency | VARCHAR(10) | Y | 买入币种 |
 | Sell Currency | VARCHAR(10) | Y | 卖出币种 |
@@ -140,7 +140,7 @@
 
 | 字段名 | 类型 | 必填 | 说明 |
 |--------|------|------|------|
-| Company | VARCHAR(50) | Y | 业务单元 |
+| Company | VARCHAR(50) | Y | 管理主体 |
 | Counterparty | VARCHAR(50) | Y | 交易对手 |
 | Currency | VARCHAR(10) | Y | 币种 |
 | Notional Amount | DECIMAL(18,2) | Y | 名义本金 |
@@ -160,7 +160,7 @@
 
 | 字段名 | 类型 | 必填 | 说明 |
 |--------|------|------|------|
-| Company | VARCHAR(50) | Y | 业务单元 |
+| Company | VARCHAR(50) | Y | 管理主体 |
 | Counterparty | VARCHAR(50) | Y | 交易对手 |
 | Currency | VARCHAR(10) | Y | 币种 |
 | Notional Amount | DECIMAL(18,2) | Y | 名义本金 |
@@ -175,7 +175,7 @@
 
 | 字段名 | 类型 | 必填 | 说明 |
 |--------|------|------|------|
-| Company | VARCHAR(50) | Y | 业务单元 |
+| Company | VARCHAR(50) | Y | 管理主体 |
 | Counterparty | VARCHAR(50) | Y | 交易对手(银行) |
 | Currency | VARCHAR(10) | Y | 币种 |
 | Principal Amount | DECIMAL(18,2) | Y | 金额 |
@@ -189,7 +189,7 @@
 
 | 字段名 | 类型 | 必填 | 说明 |
 |--------|------|------|------|
-| Company | VARCHAR(50) | Y | 业务单元 |
+| Company | VARCHAR(50) | Y | 管理主体 |
 | Counterparty | VARCHAR(50) | Y | 贷款银行 |
 | Currency | VARCHAR(10) | Y | 币种 |
 | Loan Amount | DECIMAL(18,2) | Y | 贷款本金 |
@@ -327,7 +327,7 @@
 所有交易录入均需提前配置以下基础数据：
 
 ### 5.1 组织架构
-- [ ] Company(业务单元)
+- [ ] Company(管理主体)
 - [ ] Department(部门)
 - [ ] Cost Center(成本中心)
 

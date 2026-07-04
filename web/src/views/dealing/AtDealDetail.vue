@@ -14,7 +14,7 @@
           <el-tag :type="getStatusType(detail.status)">{{ getStatusLabel(detail.status) }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="转账类型">{{ getTransferTypeLabel(detail.transferType) }}</el-descriptions-item>
-        <el-descriptions-item label="业务单元">{{ detail.businessUnit }}</el-descriptions-item>
+        <el-descriptions-item label="管理主体">{{ detail.managementEntity }}</el-descriptions-item>
         <el-descriptions-item label="源账户 ID">{{ detail.sourceAccountId }}</el-descriptions-item>
         <el-descriptions-item label="目标账户 ID">{{ detail.destAccountId }}</el-descriptions-item>
         <el-descriptions-item label="源金额" align="right">
@@ -130,6 +130,24 @@
           </el-table>
         </el-tab-pane>
 
+        <!-- GL Entry (会计分录) -->
+        <el-tab-pane label="GL Entry (M1.3)" name="gl-entry">
+          <el-alert type="warning" :closable="false" style="margin-bottom: 12px;">
+            <template #title>⚠️ 会计分录功能待 M1.3 阶段实现(预计生成 {{ expectedGlEntryCount }} 笔分录)</template>
+          </el-alert>
+          <el-descriptions :column="2" border>
+            <el-descriptions-item label="转账类型">{{ getTransferTypeLabel(detail.transferType) }}</el-descriptions-item>
+            <el-descriptions-item label="币种情况">
+              {{ detail.sourceCurrency === detail.destCurrency ? '同币种' : '跨币种 (汇率 ' + detail.exchangeRate + ')' }}
+            </el-descriptions-item>
+            <el-descriptions-item label="源金额">{{ formatAmount(detail.sourceAmount, detail.sourceCurrency) }}</el-descriptions-item>
+            <el-descriptions-item label="目标金额">{{ formatAmount(detail.destAmount, detail.destCurrency) }}</el-descriptions-item>
+            <el-descriptions-item label="规则码">AT_TRANSFER_DEFAULT</el-descriptions-item>
+            <el-descriptions-item label="分录笔数">{{ expectedGlEntryCount }} 笔(SOURCE 2 + DEST 2)</el-descriptions-item>
+          </el-descriptions>
+          <el-empty v-if="expectedGlEntryCount === 0" description="该交易无需生成分录" />
+        </el-tab-pane>
+
         <!-- 镜像快照列表 -->
         <el-tab-pane label="镜像版本" name="image">
           <el-table :data="imageList" stripe>
@@ -152,7 +170,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
@@ -174,6 +192,12 @@ const cashflowList = ref([])
 const actionList = ref([])
 const imageList = ref([])
 const activeTab = ref('dealmap')
+
+// M1.3 会计分录预计条数:AT 双腿对偶 4 笔(2 SOURCE + 2 DEST)
+const expectedGlEntryCount = computed(() => {
+  if (!detail.value || !detail.value.transferType) return 0
+  return 4
+})
 
 const getTransferTypeLabel = (type) => {
   const map = { SAME_COMPANY: '同公司', CROSS_COMPANY: '跨公司', CROSS_BORDER: '跨境' }

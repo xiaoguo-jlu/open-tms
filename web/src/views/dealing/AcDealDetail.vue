@@ -13,7 +13,7 @@
 
       <el-descriptions :column="3" border class="info-section">
         <el-descriptions-item label="交易编号">{{ detail.dealNumber }}</el-descriptions-item>
-        <el-descriptions-item label="业务主体">{{ detail.businessUnit }}</el-descriptions-item>
+        <el-descriptions-item label="管理主体">{{ detail.managementEntity }}</el-descriptions-item>
         <el-descriptions-item label="方向">
           <el-tag :type="detail.direction === 'Inflow' ? 'success' : 'danger'">
             {{ detail.direction === 'Inflow' ? '流入' : '流出' }}
@@ -112,7 +112,38 @@
           </el-table>
         </el-tab-pane>
 
-        <!-- Tab 4: 操作历史 -->
+        <!-- Tab 4: GL Entry (会计分录) -->
+        <el-tab-pane label="GL Entry (M1.3)" name="gl-entry">
+          <el-alert type="warning" :closable="false" style="margin-bottom: 12px;">
+            <template #title>⚠️ 会计分录功能待 M1.3 阶段实现(预计生成 {{ expectedGlEntryCount }} 笔分录)</template>
+          </el-alert>
+          <el-descriptions :column="2" border>
+            <el-descriptions-item label="事件类型">ActualCashflow</el-descriptions-item>
+            <el-descriptions-item label="交易方向">
+              <el-tag :type="detail.direction === 'Inflow' ? 'success' : 'danger'">
+                {{ detail.direction === 'Inflow' ? '流入' : '流出' }}
+              </el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="金额">{{ formatAmount(detail.amount, detail.currency) }}</el-descriptions-item>
+            <el-descriptions-item label="币种">{{ detail.currency }}</el-descriptions-item>
+            <el-descriptions-item label="规则码">AC_{{ detail.direction?.toUpperCase() }}_DEFAULT</el-descriptions-item>
+            <el-descriptions-item label="分录笔数">{{ expectedGlEntryCount }} 笔(预计 1 DR + 1 CR)</el-descriptions-item>
+          </el-descriptions>
+          <el-empty v-if="expectedGlEntryCount === 0" description="该交易无需生成分录" />
+          <el-table v-else :data="[]" stripe style="margin-top: 12px;">
+            <el-table-column label="行" type="index" width="60" />
+            <el-table-column label="方向" width="80" align="center">
+              <template #default>
+                <el-tag type="success">DR</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="科目" />
+            <el-table-column label="币种" width="80" align="center" />
+            <el-table-column label="金额" align="right" />
+          </el-table>
+        </el-tab-pane>
+
+        <!-- Tab 5: 操作历史 -->
         <el-tab-pane :label="`操作历史 (${actionList.length})`" name="action">
           <el-alert type="warning" :closable="false" style="margin-bottom: 12px;">
             <template #title>v2.0 一笔 Deal 可有多个独立 Action；审批仅更新 Action 状态，不影响 DealMap / Cashflow</template>
@@ -145,7 +176,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getAcDealByNumber, listActionsByDeal } from '@/api/dealing/acDeal'
 import ActionApprovalDialog from './ActionApprovalDialog.vue'
@@ -171,6 +202,12 @@ const formatAmount = (amount, currency) => {
 }
 
 const handleBack = () => router.push('/dealing/ac-deal')
+
+// M1.3 会计分录预计条数:1 DR + 1 CR(AC 单边收付)
+const expectedGlEntryCount = computed(() => {
+  if (!detail.value || !detail.value.direction) return 0
+  return 2
+})
 const handleApprove = () => { approvalVisible.value = true }
 const onApproved = () => {
   approvalVisible.value = false
