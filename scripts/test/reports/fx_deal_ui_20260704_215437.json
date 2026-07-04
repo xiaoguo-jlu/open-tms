@@ -1,0 +1,72 @@
+{
+  "feature": "FX UI Test (v3.2)",
+  "total": 7,
+  "passed": 5,
+  "failed": 1,
+  "skipped": 1,
+  "screenshots": [
+    {
+      "name": "U01",
+      "path": "scripts/test/reports/screenshots\\fx_u01_list.png"
+    },
+    {
+      "name": "U02",
+      "path": "scripts/test/reports/screenshots\\fx_u02_filter.png"
+    },
+    {
+      "name": "U03",
+      "path": "scripts/test/reports/screenshots\\fx_u03_error.png"
+    },
+    {
+      "name": "U04",
+      "path": "scripts/test/reports/screenshots\\fx_u04_detail.png"
+    },
+    {
+      "name": "U05",
+      "path": "scripts/test/reports/screenshots\\fx_u05_tab_cf.png"
+    },
+    {
+      "name": "U07",
+      "path": "scripts/test/reports/screenshots\\fx_u07_pagination.png"
+    }
+  ],
+  "results": [
+    {
+      "id": "U01",
+      "name": "Open FX list page",
+      "status": "passed"
+    },
+    {
+      "id": "U02",
+      "name": "Filter FX deals",
+      "status": "passed"
+    },
+    {
+      "id": "U03",
+      "name": "Open create drawer",
+      "status": "failed",
+      "note": "Locator expected to be visible\nActual value: <element(s) not found> \nCall log:\n  - LocatorAssertions.to_be_visible with timeout 3000ms\n  -   - waiting for locator(\".el-drawer:visible .el-alert__title:"
+    },
+    {
+      "id": "U04",
+      "name": "Navigate to detail page",
+      "status": "passed"
+    },
+    {
+      "id": "U05",
+      "name": "Switch detail tabs",
+      "status": "passed"
+    },
+    {
+      "id": "U06",
+      "name": "RATE_FIX dialog",
+      "status": "skipped",
+      "note": "No RATE_FIX buttons visible"
+    },
+    {
+      "id": "U07",
+      "name": "Test pagination",
+      "status": "passed"
+    }
+  ]
+}

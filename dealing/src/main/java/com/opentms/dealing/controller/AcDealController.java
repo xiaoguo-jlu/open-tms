@@ -29,10 +29,10 @@ public class AcDealController {
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String direction,
-            @RequestParam(required = false) String businessUnit,
+            @RequestParam(required = false) String managementEntity,
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int pageSize) {
-        return Result.success(acDealService.queryPage(keyword, status, direction, businessUnit, pageNum, pageSize));
+        return Result.success(acDealService.queryPage(keyword, status, direction, managementEntity, pageNum, pageSize));
     }
 
     /**
@@ -102,5 +102,17 @@ public class AcDealController {
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
+    }
+
+    /**
+     * 复制 AC 交易 — 返回可编辑字段（不含 dealNumber/id/createdAt 等系统字段）
+     */
+    @GetMapping("/{dealNumber}/copy")
+    public Result<AcDealDTO> copy(@PathVariable String dealNumber) {
+        AcDealDTO dto = acDealService.getCopyData(dealNumber);
+        if (dto == null) {
+            return Result.notFound("AC Deal not found");
+        }
+        return Result.success(dto);
     }
 }

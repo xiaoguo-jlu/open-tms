@@ -151,4 +151,16 @@ public class AtDealController {
         atDealService.rejectAction(actionNumber, approver, remark);
         return Result.success();
     }
+
+    /**
+     * 复制 AT 交易 — 返回可编辑字段（不含 dealNumber/id/createdAt 等系统字段）
+     */
+    @GetMapping("/{dealNumber}/copy")
+    public Result<AtDealDTO> copy(@PathVariable String dealNumber) {
+        AtDealDTO dto = atDealService.getCopyData(dealNumber);
+        if (dto == null) {
+            return Result.notFound("AT Deal not found");
+        }
+        return Result.success(dto);
+    }
 }

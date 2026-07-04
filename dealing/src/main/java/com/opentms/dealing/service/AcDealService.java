@@ -11,7 +11,7 @@ public interface AcDealService {
      * 分页查询 AC 交易列表
      */
     Page<DealVO> queryPage(String keyword, String status, String direction,
-                          String businessUnit, int pageNum, int pageSize);
+                          String managementEntity, int pageNum, int pageSize);
 
     /**
      * 获取 AC 交易详情（聚合 Deal + AcDeal + DealMap 时间线 + Cashflow + Action）
@@ -44,4 +44,9 @@ public interface AcDealService {
      * 驳回 Action（v2.0 - 仅更新 Action.approval_status1=Rejected，DealMap/Cashflow 状态不变）
      */
     boolean rejectAction(String actionNumber, String approver, String approvalRemark);
+
+    /**
+     * 获取 AC 交易的可复制数据（不含 dealNumber/id/createdAt 等系统字段，status 为 New 也不复制）
+     */
+    AcDealDTO getCopyData(String dealNumber);
 }

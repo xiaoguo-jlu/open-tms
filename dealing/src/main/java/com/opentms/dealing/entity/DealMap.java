@@ -39,6 +39,14 @@ public class DealMap {
     @TableField("event_status")
     private String eventStatus;
 
+    /** v3.2 新增:DealMap 类型（FX_BUY_AMOUNT/FX_SELL_AMOUNT/FX_RATE/FX_FIX/AC/AT） */
+    @TableField("dealmap_type")
+    private String dealmapType;
+
+    /** v3.2 新增:DealMap 单字段（替代 buy_amount/sell_amount/rate 3 字段） */
+    @TableField("amount_or_rate")
+    private BigDecimal amountOrRate;
+
     private BigDecimal amount;
 
     private String currency;

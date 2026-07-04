@@ -1,0 +1,491 @@
+{
+  "feature": "FX (Foreign Exchange)",
+  "version": "v3.2",
+  "start_time": "2026-07-04 21:31:37",
+  "total": 12,
+  "passed": 10,
+  "failed": 2,
+  "skipped": 0,
+  "results": [
+    {
+      "name": "TC_FX_API_001",
+      "status": "passed",
+      "checks": {
+        "buyAmount": true,
+        "spreadBp": true,
+        "termDays": true,
+        "maturityDate": true
+      },
+      "response": {
+        "code": 200,
+        "message": "success",
+        "data": {
+          "sellAmount": 100000.0,
+          "buyAmount": 720000.0,
+          "exchangeRate": 7.2,
+          "marketRate": 7.19,
+          "spreadBp": 100.0,
+          "tradeDate": "2026-07-04",
+          "valueDate": "2026-10-04",
+          "termDays": 92,
+          "maturityDate": "2026-10-04"
+        },
+        "timestamp": 1783171897285
+      }
+    },
+    {
+      "name": "TC_FX_API_002",
+      "status": "passed",
+      "response": {
+        "code": 400,
+        "message": "至少需要填 2 个金额/汇率字段(INPUT_INSUFFICIENT)",
+        "data": null,
+        "timestamp": 1783171897289
+      }
+    },
+    {
+      "name": "TC_FX_API_003",
+      "status": "passed",
+      "response": {
+        "code": 400,
+        "message": "交割日不能早于交易日(DATE_INVALID)",
+        "data": null,
+        "timestamp": 1783171897293
+      }
+    },
+    {
+      "name": "TC_FX_API_004",
+      "status": "passed",
+      "checks": {
+        "dealmap_count": true,
+        "cashflow_count": true,
+        "action_deal": true
+      },
+      "deal_number": "FX202607040003",
+      "response": {
+        "code": 200,
+        "message": "success",
+        "data": {
+          "dealMapCount": 3,
+          "dealNumber": "FX202607040003",
+          "cashflowCount": 2,
+          "status": "New"
+        },
+        "timestamp": 1783171897347
+      }
+    },
+    {
+      "name": "TC_FX_API_005",
+      "status": "failed",
+      "checks": {
+        "ndf_3_dealmap": true,
+        "ndf_0_cashflow": false
+      },
+      "deal_number": "FX202607040004",
+      "response": {
+        "code": 200,
+        "message": "success",
+        "data": {
+          "dealMapCount": 3,
+          "dealNumber": "FX202607040004",
+          "cashflowCount": 0,
+          "status": "New"
+        },
+        "timestamp": 1783171897894
+      }
+    },
+    {
+      "name": "TC_FX_API_006",
+      "status": "passed",
+      "checks": {
+        "filter_status": true
+      },
+      "response": {
+        "code": 200,
+        "message": "success",
+        "data": {
+          "records": [
+            {
+              "id": 27,
+              "dealNumber": "FX202607040004",
+              "dealType": "FX",
+              "managementEntityId": 1,
+              "currencyPairId": 1,
+              "sellCurrency": "EUR",
+              "sellAmount": 200000.0,
+              "buyCurrency": "USD",
+              "buyAmount": 218000.0,
+              "exchangeRate": 1.09,
+              "marketRate": 1.089,
+              "spreadBp": 10.0,
+              "productType": "NDF",
+              "tradeDate": "2026-07-04",
+              "valueDate": "2026-10-04",
+              "maturityDate": null,
+              "status": "New",
+              "description": "NDF test TC005",
+              "remark": null,
+              "createdAt": "2026-07-04T21:31:37.868805"
+            },
+            {
+              "id": 26,
+              "dealNumber": "FX202607040003",
+              "dealType": "FX",
+              "managementEntityId": 1,
+              "currencyPairId": 1,
+              "sellCurrency": "EUR",
+              "sellAmount": 50000.0,
+              "buyCurrency": "USD",
+              "buyAmount": 54500.0,
+              "exchangeRate": 1.09,
+              "marketRate": 1.089,
+              "spreadBp": 10.0,
+              "productType": "SPOT",
+              "tradeDate": "2026-07-04",
+              "valueDate": "2026-07-04",
+              "maturityDate": null,
+              "status": "New",
+              "description": "SPOT test TC004",
+              "remark": null,
+              "createdAt": "2026-07-04T21:31:37.296599"
+            },
+            {
+              "id": 25,
+              "dealNumber": "FX202607040002",
+              "dealType": "FX",
+              "managementEntityId": 1,
+              "currencyPairId": 1,
+              "sellCurrency": "USD",
+              "sellAmount": 100000.0,
+              "buyCurrency": "CNY",
+              "buyAmount": 725000.0,
+              "exchangeRate": 7.25,
+              "marketRate": 7.24,
+              "spreadBp": 100.0,
+              "productType": "SPOT",
+              "tradeDate": "2026-07-04",
+              "valueDate": "2026-07-04",
+              "maturityDate": null,
+              "status": "Canceled",
+              "description": "Test SPOT",
+              "remark": null,
+              "createdAt": "2026-07-04T21:13:15.839415"
+            },
+            {
+              "id": 24,
+              "dealNumber": "FX202607040001",
+              "dealType": "FX",
+              "managementEntityId": 1,
+              "currencyPairId": 1,
+              "sellCurrency": "USD",
+              "sellAmount": 100000.0,
+              "buyCurrency": "CNY",
+              "buyAmount": 720000.0,
+              "exchangeRate": 7.2,
+              "marketRate": 7.19,
+              "spreadBp": 100.0,
+              "productType": "FWD",
+              "tradeDate": "2026-07-04",
+              "valueDate": "2026-07-06",
+              "maturityDate": null,
+              "status": "New",
+              "description": "Test FX Deal",
+              "remark": null,
+              "createdAt": "2026-07-04T21:11:09.886217"
+            }
+          ],
+          "total": 4,
+          "size": 10,
+          "current": 1,
+          "pages": 1
+        },
+        "timestamp": 1783171898432
+      }
+    },
+    {
+      "name": "TC_FX_API_007",
+      "status": "passed",
+      "checks": {
+        "id": true,
+        "dealNumber": true,
+        "sellCurrency": true,
+        "buyCurrency": true,
+        "has_dealMapList": true,
+        "has_cashflowList": true,
+        "has_actionList": true
+      },
+      "response": {
+        "code": 200,
+        "message": "success",
+        "data": {
+          "id": 26,
+          "dealNumber": "FX202607040003",
+          "dealType": "FX",
+          "managementEntityId": 1,
+          "managementEntityName": null,
+          "counterpartyId": 4,
+          "counterpartyName": null,
+          "traderId": 1,
+          "traderName": null,
+          "instrumentId": 2,
+          "instrumentName": null,
+          "productType": null,
+          "currencyPairId": 1,
+          "currencyPairName": null,
+          "sellCurrency": "EUR",
+          "sellAmount": 50000.0,
+          "buyCurrency": "USD",
+          "buyAmount": 54500.0,
+          "exchangeRate": 1.09,
+          "marketRate": 1.089,
+          "spreadBp": 10.0,
+          "notional": 50000.0,
+          "fixingSource": null,
+          "fixingRate": null,
+          "settlementAmount": null,
+          "tradeDate": "2026-07-04",
+          "valueDate": "2026-07-04",
+          "maturityDate": "2026-07-04",
+          "termDays": 0,
+          "status": "New",
+          "description": "SPOT test TC004",
+          "remark": null,
+          "latestActionNumber": "ACT202607040005",
+          "createdBy": "tester",
+          "createdAt": "2026-07-04T21:31:37.296599",
+          "updatedBy": "tester",
+          "updatedAt": "2026-07-04T21:31:37.34156",
+          "version": 0,
+          "dealMapList": [
+            {
+              "id": 21,
+              "dealmapNumber": "DMP202607040008",
+              "dealNumber": "FX202607040003",
+              "actionNumber": "ACT202607040005",
+              "eventType": "FX",
+              "eventStatus": "Active",
+              "amount": 50000.0,
+              "currency": "EUR",
+              "direction": "Outflow",
+              "eventDate": "2026-07-04",
+              "valueDate": "2026-07-04",
+              "isReversal": "0",
+              "reversesEventId": null,
+              "reversedByEventId": null,
+              "description": "FX Deal - SELL leg (amount snapshot)",
+              "createdBy": "tester",
+              "createdAt": "2026-07-04T21:31:37.296599",
+              "updatedBy": "tester",
+              "updatedAt": "2026-07-04T21:31:37.296599",
+              "version": 0,
+              "deleted": "0"
+            },
+            {
+              "id": 22,
+              "dealmapNumber": "DMP202607040009",
+              "dealNumber": "FX202607040003",
+              "actionNumber": "ACT202607040005",
+              "eventType": "FX",
+              "eventStatus": "Active",
+              "amount": 54500.0,
+              "currency": "USD",
+              "direction": "Inflow",
+              "eventDate": "2026-07-04",
+              "valueDate": "2026-07-04",
+              "isReversal": "0",
+              "reversesEventId": null,
+              "reversedByEventId": null,
+              "description": "FX Deal - BUY leg (amount snapshot)",
+              "createdBy": "tester",
+              "createdAt": "2026-07-04T21:31:37.296599",
+              "updatedBy": "tester",
+              "updatedAt": "2026-07-04T21:31:37.296599",
+              "version": 0,
+              "deleted": "0"
+            },
+            {
+              "id": 23,
+              "dealmapNumber": "DMP202607040010",
+              "dealNumber": "FX202607040003",
+              "actionNumber": "ACT202607040005",
+              "eventType": "FX",
+              "eventStatus": "Active",
+              "amount": 1.09,
+              "currency": null,
+              "direction": null,
+              "eventDate": "2026-07-04",
+              "valueDate": "2026-07-04",
+              "isReversal": "0",
+              "reversesEventId": null,
+              "reversedByEventId": null,
+              "description": "FX Deal - rate snapshot",
+              "createdBy": "tester",
+              "createdAt": "2026-07-04T21:31:37.296599",
+              "updatedBy": "tester",
+              "updatedAt": "2026-07-04T21:31:37.296599",
+              "version": 0,
+              "deleted": "0"
+            }
+          ],
+          "cashflowList": [
+            {
+              "id": 12,
+              "cflowNumber": "CF202607040006",
+              "dealNumber": "FX202607040003",
+              "dealmapNumber": "DMP202607040008",
+              "managementEntity": "1",
+              "bankAccount": null,
+              "counterpartyAccount": null,
+              "direction": "Outflow",
+              "amount": 50000.0,
+              "currency": "EUR",
+              "cflowDate": "2026-07-04",
+              "valueDate": "2026-07-04",
+              "sourceType": "FX_DEAL",
+              "sourceRef": "FX202607040003",
+              "status": "Created",
+              "counterpartyName": null,
+              "purpose": "SPOT test TC004",
+              "remark": null,
+              "createdBy": "tester",
+              "createdAt": "2026-07-04T21:31:37.296599",
+              "updatedBy": "tester",
+              "updatedAt": "2026-07-04T21:31:37.296599",
+              "version": 0,
+              "deleted": "0"
+            },
+            {
+              "id": 13,
+              "cflowNumber": "CF202607040007",
+              "dealNumber": "FX202607040003",
+              "dealmapNumber": "DMP202607040009",
+              "managementEntity": "1",
+              "bankAccount": null,
+              "counterpartyAccount": null,
+              "direction": "Inflow",
+              "amount": 54500.0,
+              "currency": "USD",
+              "cflowDate": "2026-07-04",
+              "valueDate": "2026-07-04",
+              "sourceType": "FX_DEAL",
+              "sourceRef": "FX202607040003",
+              "status": "Created",
+              "counterpartyName": null,
+              "purpose": "SPOT test TC004",
+              "remark": null,
+              "createdBy": "tester",
+              "createdAt": "2026-07-04T21:31:37.296599",
+              "updatedBy": "tester",
+              "updatedAt": "2026-07-04T21:31:37.296599",
+              "version": 0,
+              "deleted": "0"
+            }
+          ],
+          "actionList": [
+            {
+              "id": 29,
+              "actionNumber": "ACT202607040005",
+              "dealNumber": "FX202607040003",
+              "dealType": "FX",
+              "actionType": "DEAL",
+              "actionStatus": "Approved",
+              "operator": "tester",
+              "operateAt": "2026-07-04T21:31:37.296599",
+              "remark": null,
+              "approver1": null,
+              "approver2": null,
+              "approvalStatus1": "Approved",
+              "approvalStatus2": "Approved",
+              "approvalRemark": null,
+              "createdBy": "tester",
+              "createdAt": "2026-07-04T21:31:37.296599",
+              "updatedBy": null,
+              "updatedAt": null,
+              "version": 0
+            }
+          ]
+        },
+        "timestamp": 1783171898492
+      }
+    },
+    {
+      "name": "TC_FX_API_008",
+      "status": "passed",
+      "checks": {
+        "rate_updated": true,
+        "desc_updated": true,
+        "has_update_action": true
+      },
+      "response": {
+        "code": 200,
+        "message": "success",
+        "data": null,
+        "timestamp": 1783171898515
+      }
+    },
+    {
+      "name": "TC_FX_API_009",
+      "status": "failed",
+      "checks": {
+        "fx_fix_dm": false,
+        "cashflow_added": true
+      },
+      "response": {
+        "code": 200,
+        "message": "success",
+        "data": {
+          "dealNumber": "FX202607040004",
+          "settlementAmount": 6000.0,
+          "dealmapNumber": "DMP202607040014",
+          "status": "Active"
+        },
+        "timestamp": 1783171899136
+      }
+    },
+    {
+      "name": "TC_FX_API_010",
+      "status": "passed",
+      "checks": {
+        "status_canceled": true
+      },
+      "response": {
+        "code": 200,
+        "message": "success",
+        "data": null,
+        "timestamp": 1783171900255
+      }
+    },
+    {
+      "name": "TC_FX_API_011",
+      "status": "passed",
+      "response": {
+        "code": 400,
+        "message": "RATE_FIX 仅适用于 NDF Deal(需 fixingSource)",
+        "data": null,
+        "timestamp": 1783171900773
+      }
+    },
+    {
+      "name": "TC_FX_API_012",
+      "status": "passed",
+      "response": {
+        "code": 404,
+        "message": "FX Deal not found: FX99999999-NOTEXIST",
+        "data": null,
+        "timestamp": 1783171900777
+      }
+    }
+  ],
+  "validation_points": {
+    "calculate_all": true,
+    "calculate_insufficient": true,
+    "calculate_date_invalid": true,
+    "create_spot": true,
+    "page": true,
+    "detail": true,
+    "update": true,
+    "delete": true,
+    "ratefix_rejected": true
+  },
+  "end_time": "2026-07-04 21:31:40"
+}

@@ -17,6 +17,7 @@ import com.opentms.dealing.mapper.CashflowMapper;
 import com.opentms.dealing.mapper.DealMapMapper;
 import com.opentms.dealing.mapper.DealMapper;
 import com.opentms.dealing.service.AtDealService;
+import com.opentms.dealing.service.BankAccountLookup;
 import com.opentms.dealing.vo.ActionVO;
 import com.opentms.dealing.vo.AtDealImageVO;
 import com.opentms.dealing.vo.AtDealVO;
@@ -32,6 +33,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * AT 交易服务实现（v2.0 双腿设计）
@@ -51,6 +53,7 @@ public class AtDealServiceImpl implements AtDealService {
     private final ActionMapper actionMapper;
     private final DealMapMapper dealMapMapper;
     private final CashflowMapper cashflowMapper;
+    private final BankAccountLookup bankAccountLookup;
 
     private static final String DEAL_TYPE = "AT";
     private static final String DEAL_STATUS_NEW = "New";
@@ -87,11 +90,13 @@ public class AtDealServiceImpl implements AtDealService {
                              AtDealImageMapper atDealImageMapper,
                              ActionMapper actionMapper,
                              DealMapMapper dealMapMapper,
-                             CashflowMapper cashflowMapper) {
+                             CashflowMapper cashflowMapper,
+                             BankAccountLookup bankAccountLookup) {
         this.dealMapper = dealMapper;
         this.atDealMapper = atDealMapper;
         this.atDealImageMapper = atDealImageMapper;
         this.actionMapper = actionMapper;
+        this.bankAccountLookup = bankAccountLookup;
         this.dealMapMapper = dealMapMapper;
         this.cashflowMapper = cashflowMapper;
     }
@@ -196,7 +201,7 @@ public class AtDealServiceImpl implements AtDealService {
         Deal deal = new Deal();
         deal.setDealNumber(dealNumber);
         deal.setDealType(DEAL_TYPE);
-        deal.setBusinessUnit(dto.getBusinessUnit());
+        deal.setManagementEntity(dto.getManagementEntity());
         deal.setDirection("Transfer");
         deal.setAmount(dto.getSourceAmount());
         deal.setCurrency(dto.getSourceCurrency());
@@ -321,7 +326,7 @@ public class AtDealServiceImpl implements AtDealService {
         atDealImageMapper.insert(atImage);
 
         // 3. UPDATE Deal
-        existingDeal.setBusinessUnit(dto.getBusinessUnit());
+        existingDeal.setManagementEntity(dto.getManagementEntity());
         existingDeal.setAmount(dto.getSourceAmount());
         existingDeal.setCurrency(dto.getSourceCurrency());
         existingDeal.setValueDate(dto.getValueDate());
@@ -617,7 +622,7 @@ public class AtDealServiceImpl implements AtDealService {
         cf1.setCflowNumber(generateCflowNumber());
         cf1.setDealNumber(dealNumber);
         cf1.setDealmapNumber(dealmapNumbers.get(2)); // #3 ActualCashflow SOURCE
-        cf1.setBusinessUnit(dto.getBusinessUnit());
+        cf1.setManagementEntity(dto.getManagementEntity());
         cf1.setBankAccount(String.valueOf(dto.getSourceAccountId()));
         cf1.setCounterpartyAccount(String.valueOf(dto.getDestAccountId()));
         cf1.setDirection(DIRECTION_OUTFLOW);
@@ -642,7 +647,7 @@ public class AtDealServiceImpl implements AtDealService {
         cf2.setCflowNumber(generateCflowNumber());
         cf2.setDealNumber(dealNumber);
         cf2.setDealmapNumber(dealmapNumbers.get(3)); // #4 ActualCashflow DESTINATION
-        cf2.setBusinessUnit(dto.getBusinessUnit());
+        cf2.setManagementEntity(dto.getManagementEntity());
         cf2.setBankAccount(String.valueOf(dto.getDestAccountId()));
         cf2.setCounterpartyAccount(String.valueOf(dto.getSourceAccountId()));
         cf2.setDirection(DIRECTION_INFLOW);
@@ -663,6 +668,41 @@ public class AtDealServiceImpl implements AtDealService {
         cashflowMapper.insert(cf2);
     }
 
+    // ======================== Copy ========================
+
+    @Override
+    public AtDealDTO getCopyData(String dealNumber) {
+        Deal deal = getDealByNumber(dealNumber);
+        if (deal == null) {
+            return null;
+        }
+
+        AtDeal atDeal = getAtDealByNumber(dealNumber);
+        if (atDeal == null) {
+            return null;
+        }
+
+        AtDealDTO dto = new AtDealDTO();
+        // 不复制 id, dealNumber — 系统自动生成新编号
+        dto.setTransferType(atDeal.getTransferType());
+        dto.setManagementEntity(atDeal.getManagementEntity());
+        dto.setSourceAccountId(atDeal.getSourceAccountId());
+        dto.setDestAccountId(atDeal.getDestAccountId());
+        dto.setSourceAmount(atDeal.getSourceAmount());
+        dto.setDestAmount(atDeal.getDestAmount());
+        dto.setSourceCurrency(atDeal.getSourceCurrency());
+        dto.setDestCurrency(atDeal.getDestCurrency());
+        dto.setExchangeRate(atDeal.getExchangeRate());
+        dto.setValueDate(atDeal.getValueDate());
+        dto.setPaymentMethod(atDeal.getPaymentMethod());
+        dto.setPurpose(atDeal.getPurpose());
+        dto.setRemark(deal.getRemark());
+        // operator 留空，让用户自行填写
+        dto.setOperator("");
+
+        return dto;
+    }
+
     // ======================== Validation ========================
 
     private void validateAtDeal(AtDealDTO dto) {
@@ -672,6 +712,35 @@ public class AtDealServiceImpl implements AtDealService {
         if (dto.getSourceAccountId().equals(dto.getDestAccountId())) {
             throw new RuntimeException("源账户和目标账户不能相同");
         }
+        // ====== 跨币种 / 跨管理主体 硬阻断 (硬规则) ======
+        // 加载源/目标账户的币种和管理主体
+        Map<String, Object> sourceSnap = bankAccountLookup.findAccountSnapshot(dto.getSourceAccountId());
+        Map<String, Object> destSnap   = bankAccountLookup.findAccountSnapshot(dto.getDestAccountId());
+        if (sourceSnap == null) {
+            throw new RuntimeException("源账户不存在或已删除: id=" + dto.getSourceAccountId());
+        }
+        if (destSnap == null) {
+            throw new RuntimeException("目标账户不存在或已删除: id=" + dto.getDestAccountId());
+        }
+        Object sourceCurrency = sourceSnap.get("currency");
+        Object sourceMgmtObj  = sourceSnap.get("management_entity_id");
+        Object destCurrency   = destSnap.get("currency");
+        Object destMgmtObj    = destSnap.get("management_entity_id");
+
+        // 跨币种直接拒绝 (哪怕填了汇率也不允许, AT 不做汇兑)
+        if (sourceCurrency != null && destCurrency != null
+                && !sourceCurrency.toString().equals(destCurrency.toString())) {
+            throw new RuntimeException("AT 不支持跨币种转账 (源账户币种="
+                    + sourceCurrency + ", 目标账户币种=" + destCurrency + "),请使用 FX 交易");
+        }
+        // 跨管理主体直接拒绝
+        Long sourceMgmt = toLong(sourceMgmtObj);
+        Long destMgmt   = toLong(destMgmtObj);
+        if (sourceMgmt != null && destMgmt != null && !sourceMgmt.equals(destMgmt)) {
+            throw new RuntimeException("AT 不支持跨管理主体转账 (源账户主体="
+                    + sourceMgmt + ", 目标账户主体=" + destMgmt + ")");
+        }
+
         if (dto.getSourceAmount() == null || dto.getSourceAmount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new RuntimeException("源金额必须为正数");
         }
@@ -681,7 +750,7 @@ public class AtDealServiceImpl implements AtDealService {
         if (!StringUtils.hasText(dto.getSourceCurrency()) || !StringUtils.hasText(dto.getDestCurrency())) {
             throw new RuntimeException("币种不能为空");
         }
-        // 跨币种时 exchangeRate 必填
+        // 跨币种时 exchangeRate 必填 (此处已硬阻断跨币种, 此校验通常不会触发, 但保留作防御)
         if (!dto.getSourceCurrency().equals(dto.getDestCurrency())
                 && (dto.getExchangeRate() == null || dto.getExchangeRate().compareTo(BigDecimal.ZERO) <= 0)) {
             throw new RuntimeException("跨币种必须填写汇率（>0）");
@@ -694,6 +763,16 @@ public class AtDealServiceImpl implements AtDealService {
         }
         if (dto.getValueDate() == null) {
             throw new RuntimeException("起息日不能为空");
+        }
+    }
+
+    private Long toLong(Object o) {
+        if (o == null) return null;
+        if (o instanceof Number) return ((Number) o).longValue();
+        try {
+            return Long.parseLong(o.toString());
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 
@@ -834,7 +913,7 @@ public class AtDealServiceImpl implements AtDealService {
         }
         if (atDeal != null) {
             vo.setTransferType(atDeal.getTransferType());
-            vo.setBusinessUnit(atDeal.getBusinessUnit());
+            vo.setManagementEntity(atDeal.getManagementEntity());
             vo.setSourceAccountId(atDeal.getSourceAccountId());
             vo.setDestAccountId(atDeal.getDestAccountId());
             vo.setSourceAmount(atDeal.getSourceAmount());

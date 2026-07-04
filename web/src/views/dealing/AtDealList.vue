@@ -66,8 +66,9 @@
             <el-tag :type="getStatusType(row.status)">{{ getStatusLabel(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="260" fixed="right">
           <template #default="{ row }">
+            <el-button type="success" link @click="handleCopy(row)">复制</el-button>
             <el-button type="primary" link @click="handleView(row)">查看</el-button>
             <el-button type="primary" link @click="handleEdit(row)" v-if="canEdit(row.status)">编辑</el-button>
             <el-button type="danger" link @click="handleDelete(row)" v-if="canDelete(row.status)">删除</el-button>
@@ -167,6 +168,8 @@ const handleReset = () => {
 }
 
 const handleAdd = () => { router.push('/dealing/at-deal/form') }
+
+const handleCopy = (row) => { router.push(`/dealing/at-deal/form?copyFrom=${row.dealNumber}`) }
 
 const handleView = (row) => { router.push(`/dealing/at-deal/detail?id=${row.id}`) }
 

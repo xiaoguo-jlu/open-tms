@@ -28,6 +28,14 @@ export function getAtDealByNumber(dealNumber) {
   })
 }
 
+// 复制 AT 交易 — 返回可编辑字段（不含 dealNumber/id）
+export function copyAtDeal(dealNumber) {
+  return request({
+    url: `/api/v1/dealing/at-deals/${dealNumber}/copy`,
+    method: 'get'
+  })
+}
+
 // 创建 AT 交易
 export function saveAtDeal(data) {
   return request({

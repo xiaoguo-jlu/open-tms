@@ -30,7 +30,7 @@ public class Cashflow {
     private String dealmapNumber;
 
     @TableField("business_unit")
-    private String businessUnit;
+    private String managementEntity;
 
     @TableField("bank_account")
     private String bankAccount;

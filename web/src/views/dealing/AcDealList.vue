@@ -18,8 +18,8 @@
             <el-option label="已删除" value="Canceled" />
           </el-select>
         </el-form-item>
-        <el-form-item label="业务主体">
-          <el-input v-model="queryForm.businessUnit" placeholder="业务主体编码" clearable style="width: 160px;" />
+        <el-form-item label="管理主体">
+          <el-input v-model="queryForm.managementEntity" placeholder="管理主体编码" clearable style="width: 160px;" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleQuery">查询</el-button>
@@ -42,7 +42,7 @@
             <el-link type="primary" @click="handleView(row)">{{ row.dealNumber }}</el-link>
           </template>
         </el-table-column>
-        <el-table-column prop="businessUnit" label="业务主体" width="100" />
+        <el-table-column prop="managementEntity" label="管理主体" width="100" />
         <el-table-column prop="direction" label="方向" width="80" align="center">
           <template #default="{ row }">
             <el-tag :type="row.direction === 'Inflow' ? 'success' : 'danger'">
@@ -64,8 +64,9 @@
             <el-tag :type="getStatusType(row.status)">{{ getStatusLabel(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="220" fixed="right">
+        <el-table-column label="操作" width="280" fixed="right">
           <template #default="{ row }">
+            <el-button type="success" link @click="handleCopy(row)">复制</el-button>
             <el-button type="primary" link @click="handleView(row)">详情</el-button>
             <el-button type="primary" link @click="handleEdit(row)" v-if="row.status === 'New'">编辑</el-button>
             <el-button type="warning" link @click="handleApprove(row)" v-if="row.status === 'New'">审批</el-button>
@@ -100,7 +101,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { listAcDeal, deleteAcDeal } from '@/api/dealing/acDeal'
+import { listAcDeal, deleteAcDeal, copyAcDeal } from '@/api/dealing/acDeal'
 import AcDealForm from './AcDealForm.vue'
 import ActionApprovalDialog from './ActionApprovalDialog.vue'
 
@@ -117,7 +118,7 @@ const queryForm = reactive({
   keyword: '',
   status: '',
   direction: '',
-  businessUnit: ''
+  managementEntity: ''
 })
 const pagination = reactive({ pageNum: 1, pageSize: 10, total: 0 })
 
@@ -150,13 +151,24 @@ const fetchData = async () => {
 
 const handleQuery = () => { pagination.pageNum = 1; fetchData() }
 const handleReset = () => {
-  Object.assign(queryForm, { keyword: '', status: '', direction: '', businessUnit: '' })
+  Object.assign(queryForm, { keyword: '', status: '', direction: '', managementEntity: '' })
   handleQuery()
 }
 const handleAdd = () => {
   editingDeal.value = null
   drawerTitle.value = '新建 AC 交易'
   drawerVisible.value = true
+}
+const handleCopy = async (row) => {
+  try {
+    const res = await copyAcDeal(row.dealNumber)
+    editingDeal.value = res.data // copy API 返回的 DTO 不含 dealNumber/id，保存时会走 create 逻辑
+    drawerTitle.value = `复制 AC 交易 - 基于 ${row.dealNumber}`
+    drawerVisible.value = true
+  } catch (e) {
+    ElMessage.error('获取复制数据失败')
+    console.error(e)
+  }
 }
 const handleView = (row) => {
   router.push(`/dealing/ac-deal/detail/${row.dealNumber}`)

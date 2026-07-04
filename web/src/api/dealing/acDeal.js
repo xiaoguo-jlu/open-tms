@@ -28,6 +28,14 @@ export function getAcDealByNumber(dealNumber) {
   })
 }
 
+// 复制 AC 交易 — 返回可编辑字段（不含 dealNumber/id）
+export function copyAcDeal(dealNumber) {
+  return request({
+    url: `/api/v1/dealing/ac-deals/${dealNumber}/copy`,
+    method: 'get'
+  })
+}
+
 // 创建 AC 交易（v2.0 - 自动生成 DealMap + Cashflow）
 export function createAcDeal(data) {
   return request({

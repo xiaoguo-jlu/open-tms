@@ -77,7 +77,7 @@ public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements 
 
     @Override
     public Page<DealVO> queryPage(String keyword, String status, String direction,
-                                  String businessUnit, int pageNum, int pageSize) {
+                                  String managementEntity, int pageNum, int pageSize) {
         LambdaQueryWrapper<Deal> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Deal::getDealType, DEAL_TYPE_AC);
 
@@ -90,8 +90,8 @@ public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements 
         if (StringUtils.hasText(direction)) {
             wrapper.eq(Deal::getDirection, direction);
         }
-        if (StringUtils.hasText(businessUnit)) {
-            wrapper.eq(Deal::getBusinessUnit, businessUnit);
+        if (StringUtils.hasText(managementEntity)) {
+            wrapper.eq(Deal::getManagementEntity, managementEntity);
         }
 
         wrapper.orderByDesc(Deal::getCreatedAt);
@@ -229,7 +229,7 @@ public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements 
         cashflow.setCflowNumber(cflowNumber);
         cashflow.setDealNumber(dealNumber);
         cashflow.setDealmapNumber(dealMapNumber);
-        cashflow.setBusinessUnit(dto.getBusinessUnit());
+        cashflow.setManagementEntity(dto.getManagementEntity());
         cashflow.setBankAccount(dto.getBankAccountId() != null ? String.valueOf(dto.getBankAccountId()) : null);
         cashflow.setCounterpartyAccount(dto.getCounterpartyAccountId() != null ? String.valueOf(dto.getCounterpartyAccountId()) : null);
         cashflow.setDirection(dto.getDirection());
@@ -551,8 +551,8 @@ public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements 
         if (dto == null) {
             throw new IllegalArgumentException("DTO 不能为空");
         }
-        if (!StringUtils.hasText(dto.getBusinessUnit())) {
-            throw new IllegalArgumentException("businessUnit 不能为空");
+        if (!StringUtils.hasText(dto.getManagementEntity())) {
+            throw new IllegalArgumentException("managementEntity 不能为空");
         }
         if (dto.getAmount() == null || dto.getAmount().signum() <= 0) {
             throw new IllegalArgumentException("amount 必须大于 0");
@@ -664,6 +664,44 @@ public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements 
             }
         }
         return prefix + String.format("%04d", seq);
+    }
+
+    // ==================== Copy ====================
+
+    @Override
+    public AcDealDTO getCopyData(String dealNumber) {
+        Deal deal = getByDealNumber(dealNumber);
+        if (deal == null) {
+            return null;
+        }
+
+        AcDeal acDeal = getAcDealByDealNumber(dealNumber);
+
+        AcDealDTO dto = new AcDealDTO();
+        // 不复制 id, dealNumber — 系统自动生成新编号
+        dto.setDealType(DEAL_TYPE_AC);
+        dto.setManagementEntity(deal.getManagementEntity());
+        dto.setCounterpartyId(deal.getCounterpartyId());
+        dto.setInstrumentId(deal.getInstrumentId());
+        dto.setTraderId(deal.getTraderId());
+        dto.setDirection(deal.getDirection());
+        dto.setAmount(deal.getAmount());
+        dto.setCurrency(deal.getCurrency());
+        dto.setDealDate(deal.getDealDate());
+        dto.setValueDate(deal.getValueDate());
+        dto.setDescription(deal.getDescription());
+        dto.setRemark(deal.getRemark());
+
+        if (acDeal != null) {
+            dto.setBankAccountId(acDeal.getBankAccountId());
+            dto.setCounterpartyAccountId(acDeal.getCounterpartyAccountId());
+            dto.setPaymentMethod(acDeal.getPaymentMethod());
+        }
+
+        // operator 留空，让用户自行填写
+        dto.setOperator("");
+
+        return dto;
     }
 
     private String generateImageNumber() {

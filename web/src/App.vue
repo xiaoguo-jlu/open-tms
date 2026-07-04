@@ -20,21 +20,16 @@
         </el-sub-menu>
         <el-sub-menu index="dealing">
           <template #title><el-icon><Wallet /></el-icon><span>交易管理</span></template>
-          <el-menu-item index="/dealing/deal">交易录入</el-menu-item>
+          <el-menu-item index="/dealing/ac-deal">AC 交易 (单边收付)</el-menu-item>
+          <el-menu-item index="/dealing/at-deal">AT 转账 (双边划转)</el-menu-item>
+          <el-menu-item index="/dealing/fx-deal">FX 外汇交易</el-menu-item>
+          <el-menu-item index="/dealing/action">Action 待办</el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="approval">
           <template #title><el-icon><CircleCheck /></el-icon><span>审批管理</span></template>
           <el-menu-item index="/approval/rule">审批规则</el-menu-item>
           <el-menu-item index="/approval/template">审批流程配置</el-menu-item>
           <el-menu-item index="/approval/task">审批任务</el-menu-item>
-        </el-sub-menu>
-        <el-sub-menu index="transfer">
-          <template #title><el-icon><Switch /></el-icon><span>转账管理</span></template>
-          <el-menu-item index="/transfer/list">转账交易</el-menu-item>
-        </el-sub-menu>
-        <el-sub-menu index="ac">
-          <template #title><el-icon><Coin /></el-icon><span>现金流管理</span></template>
-          <el-menu-item index="/ac/list">AC交易</el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="risk">
           <template #title><el-icon><Warning /></el-icon><span>风险管理</span></template>
@@ -62,7 +57,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { DataAnalysis, Grid, Wallet, CircleCheck, Switch, Coin, Money, Warning, DataLine } from '@element-plus/icons-vue'
+import { DataAnalysis, Grid, Wallet, CircleCheck, Switch, Money, Warning, DataLine } from '@element-plus/icons-vue'
 const route = useRoute()
 const activeMenu = computed(() => route.path)
 </script>

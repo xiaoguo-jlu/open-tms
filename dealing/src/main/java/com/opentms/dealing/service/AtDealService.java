@@ -88,4 +88,9 @@ public interface AtDealService {
      * 关键：仅更新 Action.approval_status1=Rejected，不改变 DealMap / Cashflow 状态
      */
     boolean rejectAction(String actionNumber, String approver, String remark);
+
+    /**
+     * 获取 AT 交易的可复制数据（不含 dealNumber/id/createdAt 等系统字段）
+     */
+    AtDealDTO getCopyData(String dealNumber);
 }
