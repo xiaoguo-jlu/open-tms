@@ -55,6 +55,14 @@ export function deleteFxDeal(id) {
   })
 }
 
+// 获取可复制字段（id/dealNumber 置 null）
+export function copyFxDeal(dealNumber) {
+  return request({
+    url: `/api/v1/dealing/fx-deals/${dealNumber}/copy`,
+    method: 'get'
+  })
+}
+
 // NDF RATE_FIX
 export function rateFixFxDeal(id, data) {
   return request({

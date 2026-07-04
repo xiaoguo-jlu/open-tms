@@ -62,6 +62,18 @@ public class FxDealController {
     }
 
     /**
+     * 按 dealNumber 获取可复制字段（id/dealNumber 置 null）
+     */
+    @GetMapping("/{dealNumber}/copy")
+    public Result<FxDealDTO> getCopyData(@PathVariable String dealNumber) {
+        FxDealDTO dto = fxDealService.getCopyData(dealNumber);
+        if (dto == null) {
+            return Result.notFound("FX Deal not found: " + dealNumber);
+        }
+        return Result.success(dto);
+    }
+
+    /**
      * 按 dealNumber 获取详情
      */
     @GetMapping("/{dealNumber}")

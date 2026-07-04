@@ -292,6 +292,38 @@ public class FxDealServiceImpl implements FxDealService {
         return vo;
     }
 
+    @Override
+    public FxDealDTO getCopyData(String dealNumber) {
+        Deal deal = getDealByNumber(dealNumber);
+        if (deal == null) return null;
+        FxDeal fxDeal = getFxDealByNumber(dealNumber);
+
+        FxDealDTO dto = new FxDealDTO();
+        dto.setManagementEntityId(fxDeal != null ? fxDeal.getManagementEntityId() : null);
+        dto.setCounterpartyId(deal.getCounterpartyId());
+        dto.setTraderId(deal.getTraderId());
+        dto.setInstrumentId(deal.getInstrumentId());
+        dto.setCurrencyPairId(fxDeal != null ? fxDeal.getCurrencyPairId() : null);
+        dto.setSellCurrency(fxDeal != null ? fxDeal.getSellCurrency() : null);
+        dto.setSellAmount(fxDeal != null ? fxDeal.getSellAmount() : null);
+        dto.setBuyCurrency(fxDeal != null ? fxDeal.getBuyCurrency() : null);
+        dto.setBuyAmount(fxDeal != null ? fxDeal.getBuyAmount() : null);
+        dto.setExchangeRate(fxDeal != null ? fxDeal.getExchangeRate() : null);
+        dto.setMarketRate(fxDeal != null ? fxDeal.getMarketRate() : null);
+        dto.setSpreadBp(fxDeal != null ? fxDeal.getSpreadBp() : null);
+        dto.setTradeDate(deal.getDealDate());
+        dto.setValueDate(deal.getValueDate());
+        dto.setNotional(fxDeal != null ? fxDeal.getNotional() : null);
+        dto.setFixingSource(fxDeal != null ? fxDeal.getFixingSource() : null);
+        dto.setDescription(deal.getDescription());
+        dto.setRemark(deal.getRemark());
+        // 系统字段清空
+        dto.setId(null);
+        dto.setDealNumber(null);
+        dto.setOperator("");
+        return dto;
+    }
+
     // ======================== Create ========================
 
     @Override

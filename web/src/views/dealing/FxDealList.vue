@@ -77,6 +77,7 @@
           <template #default="{ row }">
             <el-button type="primary" link @click="handleView(row)">详情</el-button>
             <el-button type="primary" link @click="handleEdit(row)" v-if="row.status !== 'Canceled'">编辑</el-button>
+            <el-button type="success" link @click="handleCopy(row)">复制</el-button>
             <el-button type="warning" link @click="handleRateFix(row)" v-if="row.productType === 'NDF' && row.status === 'New'">RATE_FIX</el-button>
             <el-button type="danger" link @click="handleDelete(row)" v-if="row.status !== 'Canceled'">删除</el-button>
           </template>
@@ -122,7 +123,7 @@
 import { ref, reactive, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { listFxDeal, deleteFxDeal, rateFixFxDeal } from '@/api/dealing/fxDeal'
+import { listFxDeal, deleteFxDeal, rateFixFxDeal, copyFxDeal } from '@/api/dealing/fxDeal'
 import FxDealForm from './FxDealForm.vue'
 
 const router = useRouter()
@@ -191,6 +192,16 @@ const handleEdit = (row) => {
   editingDeal.value = row
   drawerTitle.value = `编辑 FX 交易 - ${row.dealNumber}`
   drawerVisible.value = true
+}
+const handleCopy = async (row) => {
+  try {
+    const res = await copyFxDeal(row.dealNumber)
+    editingDeal.value = res.data || res
+    drawerTitle.value = '复制 FX 交易'
+    drawerVisible.value = true
+  } catch (e) {
+    ElMessage.error(e?.message || '复制失败')
+  }
 }
 const handleDelete = async (row) => {
   try {

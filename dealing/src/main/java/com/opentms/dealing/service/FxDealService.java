@@ -53,4 +53,9 @@ public interface FxDealService {
      * @return 包含 dealNumber / settlementAmount / dealmapNumber
      */
     Map<String, Object> rateFix(Long id, BigDecimal fixingRate, String operator);
+
+    /**
+     * 获取可复制字段（id/dealNumber 置 null，operator 置空）
+     */
+    FxDealDTO getCopyData(String dealNumber);
 }

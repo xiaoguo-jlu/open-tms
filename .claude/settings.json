@@ -4,21 +4,5 @@
       "Bash",
       "Read"
     ]
-  },
-  "transcript": {
-    "path": ".claude/transcripts/{timestamp}.jsonl"
-  },
-  "hooks": {
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "mkdir -p .claude/archive && cp -r .claude/sessions \".claude/archive/session_$(date +%Y%m%d_%H%M%S)\"",
-            "statusMessage": "Archiving session..."
-          }
-        ]
-      }
-    ]
   }
 }
