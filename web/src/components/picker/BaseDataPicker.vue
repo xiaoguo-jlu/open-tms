@@ -116,7 +116,9 @@ const props = defineProps({
   disabled: { type: Boolean, default: false },
   clearable: { type: Boolean, default: true },
   filters: { type: Object, default: () => ({}) },
-  autoFilter: { type: Object, default: () => ({}) }
+  autoFilter: { type: Object, default: () => ({}) },
+  /** 预加载的当前行（用于外部已查到的 row，picker 直接展示，不发起 API） */
+  preloadRow: { type: Object, default: null }
 })
 
 const emit = defineEmits(['update:modelValue', 'change', 'clear', 'open', 'close'])
@@ -139,6 +141,12 @@ function rebuildDisplayText() {
   const v = props.modelValue
   if (v == null || v === '') {
     displayText.value = ''
+    return
+  }
+  // 外部预加载的行（最优先：外部已经查好完整 row，无需 API）
+  if (props.preloadRow && props.preloadRow[preset.value.returnField] === v) {
+    currentRow.value = props.preloadRow
+    displayText.value = preset.value.displayFormat(props.preloadRow)
     return
   }
   // 命中当前页缓存
@@ -297,6 +305,18 @@ watch(
   () => {
     fetchByIdIfNeeded()
   }
+)
+
+/* ============ 监听外部预加载行（外部已查到 row，无需再请求 API） ============ */
+watch(
+  () => props.preloadRow,
+  (val) => {
+    if (val) {
+      currentRow.value = val
+      displayText.value = preset.value.displayFormat(val)
+    }
+  },
+  { immediate: false }
 )
 
 /* ============ 监听自动过滤(深) ============ */

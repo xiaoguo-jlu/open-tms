@@ -166,4 +166,36 @@ public class FxDealController {
                 && !dto.getValueDate().isEqual(dto.getTradeDate())) return "FWD";
         return "SPOT";
     }
+
+    /**
+     * 审批通过 Action
+     */
+    @PostMapping("/actions/{actionNumber}/approve")
+    public Result<Void> approve(@PathVariable String actionNumber,
+                                @RequestBody Map<String, String> request) {
+        try {
+            String approver = request.getOrDefault("approver", "system");
+            String remark = request.get("remark");
+            fxDealService.approveAction(actionNumber, approver, remark);
+            return Result.success();
+        } catch (RuntimeException e) {
+            return Result.badRequest(e.getMessage());
+        }
+    }
+
+    /**
+     * 驳回 Action
+     */
+    @PostMapping("/actions/{actionNumber}/reject")
+    public Result<Void> reject(@PathVariable String actionNumber,
+                               @RequestBody Map<String, String> request) {
+        try {
+            String approver = request.getOrDefault("approver", "system");
+            String remark = request.get("remark");
+            fxDealService.rejectAction(actionNumber, approver, remark);
+            return Result.success();
+        } catch (RuntimeException e) {
+            return Result.badRequest(e.getMessage());
+        }
+    }
 }

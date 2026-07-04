@@ -71,3 +71,21 @@ export function rateFixFxDeal(id, data) {
     data
   })
 }
+
+// 审批通过 Action
+export function approveFxAction(actionNumber, data) {
+  return request({
+    url: `/api/v1/dealing/fx-deals/actions/${actionNumber}/approve`,
+    method: 'post',
+    data
+  })
+}
+
+// 驳回 Action
+export function rejectFxAction(actionNumber, data) {
+  return request({
+    url: `/api/v1/dealing/fx-deals/actions/${actionNumber}/reject`,
+    method: 'post',
+    data
+  })
+}

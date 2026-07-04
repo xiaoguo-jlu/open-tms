@@ -78,6 +78,7 @@
             <el-button type="primary" link @click="handleView(row)">详情</el-button>
             <el-button type="primary" link @click="handleEdit(row)" v-if="row.status !== 'Canceled'">编辑</el-button>
             <el-button type="success" link @click="handleCopy(row)">复制</el-button>
+            <el-button type="warning" link @click="handleApprove(row)" v-if="row.status === 'New'">审批</el-button>
             <el-button type="warning" link @click="handleRateFix(row)" v-if="row.productType === 'NDF' && row.status === 'New'">RATE_FIX</el-button>
             <el-button type="danger" link @click="handleDelete(row)" v-if="row.status !== 'Canceled'">删除</el-button>
           </template>
@@ -117,13 +118,46 @@
       </template>
     </el-dialog>
   </div>
+
+  <!-- 审批弹窗 -->
+  <el-dialog v-model="approvalVisible" title="FX 交易审批" width="780px" destroy-on-close>
+    <el-alert :title="`交易编号: ${approvingDeal?.dealNumber || ''}`" type="info" :closable="false" style="margin-bottom: 12px;" />
+    <el-table :data="pendingActions" v-loading="approvalLoading" stripe max-height="300">
+      <el-table-column prop="actionNumber" label="Action 编号" width="170" />
+      <el-table-column prop="actionType" label="类型" width="100" align="center">
+        <template #default="{ row }">
+          <el-tag size="small">{{ row.actionType }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="operator" label="操作人" width="100" />
+      <el-table-column prop="actionStatus" label="状态" width="100" align="center">
+        <template #default="{ row }">
+          <el-tag :type="row.actionStatus === 'Approved' ? 'success' : row.actionStatus === 'Rejected' ? 'danger' : 'warning'" size="small">
+            {{ row.actionStatus }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="remark" label="备注" min-width="180" show-overflow-tooltip />
+      <el-table-column label="操作" width="140" align="center">
+        <template #default="{ row }">
+          <el-button v-if="row.actionStatus === 'Approved' || row.approvalStatus1 === 'Pending' || !row.approvalStatus1" type="success" link size="small" @click="doApprove(row)">通过</el-button>
+          <el-button type="danger" link size="small" @click="doReject(row)">驳回</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-empty v-if="!approvalLoading && pendingActions.length === 0" description="该交易没有可审批的 Action" />
+    <template #footer>
+      <el-button @click="approvalVisible = false">关闭</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { listFxDeal, deleteFxDeal, rateFixFxDeal, copyFxDeal } from '@/api/dealing/fxDeal'
+import { listFxDeal, deleteFxDeal, rateFixFxDeal, copyFxDeal, approveFxAction, rejectFxAction } from '@/api/dealing/fxDeal'
+import { listActionsByDeal } from '@/api/dealing/acDeal'
 import FxDealForm from './FxDealForm.vue'
 
 const router = useRouter()
@@ -138,6 +172,12 @@ const rateFixVisible = ref(false)
 const rateFixing = ref(false)
 const fixingDeal = ref(null)
 const rateFixForm = reactive({ fixingRate: null, operator: 'admin' })
+
+// 审批
+const approvalVisible = ref(false)
+const approvalLoading = ref(false)
+const approvingDeal = ref(null)
+const pendingActions = ref([])
 
 const queryForm = reactive({
   managementEntityId: null,
@@ -217,6 +257,46 @@ const handleDelete = async (row) => {
     if (e !== 'cancel') console.error(e)
   }
 }
+const handleApprove = async (row) => {
+  approvingDeal.value = row
+  approvalVisible.value = true
+  pendingActions.value = []
+  approvalLoading.value = true
+  try {
+    const res = await listActionsByDeal(row.dealNumber)
+    const records = res?.data?.records || res?.data || res || []
+    pendingActions.value = (Array.isArray(records) ? records : []).filter(a => a.actionStatus === 'Pending' || a.actionStatus === 'Approved')
+  } catch (e) {
+    console.error(e)
+    ElMessage.error('加载 Action 失败')
+  } finally {
+    approvalLoading.value = false
+  }
+}
+
+const doApprove = async (action) => {
+  try {
+    await approveFxAction(action.actionNumber, { approver: 'admin', remark: 'FX 审批通过' })
+    ElMessage.success(`Action ${action.actionNumber} 审批通过`)
+    await handleApprove(approvingDeal.value)
+    fetchData()
+  } catch (e) {
+    ElMessage.error(e?.message || '审批失败')
+  }
+}
+
+const doReject = async (action) => {
+  try {
+    await ElMessageBox.confirm(`确认驳回 Action ${action.actionNumber}？`, '驳回确认', { type: 'warning' })
+    await rejectFxAction(action.actionNumber, { approver: 'admin', remark: 'FX 审批驳回' })
+    ElMessage.success('已驳回')
+    await handleApprove(approvingDeal.value)
+    fetchData()
+  } catch (e) {
+    if (e !== 'cancel') ElMessage.error(e?.message || '驳回失败')
+  }
+}
+
 const handleRateFix = (row) => {
   fixingDeal.value = row
   rateFixForm.fixingRate = null

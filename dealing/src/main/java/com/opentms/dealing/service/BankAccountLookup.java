@@ -36,4 +36,18 @@ public class BankAccountLookup {
                 accountId);
         return rows.isEmpty() ? null : rows.get(0);
     }
+
+    /**
+     * 查询账户完整信息 (含 accountNo/accountName) — 用于复制/展示
+     */
+    public Map<String, Object> findAccountFull(Long accountId) {
+        if (accountId == null) {
+            return null;
+        }
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(
+                "SELECT id, account_no, account_name, currency, management_entity_id, account_type, bank_id " +
+                        "FROM tms_bank_account_t WHERE id = ? AND deleted = '0'",
+                accountId);
+        return rows.isEmpty() ? null : rows.get(0);
+    }
 }

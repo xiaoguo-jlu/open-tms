@@ -35,6 +35,11 @@ public class AtDealDTO {
     private String sourceCurrency;
     private String destCurrency;
 
+    /** 源账户账号（用于前端展示，不入库） */
+    private String sourceAccountNo;
+    /** 目标账户账号（用于前端展示，不入库） */
+    private String destAccountNo;
+
     /** 跨币种时记录汇率；同币种为 1 */
     private BigDecimal exchangeRate;
 

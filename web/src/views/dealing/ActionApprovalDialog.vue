@@ -4,7 +4,7 @@
       <template #title>请选择需要审批的 Action（可多选）。审批仅更新 Action 状态，DealMap / Cashflow 任何状态都不变。</template>
     </el-alert>
 
-    <el-table :data="pendingActions" @selection-change="onSelectionChange" stripe>
+    <el-table :data="pendingActions" @selection-change="onSelectionChange" v-loading="loadingActions" stripe>
       <el-table-column type="selection" width="50" align="center" />
       <el-table-column type="index" label="序号" width="60" align="center" />
       <el-table-column prop="actionNumber" label="Action 编号" width="160" />
@@ -22,6 +22,7 @@
       </el-table-column>
       <el-table-column prop="remark" label="备注" />
     </el-table>
+    <el-empty v-if="!loadingActions && pendingActions.length === 0" description="该交易没有待审批的 Action" />
 
     <el-form :model="form" label-width="100px" style="margin-top: 16px;">
       <el-form-item label="审批人">
@@ -43,7 +44,7 @@
 <script setup>
 import { ref, reactive, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import { approveAction, rejectAction } from '@/api/dealing/acDeal'
+import { approveAction, rejectAction, listActionsByDeal } from '@/api/dealing/acDeal'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -61,8 +62,35 @@ const selectedActions = ref([])
 const approving = ref(false)
 const rejecting = ref(false)
 const isReject = ref(false)
+const loadedActions = ref([])
+const loadingActions = ref(false)
 
-const pendingActions = computed(() => (props.actions || []).filter(a => a.approvalStatus1 === 'Pending'))
+// 弹窗打开时,若父组件未传 actions 则按 dealNumber 自动拉取该 Deal 的所有 Action
+const fetchActionsIfNeeded = async () => {
+  if (props.actions && props.actions.length > 0) {
+    loadedActions.value = props.actions
+    return
+  }
+  const dealNumber = props.deal?.dealNumber
+  if (!dealNumber) {
+    loadedActions.value = []
+    return
+  }
+  loadingActions.value = true
+  try {
+    const res = await listActionsByDeal(dealNumber)
+    loadedActions.value = res.data || []
+  } catch (e) {
+    ElMessage.error('加载 Action 失败: ' + (e?.message || ''))
+    loadedActions.value = []
+  } finally {
+    loadingActions.value = false
+  }
+}
+
+watch(() => props.modelValue, (v) => { if (v) fetchActionsIfNeeded() })
+
+const pendingActions = computed(() => (loadedActions.value || []).filter(a => a.approvalStatus1 === 'Pending'))
 
 const getActionTypeLabel = (t) => ({ CREATE: '创建', UPDATE: '修改', DELETE: '删除', APPROVE: '审批', REJECT: '驳回' }[t] || t)
 const getActionTypeTag = (t) => ({ CREATE: 'success', UPDATE: 'warning', DELETE: 'danger', APPROVE: 'success', REJECT: 'danger' }[t] || 'info')
@@ -70,7 +98,7 @@ const getApprovalTag = (s) => ({ Approved: 'success', Pending: 'warning', Reject
 
 const onSelectionChange = (rows) => { selectedActions.value = rows }
 
-const handleClose = () => { visible.value = false; isReject.value = false; form.approvalRemark = ''; selectedActions.value = [] }
+const handleClose = () => { visible.value = false; isReject.value = false; form.approvalRemark = ''; selectedActions.value = []; loadedActions.value = [] }
 
 const handleApprove = async () => {
   if (!form.approver) { ElMessage.error('审批人不能为空'); return }

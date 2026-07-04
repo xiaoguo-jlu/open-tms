@@ -74,6 +74,8 @@ public class FxDealServiceImpl implements FxDealService {
     private static final String ACTION_TYPE_RATE_FIX = "RATE_FIX";
 
     private static final String ACTION_STATUS_APPROVED = "Approved";
+    private static final String APPROVAL_STATUS_APPROVED = "Approved";
+    private static final String APPROVAL_STATUS_REJECTED = "Rejected";
 
     private static final String DEALMAP_TYPE_FX_BUY_AMOUNT = "FX_BUY_AMOUNT";
     private static final String DEALMAP_TYPE_FX_SELL_AMOUNT = "FX_SELL_AMOUNT";
@@ -322,6 +324,82 @@ public class FxDealServiceImpl implements FxDealService {
         dto.setDealNumber(null);
         dto.setOperator("");
         return dto;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean approveAction(String actionNumber, String approver, String remark) {
+        Action action = getActionByNumber(actionNumber);
+        if (action == null) {
+            throw new RuntimeException("Action 不存在: " + actionNumber);
+        }
+        LocalDateTime now = LocalDateTime.now();
+
+        // 关键：仅更新 Action.approval_status1，不改变 DealMap / Cashflow 任何状态
+        if (action.getApprover1() == null) {
+            action.setApprover1(approver);
+        }
+        action.setApprovalStatus1(APPROVAL_STATUS_APPROVED);
+        if (StringUtils.hasText(remark)) {
+            action.setApprovalRemark(remark);
+        }
+        action.setOperator(approver);
+        action.setOperateAt(now);
+        action.setUpdatedBy(approver);
+        action.setUpdatedAt(now);
+        action.setVersion((action.getVersion() == null ? 0 : action.getVersion()) + 1);
+        actionMapper.updateById(action);
+
+        // 若 Action 对应 FX 业务，同时更新 Deal.status → Active
+        if (DEAL_TYPE.equals(action.getDealType())) {
+            Deal deal = getDealByNumber(action.getDealNumber());
+            if (deal != null) {
+                deal.setStatus(DEAL_STATUS_ACTIVE);
+                deal.setUpdatedBy(approver);
+                deal.setUpdatedAt(now);
+                deal.setVersion((deal.getVersion() == null ? 0 : deal.getVersion()) + 1);
+                dealMapper.updateById(deal);
+            }
+        }
+        log.info("[FX] Action {} approved by {}", actionNumber, approver);
+        return true;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean rejectAction(String actionNumber, String approver, String remark) {
+        Action action = getActionByNumber(actionNumber);
+        if (action == null) {
+            throw new RuntimeException("Action 不存在: " + actionNumber);
+        }
+        LocalDateTime now = LocalDateTime.now();
+
+        if (action.getApprover1() == null) {
+            action.setApprover1(approver);
+        }
+        action.setApprovalStatus1(APPROVAL_STATUS_REJECTED);
+        if (StringUtils.hasText(remark)) {
+            action.setApprovalRemark(remark);
+        }
+        action.setOperator(approver);
+        action.setOperateAt(now);
+        action.setUpdatedBy(approver);
+        action.setUpdatedAt(now);
+        action.setVersion((action.getVersion() == null ? 0 : action.getVersion()) + 1);
+        actionMapper.updateById(action);
+
+        if (DEAL_TYPE.equals(action.getDealType())) {
+            Deal deal = getDealByNumber(action.getDealNumber());
+            if (deal != null) {
+                deal.setStatus(APPROVAL_STATUS_REJECTED);
+                deal.setUpdatedBy(approver);
+                deal.setUpdatedAt(now);
+                deal.setVersion((deal.getVersion() == null ? 0 : deal.getVersion()) + 1);
+                dealMapper.updateById(deal);
+            }
+        }
+        log.info("[FX] Action {} rejected by {}", actionNumber, approver);
+        return true;
     }
 
     // ======================== Create ========================
@@ -869,6 +947,12 @@ public class FxDealServiceImpl implements FxDealService {
         LambdaQueryWrapper<Deal> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Deal::getDealNumber, dealNumber);
         return dealMapper.selectOne(wrapper);
+    }
+
+    private Action getActionByNumber(String actionNumber) {
+        LambdaQueryWrapper<Action> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Action::getActionNumber, actionNumber);
+        return actionMapper.selectOne(wrapper);
     }
 
     private FxDeal getFxDealByNumber(String dealNumber) {

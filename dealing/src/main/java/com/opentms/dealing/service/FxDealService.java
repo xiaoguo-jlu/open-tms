@@ -58,4 +58,14 @@ public interface FxDealService {
      * 获取可复制字段（id/dealNumber 置 null，operator 置空）
      */
     FxDealDTO getCopyData(String dealNumber);
+
+    /**
+     * 审批通过 Action（仅更新 Action.approval_status1，Deal.status → Approved）
+     */
+    boolean approveAction(String actionNumber, String approver, String remark);
+
+    /**
+     * 驳回 Action（Deal.status → Rejected）
+     */
+    boolean rejectAction(String actionNumber, String approver, String remark);
 }

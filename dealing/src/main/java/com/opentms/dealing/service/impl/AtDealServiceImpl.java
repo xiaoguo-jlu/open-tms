@@ -203,8 +203,13 @@ public class AtDealServiceImpl implements AtDealService {
         deal.setDealType(DEAL_TYPE);
         deal.setManagementEntity(dto.getManagementEntity());
         deal.setDirection("Transfer");
+        // AT 内部转账不直接关联外部对手方，counterparty_id / trader_id / instrument_id 设为 0 占位（满足 NOT NULL 约束）
+        deal.setCounterpartyId(0L);
+        deal.setTraderId(0L);
+        deal.setInstrumentId(0L);
         deal.setAmount(dto.getSourceAmount());
         deal.setCurrency(dto.getSourceCurrency());
+        deal.setDealDate(dto.getValueDate());
         deal.setValueDate(dto.getValueDate());
         deal.setStatus(DEAL_STATUS_NEW);
         deal.setDescription(dto.getPurpose());
@@ -697,6 +702,19 @@ public class AtDealServiceImpl implements AtDealService {
         dto.setPaymentMethod(atDeal.getPaymentMethod());
         dto.setPurpose(atDeal.getPurpose());
         dto.setRemark(deal.getRemark());
+        // 补充源/目标账户的 accountNo，让前端 picker 能直接显示账号
+        if (atDeal.getSourceAccountId() != null) {
+            Map<String, Object> sourceSnap = bankAccountLookup.findAccountFull(atDeal.getSourceAccountId());
+            if (sourceSnap != null) {
+                dto.setSourceAccountNo(String.valueOf(sourceSnap.get("account_no")));
+            }
+        }
+        if (atDeal.getDestAccountId() != null) {
+            Map<String, Object> destSnap = bankAccountLookup.findAccountFull(atDeal.getDestAccountId());
+            if (destSnap != null) {
+                dto.setDestAccountNo(String.valueOf(destSnap.get("account_no")));
+            }
+        }
         // operator 留空，让用户自行填写
         dto.setOperator("");
 

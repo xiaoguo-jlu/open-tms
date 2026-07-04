@@ -74,8 +74,12 @@ public class AtDealController {
      */
     @PostMapping
     public Result<Void> save(@RequestBody AtDealDTO dto) {
-        atDealService.saveAtDeal(dto);
-        return Result.success();
+        try {
+            atDealService.saveAtDeal(dto);
+            return Result.success();
+        } catch (RuntimeException e) {
+            return Result.badRequest(e.getMessage());
+        }
     }
 
     /**
@@ -83,8 +87,12 @@ public class AtDealController {
      */
     @PostMapping("/update")
     public Result<Void> update(@RequestBody AtDealDTO dto) {
-        atDealService.updateAtDeal(dto);
-        return Result.success();
+        try {
+            atDealService.updateAtDeal(dto);
+            return Result.success();
+        } catch (RuntimeException e) {
+            return Result.badRequest(e.getMessage());
+        }
     }
 
     /**
