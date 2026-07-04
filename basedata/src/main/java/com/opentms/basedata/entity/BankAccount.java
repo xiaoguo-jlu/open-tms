@@ -29,54 +29,58 @@ public class BankAccount {
     @TableField("account_type")
     private String accountType;
 
-    @TableField("business_unit_id")
-    private Long businessUnitId;
+    @TableField("management_entity_id")
+    private Long managementEntityId;
 
     private String status;
 
     private String remark;
 
     // ===== 2026-06-29 扩展:银行账户业务字段(原 bankaccount 模块) =====
+    // 这些字段只在 dealing 侧 BankAccountList/AtDealForm 上展示或暂未落库,
+    // 当前 tms_bank_account_t 表不包含这些列;若未来要落库则同步建表并移除 exist=false。
+    // 此处统一加 @TableField(exist = false) 防止 MyBatis Plus 自动 SELECT 这些不存在的列导致 SQL 错误(字段不存在)。
 
     /**
      * 账户别名
      */
+    @TableField(exist = false)
     private String account;
 
     /**
      * 账户性质:Internal(内部)/ External(外部)
      */
-    @TableField("account_nature")
+    @TableField(exist = false)
     private String accountNature;
 
     /**
      * 是否归集:0=否 1=是
      */
-    @TableField("is_collected")
+    @TableField(exist = false)
     private String isCollected;
 
     /**
      * 归集方向:Up(上拨)/ Down(下拨)
      */
-    @TableField("collect_direction")
+    @TableField(exist = false)
     private String collectDirection;
 
     /**
      * 主账户ID(归集时关联)
      */
-    @TableField("main_account_id")
+    @TableField(exist = false)
     private Long mainAccountId;
 
     /**
      * 日累计限额
      */
-    @TableField("day_limit")
+    @TableField(exist = false)
     private BigDecimal dayLimit;
 
     /**
      * 夜间限额
      */
-    @TableField("night_limit")
+    @TableField(exist = false)
     private BigDecimal nightLimit;
 
     /**

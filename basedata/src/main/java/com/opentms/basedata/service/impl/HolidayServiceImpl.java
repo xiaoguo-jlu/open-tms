@@ -24,13 +24,16 @@ public class HolidayServiceImpl extends ServiceImpl<HolidayMapper, Holiday> impl
     }
 
     @Override
-    public Page<Holiday> queryPage(String countryCode, Integer year, int pageNum, int pageSize) {
+    public Page<Holiday> queryPage(String countryCode, Integer year, String keyword, int pageNum, int pageSize) {
         LambdaQueryWrapper<Holiday> wrapper = new LambdaQueryWrapper<>();
         if (StringUtils.hasText(countryCode)) {
             wrapper.eq(Holiday::getCountryCode, countryCode);
         }
         if (year != null) {
             wrapper.apply("EXTRACT(YEAR FROM holiday_date) = {0}", year);
+        }
+        if (StringUtils.hasText(keyword)) {
+            wrapper.like(Holiday::getName, keyword.trim());
         }
         wrapper.orderByAsc(Holiday::getHolidayDate);
         return page(new Page<>(pageNum, pageSize), wrapper);

@@ -34,7 +34,7 @@ public class AtDealImageVO {
 
     private BigDecimal exchangeRate;
 
-    private String businessUnit;
+    private String managementEntity;
 
     private LocalDate valueDate;
 

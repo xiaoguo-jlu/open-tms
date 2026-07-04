@@ -111,7 +111,7 @@ def test_create_ac_deal():
 
     deal = {
         "dealType": "AC",
-        "businessUnit": "BU001",
+        "managementEntity": "BU001",
         "traderId": 1,
         "counterpartyId": 5001,
         "instrumentId": 301,
@@ -264,7 +264,7 @@ def test_update_ac_deal(deal_id, deal_number):
     update = {
         "dealNumber": deal_number,
         "dealType": "AC",
-        "businessUnit": "BU001",
+        "managementEntity": "BU001",
         "traderId": 1,
         "counterpartyId": 5001,
         "instrumentId": 301,
@@ -500,8 +500,8 @@ def test_validation_errors():
     print("=" * 60)
     results = []
 
-    # 缺 businessUnit
-    r1 = {"name": "缺 businessUnit", "status": "failed"}
+    # 缺 managementEntity
+    r1 = {"name": "缺 managementEntity", "status": "failed"}
     resp = curl_cmd("POST", "/api/v1/dealing/ac-deals", {
         "direction": "Outflow", "amount": 100, "currency": "CNY",
         "dealDate": "2026-06-21", "valueDate": "2026-06-21",
@@ -511,12 +511,12 @@ def test_validation_errors():
         r1["status"] = "passed"
         r1["message"] = resp.get("message")
     results.append(r1)
-    print(f"  [{'PASS' if r1['status'] == 'passed' else 'FAIL'}] 缺 businessUnit: {r1.get('message', resp)}")
+    print(f"  [{'PASS' if r1['status'] == 'passed' else 'FAIL'}] 缺 managementEntity: {r1.get('message', resp)}")
 
     # 金额 = 0
     r2 = {"name": "金额=0", "status": "failed"}
     resp = curl_cmd("POST", "/api/v1/dealing/ac-deals", {
-        "businessUnit": "BU001", "traderId": 1, "direction": "Outflow", "amount": 0,
+        "managementEntity": "BU001", "traderId": 1, "direction": "Outflow", "amount": 0,
         "currency": "CNY", "dealDate": "2026-06-21", "valueDate": "2026-06-21",
         "bankAccountId": 1, "operator": "tester"
     })
@@ -529,7 +529,7 @@ def test_validation_errors():
     # 起息日 < 交易日期
     r3 = {"name": "起息日早于交易日期", "status": "failed"}
     resp = curl_cmd("POST", "/api/v1/dealing/ac-deals", {
-        "businessUnit": "BU001", "traderId": 1, "direction": "Outflow", "amount": 100,
+        "managementEntity": "BU001", "traderId": 1, "direction": "Outflow", "amount": 100,
         "currency": "CNY", "dealDate": "2026-06-21", "valueDate": "2026-06-20",
         "bankAccountId": 1, "operator": "tester"
     })
@@ -542,7 +542,7 @@ def test_validation_errors():
     # 方向非法
     r4 = {"name": "方向非法", "status": "failed"}
     resp = curl_cmd("POST", "/api/v1/dealing/ac-deals", {
-        "businessUnit": "BU001", "traderId": 1, "direction": "INVALID", "amount": 100,
+        "managementEntity": "BU001", "traderId": 1, "direction": "INVALID", "amount": 100,
         "currency": "CNY", "dealDate": "2026-06-21", "valueDate": "2026-06-21",
         "bankAccountId": 1, "operator": "tester"
     })

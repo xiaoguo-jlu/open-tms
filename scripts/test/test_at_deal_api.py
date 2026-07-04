@@ -220,7 +220,7 @@ def test_tc_at_001_same_company_same_currency(test_data):
     at = {
         "dealType": "AT",
         "transferType": "SAME_COMPANY",
-        "businessUnit": test_data.get("business_unit") or "BU001",
+        "managementEntity": test_data.get("business_unit") or "BU001",
         "sourceAccountId": src.get("id"),
         "destAccountId": dst.get("id"),
         "sourceAmount": 1000000.00,
@@ -368,7 +368,7 @@ def test_tc_at_005_cross_currency(test_data):
     at = {
         "dealType": "AT",
         "transferType": "CROSS_BORDER",
-        "businessUnit": test_data.get("business_unit") or "BU001",
+        "managementEntity": test_data.get("business_unit") or "BU001",
         "sourceAccountId": src.get("id"),
         "destAccountId": dst.get("id"),
         "sourceAmount": 1000000.00,
@@ -419,7 +419,7 @@ def test_tc_at_007_cross_company(test_data):
     at = {
         "dealType": "AT",
         "transferType": "CROSS_COMPANY",
-        "businessUnit": test_data.get("business_unit") or "BU001",
+        "managementEntity": test_data.get("business_unit") or "BU001",
         "sourceAccountId": src.get("id"),
         "destAccountId": dst.get("id"),
         "sourceAmount": 500000.00,
@@ -452,7 +452,7 @@ def test_tc_at_008_cross_company_cross_currency(test_data):
     at = {
         "dealType": "AT",
         "transferType": "CROSS_COMPANY",
-        "businessUnit": test_data.get("business_unit") or "BU001",
+        "managementEntity": test_data.get("business_unit") or "BU001",
         "sourceAccountId": src.get("id"),
         "destAccountId": dst.get("id"),
         "sourceAmount": 100000.00,
@@ -484,7 +484,7 @@ def test_tc_at_009_cross_border(test_data):
     at = {
         "dealType": "AT",
         "transferType": "CROSS_BORDER",
-        "businessUnit": test_data.get("business_unit") or "BU001",
+        "managementEntity": test_data.get("business_unit") or "BU001",
         "sourceAccountId": src.get("id"),
         "destAccountId": dst.get("id"),
         "sourceAmount": 50000.00,
@@ -640,7 +640,7 @@ def test_tc_at_013_same_account_validation(test_data):
     at = {
         "dealType": "AT",
         "transferType": "SAME_COMPANY",
-        "businessUnit": test_data.get("business_unit") or "BU001",
+        "managementEntity": test_data.get("business_unit") or "BU001",
         "sourceAccountId": src.get("id"),
         "destAccountId": src.get("id"),  # 故意相同
         "sourceAmount": 100.00,
@@ -678,7 +678,7 @@ def test_tc_at_014_missing_exchange_rate(test_data):
     at = {
         "dealType": "AT",
         "transferType": "CROSS_BORDER",
-        "businessUnit": test_data.get("business_unit") or "BU001",
+        "managementEntity": test_data.get("business_unit") or "BU001",
         "sourceAccountId": src.get("id"),
         "destAccountId": dst.get("id"),
         "sourceAmount": 100.00,
@@ -711,7 +711,7 @@ def test_tc_at_015_zero_source_amount(test_data):
     at = {
         "dealType": "AT",
         "transferType": "SAME_COMPANY",
-        "businessUnit": test_data.get("business_unit") or "BU001",
+        "managementEntity": test_data.get("business_unit") or "BU001",
         "sourceAccountId": src.get("id"),
         "destAccountId": dst.get("id"),
         "sourceAmount": 0,
@@ -744,7 +744,7 @@ def test_tc_at_016_zero_dest_amount(test_data):
     at = {
         "dealType": "AT",
         "transferType": "SAME_COMPANY",
-        "businessUnit": test_data.get("business_unit") or "BU001",
+        "managementEntity": test_data.get("business_unit") or "BU001",
         "sourceAccountId": src.get("id"),
         "destAccountId": dst.get("id"),
         "sourceAmount": 100.00,

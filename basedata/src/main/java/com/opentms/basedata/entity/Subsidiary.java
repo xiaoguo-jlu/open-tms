@@ -17,7 +17,7 @@ public class Subsidiary extends BasedataEntity {
 
     private String parentCode;
 
-    private String businessUnitCode;
+    private String managementEntityCode;
 
     private String legalPerson;
 

@@ -52,8 +52,8 @@ public class AtDeal {
     @TableField("exchange_rate")
     private BigDecimal exchangeRate;
 
-    @TableField("business_unit")
-    private String businessUnit;
+    @TableField("management_entity")
+    private String managementEntity;
 
     @TableField("value_date")
     private LocalDate valueDate;

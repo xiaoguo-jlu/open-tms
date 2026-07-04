@@ -27,7 +27,7 @@ common/src/main/java/com/opentms/common/
 basedata/src/main/java/com/opentms/basedata/
 ├── entity/
 │   ├── Currency.java                # 已有
-│   ├── BusinessUnit.java            # 新增
+│   ├── ManagementEntity.java            # 新增
 │   ├── Trader.java                  # 新增
 │   ├── Country.java                 # 新增
 │   ├── Holiday.java                 # 新增
@@ -36,30 +36,30 @@ basedata/src/main/java/com/opentms/basedata/
 │   └── CounterpartyAccount.java     # 新增
 ├── dto/
 │   ├── CurrencyDTO.java             # 新增
-│   ├── BusinessUnitDTO.java         # 新增
+│   ├── ManagementEntityDTO.java         # 新增
 │   └── ...
 ├── vo/
 │   ├── CurrencyVO.java              # 新增
-│   ├── BusinessUnitVO.java          # 新增
+│   ├── ManagementEntityVO.java          # 新增
 │   └── ...
 ├── mapper/
 │   ├── CurrencyMapper.java          # 已有
-│   ├── BusinessUnitMapper.java       # 新增
+│   ├── ManagementEntityMapper.java       # 新增
 │   └── ...
 ├── service/
 │   ├── CurrencyService.java         # 已有
 │   ├── BaseService.java             # 新增：抽象基类
-│   ├── BusinessUnitService.java     # 新增
+│   ├── ManagementEntityService.java     # 新增
 │   └── ...
 ├── service/impl/
 │   ├── CurrencyServiceImpl.java     # 已有
 │   ├── BaseServiceImpl.java         # 新增：抽象实现
-│   ├── BusinessUnitServiceImpl.java # 新增
+│   ├── ManagementEntityServiceImpl.java # 新增
 │   └── ...
 ├── controller/
 │   ├── CurrencyController.java      # 已有
 │   ├── BaseController.java          # 新增：抽象基类
-│   ├── BusinessUnitController.java  # 新增
+│   ├── ManagementEntityController.java  # 新增
 │   └── ...
 └── handler/
     └── IdHandler.java               # 新增：脱敏处理器
@@ -500,22 +500,22 @@ git commit -m "feat: 创建抽象BaseController"
 
 ---
 
-## Task 5: 实现BusinessUnit实体及完整业务
+## Task 5: 实现ManagementEntity实体及完整业务
 
 **Files:**
-- Create: `basedata/src/main/java/com/opentms/basedata/entity/BusinessUnit.java`
-- Create: `basedata/src/main/java/com/opentms/basedata/dto/BusinessUnitDTO.java`
-- Create: `basedata/src/main/java/com/opentms/basedata/vo/BusinessUnitVO.java`
-- Create: `basedata/src/main/java/com/opentms/basedata/mapper/BusinessUnitMapper.java`
-- Create: `basedata/src/main/java/com/opentms/basedata/service/BusinessUnitService.java`
-- Create: `basedata/src/main/java/com/opentms/basedata/service/impl/BusinessUnitServiceImpl.java`
-- Create: `basedata/src/main/java/com/opentms/basedata/controller/BusinessUnitController.java`
-- Create: `basedata/src/main/resources/mapper/BusinessUnitMapper.xml` (如需)
+- Create: `basedata/src/main/java/com/opentms/basedata/entity/ManagementEntity.java`
+- Create: `basedata/src/main/java/com/opentms/basedata/dto/ManagementEntityDTO.java`
+- Create: `basedata/src/main/java/com/opentms/basedata/vo/ManagementEntityVO.java`
+- Create: `basedata/src/main/java/com/opentms/basedata/mapper/ManagementEntityMapper.java`
+- Create: `basedata/src/main/java/com/opentms/basedata/service/ManagementEntityService.java`
+- Create: `basedata/src/main/java/com/opentms/basedata/service/impl/ManagementEntityServiceImpl.java`
+- Create: `basedata/src/main/java/com/opentms/basedata/controller/ManagementEntityController.java`
+- Create: `basedata/src/main/resources/mapper/ManagementEntityMapper.xml` (如需)
 
-- [ ] **Step 1: 创建BusinessUnit实体**
+- [ ] **Step 1: 创建ManagementEntity实体**
 
 ```java
-// basedata/src/main/java/com/opentms/basedata/entity/BusinessUnit.java
+// basedata/src/main/java/com/opentms/basedata/entity/ManagementEntity.java
 package com.opentms.basedata.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -525,8 +525,8 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("tms_business_unit_t")
-public class BusinessUnit extends BaseCodeEntity {
+@TableName("tms_management_entity_t")
+public class ManagementEntity extends BaseCodeEntity {
 
     private String enName;
 
@@ -538,10 +538,10 @@ public class BusinessUnit extends BaseCodeEntity {
 }
 ```
 
-- [ ] **Step 2: 创建BusinessUnitDTO**
+- [ ] **Step 2: 创建ManagementEntityDTO**
 
 ```java
-// basedata/src/main/java/com/opentms/basedata/dto/BusinessUnitDTO.java
+// basedata/src/main/java/com/opentms/basedata/dto/ManagementEntityDTO.java
 package com.opentms.basedata.dto;
 
 import lombok.Data;
@@ -549,7 +549,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class BusinessUnitDTO extends BaseDTO {
+public class ManagementEntityDTO extends BaseDTO {
 
     private String enName;
 
@@ -561,10 +561,10 @@ public class BusinessUnitDTO extends BaseDTO {
 }
 ```
 
-- [ ] **Step 3: 创建BusinessUnitVO**
+- [ ] **Step 3: 创建ManagementEntityVO**
 
 ```java
-// basedata/src/main/java/com/opentms/basedata/vo/BusinessUnitVO.java
+// basedata/src/main/java/com/opentms/basedata/vo/ManagementEntityVO.java
 package com.opentms.basedata.vo;
 
 import lombok.Data;
@@ -572,7 +572,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class BusinessUnitVO extends BaseVO {
+public class ManagementEntityVO extends BaseVO {
 
     private String enName;
 
@@ -584,61 +584,61 @@ public class BusinessUnitVO extends BaseVO {
 }
 ```
 
-- [ ] **Step 4: 创建BusinessUnitMapper**
+- [ ] **Step 4: 创建ManagementEntityMapper**
 
 ```java
-// basedata/src/main/java/com/opentms/basedata/mapper/BusinessUnitMapper.java
+// basedata/src/main/java/com/opentms/basedata/mapper/ManagementEntityMapper.java
 package com.opentms.basedata.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.opentms.basedata.entity.BusinessUnit;
+import com.opentms.basedata.entity.ManagementEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface BusinessUnitMapper extends BaseMapper<BusinessUnit> {
+public interface ManagementEntityMapper extends BaseMapper<ManagementEntity> {
 }
 ```
 
-- [ ] **Step 5: 创建BusinessUnitService**
+- [ ] **Step 5: 创建ManagementEntityService**
 
 ```java
-// basedata/src/main/java/com/opentms/basedata/service/BusinessUnitService.java
+// basedata/src/main/java/com/opentms/basedata/service/ManagementEntityService.java
 package com.opentms.basedata.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.opentms.basedata.entity.BusinessUnit;
+import com.opentms.basedata.entity.ManagementEntity;
 
-public interface BusinessUnitService extends IService<BusinessUnit> {
+public interface ManagementEntityService extends IService<ManagementEntity> {
 }
 ```
 
-- [ ] **Step 6: 创建BusinessUnitServiceImpl**
+- [ ] **Step 6: 创建ManagementEntityServiceImpl**
 
 ```java
-// basedata/src/main/java/com/opentms/basedata/service/impl/BusinessUnitServiceImpl.java
+// basedata/src/main/java/com/opentms/basedata/service/impl/ManagementEntityServiceImpl.java
 package com.opentms.basedata.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.opentms.basedata.entity.BusinessUnit;
-import com.opentms.basedata.mapper.BusinessUnitMapper;
-import com.opentms.basedata.service.BusinessUnitService;
+import com.opentms.basedata.entity.ManagementEntity;
+import com.opentms.basedata.mapper.ManagementEntityMapper;
+import com.opentms.basedata.service.ManagementEntityService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class BusinessUnitServiceImpl extends ServiceImpl<BusinessUnitMapper, BusinessUnit> implements BusinessUnitService {
+public class ManagementEntityServiceImpl extends ServiceImpl<ManagementEntityMapper, ManagementEntity> implements ManagementEntityService {
 }
 ```
 
-- [ ] **Step 7: 创建BusinessUnitController**
+- [ ] **Step 7: 创建ManagementEntityController**
 
 ```java
-// basedata/src/main/java/com/opentms/basedata/controller/BusinessUnitController.java
+// basedata/src/main/java/com/opentms/basedata/controller/ManagementEntityController.java
 package com.opentms.basedata.controller;
 
-import com.opentms.basedata.dto.BusinessUnitDTO;
-import com.opentms.basedata.entity.BusinessUnit;
-import com.opentms.basedata.service.BusinessUnitService;
-import com.opentms.basedata.vo.BusinessUnitVO;
+import com.opentms.basedata.dto.ManagementEntityDTO;
+import com.opentms.basedata.entity.ManagementEntity;
+import com.opentms.basedata.service.ManagementEntityService;
+import com.opentms.basedata.vo.ManagementEntityVO;
 import com.opentms.common.model.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -646,24 +646,24 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/business-units")
+@RequestMapping("/api/v1/management-entities")
 @RequiredArgsConstructor
-public class BusinessUnitController {
+public class ManagementEntityController {
 
-    private final BusinessUnitService businessUnitService;
+    private final ManagementEntityService managementEntityService;
 
     @GetMapping("/page")
-    public Result<com.baomidou.mybatisplus.core.metadata.IPage<BusinessUnitVO>> page(
+    public Result<com.baomidou.mybatisplus.core.metadata.IPage<ManagementEntityVO>> page(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "1") int pageNo,
             @RequestParam(defaultValue = "20") int pageSize) {
-        return Result.success(businessUnitService.queryPage(keyword, status, pageNo, pageSize));
+        return Result.success(managementEntityService.queryPage(keyword, status, pageNo, pageSize));
     }
 
     @GetMapping("/{id}")
-    public Result<BusinessUnitVO> getById(@PathVariable Long id) {
-        BusinessUnit entity = businessUnitService.getById(id);
+    public Result<ManagementEntityVO> getById(@PathVariable Long id) {
+        ManagementEntity entity = managementEntityService.getById(id);
         if (entity == null) {
             return Result.notFound("Not found");
         }
@@ -671,36 +671,36 @@ public class BusinessUnitController {
     }
 
     @PostMapping
-    public Result<Void> save(@RequestBody BusinessUnitDTO dto) {
-        businessUnitService.saveBusiness(dto);
+    public Result<Void> save(@RequestBody ManagementEntityDTO dto) {
+        managementEntityService.saveBusiness(dto);
         return Result.success();
     }
 
     @PutMapping
-    public Result<Void> update(@RequestBody BusinessUnitDTO dto) {
-        businessUnitService.updateBusiness(dto);
+    public Result<Void> update(@RequestBody ManagementEntityDTO dto) {
+        managementEntityService.updateBusiness(dto);
         return Result.success();
     }
 
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
-        businessUnitService.deleteBusiness(id);
+        managementEntityService.deleteBusiness(id);
         return Result.success();
     }
 
     @PostMapping("/batch-delete")
     public Result<Void> batchDelete(@RequestBody List<Long> ids) {
-        businessUnitService.removeByIds(ids);
+        managementEntityService.removeByIds(ids);
         return Result.success();
     }
 
     @GetMapping("/list")
-    public Result<List<BusinessUnitVO>> list() {
-        return Result.success(businessUnitService.listAll());
+    public Result<List<ManagementEntityVO>> list() {
+        return Result.success(managementEntityService.listAll());
     }
 
-    private BusinessUnitVO convertToVO(BusinessUnit entity) {
-        BusinessUnitVO vo = new BusinessUnitVO();
+    private ManagementEntityVO convertToVO(ManagementEntity entity) {
+        ManagementEntityVO vo = new ManagementEntityVO();
         vo.setId(entity.getId());
         vo.setCode(entity.getCode());
         vo.setName(entity.getName());
@@ -718,47 +718,47 @@ public class BusinessUnitController {
 }
 ```
 
-- [ ] **Step 8: 更新BusinessUnitService添加业务方法**
+- [ ] **Step 8: 更新ManagementEntityService添加业务方法**
 
 ```java
-// basedata/src/main/java/com/opentms/basedata/service/BusinessUnitService.java
+// basedata/src/main/java/com/opentms/basedata/service/ManagementEntityService.java
 package com.opentms.basedata.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.opentms.basedata.dto.BusinessUnitDTO;
-import com.opentms.basedata.entity.BusinessUnit;
-import com.opentms.basedata.vo.BusinessUnitVO;
+import com.opentms.basedata.dto.ManagementEntityDTO;
+import com.opentms.basedata.entity.ManagementEntity;
+import com.opentms.basedata.vo.ManagementEntityVO;
 
-public interface BusinessUnitService extends IService<BusinessUnit> {
+public interface ManagementEntityService extends IService<ManagementEntity> {
 
-    IPage<BusinessUnitVO> queryPage(String keyword, String status, int pageNo, int pageSize);
+    IPage<ManagementEntityVO> queryPage(String keyword, String status, int pageNo, int pageSize);
 
-    void saveBusiness(BusinessUnitDTO dto);
+    void saveBusiness(ManagementEntityDTO dto);
 
-    void updateBusiness(BusinessUnitDTO dto);
+    void updateBusiness(ManagementEntityDTO dto);
 
     void deleteBusiness(Long id);
 
-    List<BusinessUnitVO> listAll();
+    List<ManagementEntityVO> listAll();
 }
 ```
 
-- [ ] **Step 9: 更新BusinessUnitServiceImpl添加业务实现**
+- [ ] **Step 9: 更新ManagementEntityServiceImpl添加业务实现**
 
 ```java
-// basedata/src/main/java/com/opentms/basedata/service/impl/BusinessUnitServiceImpl.java
+// basedata/src/main/java/com/opentms/basedata/service/impl/ManagementEntityServiceImpl.java
 package com.opentms.basedata.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.opentms.basedata.dto.BusinessUnitDTO;
-import com.opentms.basedata.entity.BusinessUnit;
-import com.opentms.basedata.mapper.BusinessUnitMapper;
-import com.opentms.basedata.service.BusinessUnitService;
-import com.opentms.basedata.vo.BusinessUnitVO;
+import com.opentms.basedata.dto.ManagementEntityDTO;
+import com.opentms.basedata.entity.ManagementEntity;
+import com.opentms.basedata.mapper.ManagementEntityMapper;
+import com.opentms.basedata.service.ManagementEntityService;
+import com.opentms.basedata.vo.ManagementEntityVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -767,40 +767,40 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class BusinessUnitServiceImpl extends ServiceImpl<BusinessUnitMapper, BusinessUnit> implements BusinessUnitService {
+public class ManagementEntityServiceImpl extends ServiceImpl<ManagementEntityMapper, ManagementEntity> implements ManagementEntityService {
 
     @Override
-    public IPage<BusinessUnitVO> queryPage(String keyword, String status, int pageNo, int pageSize) {
-        LambdaQueryWrapper<BusinessUnit> wrapper = new LambdaQueryWrapper<>();
+    public IPage<ManagementEntityVO> queryPage(String keyword, String status, int pageNo, int pageSize) {
+        LambdaQueryWrapper<ManagementEntity> wrapper = new LambdaQueryWrapper<>();
         
         if (StringUtils.hasText(keyword)) {
-            wrapper.like(BusinessUnit::getCode, keyword)
+            wrapper.like(ManagementEntity::getCode, keyword)
                    .or()
-                   .like(BusinessUnit::getName, keyword);
+                   .like(ManagementEntity::getName, keyword);
         }
         
         if (StringUtils.hasText(status)) {
-            wrapper.eq(BusinessUnit::getStatus, status);
+            wrapper.eq(ManagementEntity::getStatus, status);
         }
         
-        wrapper.orderByDesc(BusinessUnit::getCreatedAt);
+        wrapper.orderByDesc(ManagementEntity::getCreatedAt);
         
-        Page<BusinessUnit> page = new Page<>(pageNo, pageSize);
-        IPage<BusinessUnit> result = this.page(page, wrapper);
+        Page<ManagementEntity> page = new Page<>(pageNo, pageSize);
+        IPage<ManagementEntity> result = this.page(page, wrapper);
         
         return result.convert(this::convertToVO);
     }
 
     @Override
-    public void saveBusiness(BusinessUnitDTO dto) {
-        BusinessUnit entity = new BusinessUnit();
+    public void saveBusiness(ManagementEntityDTO dto) {
+        ManagementEntity entity = new ManagementEntity();
         BeanUtils.copyProperties(dto, entity);
         this.save(entity);
     }
 
     @Override
-    public void updateBusiness(BusinessUnitDTO dto) {
-        BusinessUnit entity = new BusinessUnit();
+    public void updateBusiness(ManagementEntityDTO dto) {
+        ManagementEntity entity = new ManagementEntity();
         BeanUtils.copyProperties(dto, entity);
         this.updateById(entity);
     }
@@ -811,17 +811,17 @@ public class BusinessUnitServiceImpl extends ServiceImpl<BusinessUnitMapper, Bus
     }
 
     @Override
-    public List<BusinessUnitVO> listAll() {
-        List<BusinessUnit> list = this.list();
-        List<BusinessUnitVO> result = new ArrayList<>();
-        for (BusinessUnit entity : list) {
+    public List<ManagementEntityVO> listAll() {
+        List<ManagementEntity> list = this.list();
+        List<ManagementEntityVO> result = new ArrayList<>();
+        for (ManagementEntity entity : list) {
             result.add(convertToVO(entity));
         }
         return result;
     }
 
-    private BusinessUnitVO convertToVO(BusinessUnit entity) {
-        BusinessUnitVO vo = new BusinessUnitVO();
+    private ManagementEntityVO convertToVO(ManagementEntity entity) {
+        ManagementEntityVO vo = new ManagementEntityVO();
         vo.setId(entity.getId());
         vo.setCode(entity.getCode());
         vo.setName(entity.getName());
@@ -842,8 +842,8 @@ public class BusinessUnitServiceImpl extends ServiceImpl<BusinessUnitMapper, Bus
 - [ ] **Step 10: Commit**
 
 ```bash
-git add basedata/src/main/java/com/opentms/basedata/entity/BusinessUnit.java basedata/src/main/java/com/opentms/basedata/dto/BusinessUnitDTO.java basedata/src/main/java/com/opentms/basedata/vo/BusinessUnitVO.java basedata/src/main/java/com/opentms/basedata/mapper/BusinessUnitMapper.java basedata/src/main/java/com/opentms/basedata/service/BusinessUnitService.java basedata/src/main/java/com/opentms/basedata/service/impl/BusinessUnitServiceImpl.java basedata/src/main/java/com/opentms/basedata/controller/BusinessUnitController.java
-git commit -m "feat(basedata): 实现BusinessUnit实体及完整CRUD"
+git add basedata/src/main/java/com/opentms/basedata/entity/ManagementEntity.java basedata/src/main/java/com/opentms/basedata/dto/ManagementEntityDTO.java basedata/src/main/java/com/opentms/basedata/vo/ManagementEntityVO.java basedata/src/main/java/com/opentms/basedata/mapper/ManagementEntityMapper.java basedata/src/main/java/com/opentms/basedata/service/ManagementEntityService.java basedata/src/main/java/com/opentms/basedata/service/impl/ManagementEntityServiceImpl.java basedata/src/main/java/com/opentms/basedata/controller/ManagementEntityController.java
+git commit -m "feat(basedata): 实现ManagementEntity实体及完整CRUD"
 ```
 
 ---
@@ -879,8 +879,8 @@ git commit -m "feat(basedata): 实现BusinessUnit实体及完整CRUD"
 -- Open-TMS 基础数据表
 -- 数据库: opentms_dev
 
--- 业务单元表
-CREATE TABLE tms_business_unit_t (
+-- 管理主体表
+CREATE TABLE tms_management_entity_t (
     id BIGSERIAL PRIMARY KEY,
     code VARCHAR(50) NOT NULL UNIQUE,
     name VARCHAR(200) NOT NULL,
@@ -896,8 +896,8 @@ CREATE TABLE tms_business_unit_t (
     version INT DEFAULT 0,
     deleted CHAR(1) DEFAULT '0'
 );
-CREATE INDEX idx_business_unit_code ON tms_business_unit_t(code);
-CREATE INDEX idx_business_unit_status ON tms_business_unit_t(status);
+CREATE INDEX idx_management_entity_code ON tms_management_entity_t(code);
+CREATE INDEX idx_management_entity_status ON tms_management_entity_t(status);
 
 -- 交易员表
 CREATE TABLE tms_trader_t (

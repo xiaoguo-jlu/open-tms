@@ -9,9 +9,11 @@ public class CurrencyPairVO extends BasedataVO {
 
     private String pairCode;
 
-    private String baseCurrency;
+    private String currency1;
 
-    private String quoteCurrency;
+    private String currency2;
+
+    private String strongerCurrency;
 
     private Integer bidDecimal;
 

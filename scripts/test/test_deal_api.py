@@ -117,7 +117,7 @@ def prepare_test_data():
     print("="*60)
 
     test_data = {
-        "businessUnit": None,
+        "managementEntity": None,
         "counterparty": None,
         "counterpartyAccount": None,
         "trader": None,
@@ -131,7 +131,7 @@ def prepare_test_data():
     if resp and resp.get("code") == 200:
         records = resp.get("data", {}).get("records", [])
         if records:
-            test_data["businessUnit"] = records[0].get("code")
+            test_data["managementEntity"] = records[0].get("code")
             print(f"      [OK] businessUnit: {test_data['businessUnit']}")
         else:
             print(f"      [WARN] No businessUnit found")
@@ -216,7 +216,7 @@ def test_create_deal(test_data):
 
     deal = {
         "dealType": "AC",
-        "businessUnit": test_data.get("businessUnit") or "BU001",
+        "managementEntity": test_data.get("managementEntity") or "BU001",
         "counterpartyId": (test_data.get("counterparty") or {}).get("id") or 1,
         "instrumentId": (test_data.get("instrument") or {}).get("id") or 1,  # Required field
         "traderId": (test_data.get("trader") or {}).get("id") or 1000,
@@ -383,7 +383,7 @@ def test_update_deal(deal_id, deal_number, test_data):
         "id": deal_id,
         "dealNumber": deal_number,
         "dealType": "AC",
-        "businessUnit": test_data.get("businessUnit") or "BU001",
+        "managementEntity": test_data.get("managementEntity") or "BU001",
         "counterpartyId": (test_data.get("counterparty") or {}).get("id") or 1,
         "instrumentId": (test_data.get("instrument") or {}).get("id") or 1,
         "traderId": (test_data.get("trader") or {}).get("id") or 1000,

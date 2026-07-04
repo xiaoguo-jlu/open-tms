@@ -1,5 +1,7 @@
 # 资金计划管理接口
 
+> ⚠️ [PLANNED — Not Implemented] M2 资金计划
+
 **模块**: fundplan  
 **版本**: v1.0  
 **路径**: `/api/v1/fund-plans`
@@ -10,14 +12,14 @@
 
 ### 请求
 ```
-GET /api/v1/fund-plans/annual?pageNo=1&pageSize=20&year=2026&businessUnitId=xxx&status=xxx
+GET /api/v1/fund-plans/annual?pageNo=1&pageSize=20&year=2026&managementEntityId=xxx&status=xxx
 ```
 
 ### 参数
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
 | year | int | 否 | 年份 |
-| businessUnitId | long | 否 | 业务单元ID |
+| managementEntityId | long | 否 | 管理主体ID |
 | status | string | 否 | 状态 |
 
 ### 响应
@@ -29,8 +31,8 @@ GET /api/v1/fund-plans/annual?pageNo=1&pageSize=20&year=2026&businessUnitId=xxx&
       {
         "id": 1,
         "planYear": 2026,
-        "businessUnitId": 1,
-        "businessUnitName": "测试公司",
+        "managementEntityId": 1,
+        "managementEntityName": "测试公司",
         "totalIncome": 10000000.00,
         "totalExpense": 8000000.00,
         "netCashFlow": 2000000.00,
@@ -57,7 +59,7 @@ POST /api/v1/fund-plans/annual
 ```json
 {
   "planYear": 2026,
-  "businessUnitId": 1,
+  "managementEntityId": 1,
   "totalIncome": 10000000.00,
   "totalExpense": 8000000.00,
   "planItems": [
@@ -112,7 +114,7 @@ GET /api/v1/fund-plans/monthly?annualPlanId=xxx&month=4&status=xxx
 ## 8. 月度计划调整
 
 ```
-PUT /api/v1/fund-plans/monthly/{id}
+POST /api/v1/fund-plans/monthly/update/{id}
 ```
 
 ---

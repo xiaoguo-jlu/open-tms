@@ -185,7 +185,7 @@
 ```json
 {
   "transferDate": "2026-04-06",
-  "businessUnit": "BU001",
+  "managementEntity": "BU001",
   "fromAccount": "6222021234567890",
   "toAccount": "6222029876543210",
   "amount": 100000.00,
@@ -246,7 +246,7 @@
 ```json
 {
   "transferDate": "2026-04-06",
-  "businessUnit": "BU001",
+  "managementEntity": "BU001",
   "fromAccount": "6222021234567890",
   "toAccount": "6222021234567890",
   "amount": 100000.00,
@@ -468,7 +468,7 @@
 
 | 字段 | 类型 | 正常值 | 异常值 |
 |------|------|--------|--------|
-| businessUnit | string | BU001 | null, 空字符串 |
+| managementEntity | string | BU001 | null, 空字符串 |
 | fromAccount | string | 6222021234567890 | null, 空字符串 |
 | toAccount | string | 6222029876543210 | null, 等于fromAccount |
 | amount | decimal | 100000.00 | 0, 负数 |

@@ -5,7 +5,7 @@
         <el-form-item label="账户名称">
           <el-input v-model="queryForm.accountName" placeholder="请输入账户名称" clearable @keyup.enter="handleQuery" />
         </el-form-item>
-        <el-form-item label="业务单元">
+        <el-form-item label="管理主体">
           <el-select v-model="queryForm.entityId" placeholder="请选择" clearable filterable>
             <el-option v-for="item in entityList" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
@@ -32,7 +32,7 @@
         <el-table-column prop="accountName" label="账户名称" min-width="150" />
         <el-table-column prop="account" label="账号" width="180" />
         <el-table-column prop="bankName" label="开户银行" min-width="150" />
-        <el-table-column prop="entityName" label="所属业务单元" width="120" />
+        <el-table-column prop="entityName" label="所属管理主体" width="120" />
         <el-table-column prop="currencyCode" label="币种" width="80" />
         <el-table-column prop="accountType" label="账户类型" width="100">
           <template #default="{ row }">
@@ -87,7 +87,7 @@
         <el-form-item label="开户银行" prop="bankId">
           <el-input v-model="formData.bankId" placeholder="请输入开户银行ID" />
         </el-form-item>
-        <el-form-item label="所属业务单元" prop="entityId">
+        <el-form-item label="所属管理主体" prop="entityId">
           <el-select v-model="formData.entityId" placeholder="请选择" style="width: 100%;" filterable>
             <el-option v-for="item in entityList" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
@@ -166,7 +166,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { listBankAccount, saveBankAccount, updateBankAccount, deleteBankAccount, getAccountBalance, syncBankAccount } from '@/api/dealing'
-import { listBusinessUnit, listCurrency } from '@/api/basedata'
+import { listManagementEntity, listCurrency } from '@/api/basedata'
 
 const loading = ref(false)
 const drawerVisible = ref(false)
@@ -193,7 +193,7 @@ const rules = {
   accountName: [{ required: true, message: '请输入账户名称', trigger: 'blur' }],
   account: [{ required: true, message: '请输入账号', trigger: 'blur' }],
   bankId: [{ required: true, message: '请选择开户银行', trigger: 'change' }],
-  entityId: [{ required: true, message: '请选择业务单元', trigger: 'change' }],
+  entityId: [{ required: true, message: '请选择管理主体', trigger: 'change' }],
   currencyCode: [{ required: true, message: '请选择币种', trigger: 'change' }],
   accountType: [{ required: true, message: '请选择账户类型', trigger: 'change' }],
   accountNature: [{ required: true, message: '请选择账户性质', trigger: 'change' }]
@@ -213,7 +213,7 @@ const formatAmount = (amount) => {
 }
 
 const fetchLists = async () => {
-  entityList.value = (await listBusinessUnit({ pageSize: 1000 })).data.records || []
+  entityList.value = (await listManagementEntity({ pageSize: 1000 })).data.records || []
   currencyList.value = (await listCurrency({ pageSize: 1000 })).data.records || []
   mainAccountList.value = (await listBankAccount({ pageSize: 1000, isCollected: '1' })).data.records || []
 }

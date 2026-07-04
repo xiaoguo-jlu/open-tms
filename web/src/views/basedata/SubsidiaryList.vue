@@ -26,7 +26,7 @@
         <el-table-column prop="code" label="子公司编码" width="140" />
         <el-table-column prop="name" label="名称" min-width="150" />
         <el-table-column prop="enName" label="英文名称" min-width="150" />
-        <el-table-column prop="businessUnitCode" label="资金管理主体" width="140" />
+        <el-table-column prop="managementEntityCode" label="资金管理主体" width="140" />
         <el-table-column prop="legalPerson" label="法人代表" width="100" />
         <el-table-column prop="phone" label="电话" width="120" />
         <el-table-column prop="status" label="状态" width="80" align="center">
@@ -71,8 +71,8 @@
         <el-form-item label="父级编码" prop="parentCode">
           <el-input v-model="formData.parentCode" placeholder="请输入父级编码" maxlength="20" show-word-limit />
         </el-form-item>
-        <el-form-item label="资金管理主体" prop="businessUnitCode">
-          <el-input v-model="formData.businessUnitCode" placeholder="请输入所属资金管理主体编码" maxlength="20" show-word-limit />
+        <el-form-item label="资金管理主体" prop="managementEntityCode">
+          <el-input v-model="formData.managementEntityCode" placeholder="请输入所属资金管理主体编码" maxlength="20" show-word-limit />
         </el-form-item>
         <el-form-item label="法人代表" prop="legalPerson">
           <el-input v-model="formData.legalPerson" placeholder="请输入法人代表" maxlength="50" show-word-limit />
@@ -129,7 +129,7 @@ const formData = reactive({
   name: '',
   enName: '',
   parentCode: '',
-  businessUnitCode: '',
+  managementEntityCode: '',
   legalPerson: '',
   registrationNo: '',
   taxNo: '',
@@ -144,7 +144,7 @@ const rules = {
   name: [{ required: true, message: '请输入名称', trigger: 'blur' }, { min: 1, max: 100, message: '最多100个字符', trigger: 'blur' }],
   enName: [{ min: 0, max: 100, message: '最多100个字符', trigger: 'blur' }],
   parentCode: [{ min: 0, max: 20, message: '最多20个字符', trigger: 'blur' }],
-  businessUnitCode: [{ min: 0, max: 20, message: '最多20个字符', trigger: 'blur' }],
+  managementEntityCode: [{ min: 0, max: 20, message: '最多20个字符', trigger: 'blur' }],
   legalPerson: [{ min: 0, max: 50, message: '最多50个字符', trigger: 'blur' }],
   registrationNo: [{ min: 0, max: 50, message: '最多50个字符', trigger: 'blur' }],
   taxNo: [{ min: 0, max: 50, message: '最多50个字符', trigger: 'blur' }],
@@ -189,7 +189,7 @@ const handleReset = () => {
 
 const handleAdd = () => {
   Object.assign(formData, {
-    id: null, code: '', name: '', enName: '', parentCode: '', businessUnitCode: '',
+    id: null, code: '', name: '', enName: '', parentCode: '', managementEntityCode: '',
     legalPerson: '', registrationNo: '', taxNo: '', address: '', phone: '', email: '', status: '1'
   })
   formRef.value?.resetFields()

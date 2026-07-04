@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Open-TMS 基础数据模块 API自动化测试
-测试所有基础数据实体: Bank, Counterparty, CounterpartyAccount, Country, Currency, Holiday, Trader, BusinessUnit, Subsidiary, CurrencyPair
+测试所有基础数据实体: Bank, Counterparty, CounterpartyAccount, Country, Currency, Holiday, Trader, ManagementEntity, Subsidiary, CurrencyPair
 
 增强功能:
 - 详细的错误日志和响应内容
@@ -31,7 +31,7 @@ API_ENDPOINTS = {
     "Counterparty": "/api/v1/counterparties",
     "Subsidiary": "/api/v1/subsidiaries",
     "CurrencyPair": "/api/v1/currency-pairs",
-    "BusinessUnit": "/api/v1/management-entities",
+    "ManagementEntity": "/api/v1/management-entities",
     "CounterpartyAccount": "/api/v1/counterparty-accounts",
     "Holiday": "/api/v1/holidays",
 }
@@ -634,7 +634,7 @@ def test_subsidiary():
                 "status": records[0].get("status", "1"),
                 "enName": records[0].get("enName"),
                 "parentCode": records[0].get("parentCode"),
-                "businessUnitCode": records[0].get("businessUnitCode"),
+                "managementEntityCode": records[0].get("managementEntityCode"),
                 "legalPerson": records[0].get("legalPerson"),
                 "registrationNo": records[0].get("registrationNo"),
                 "taxNo": records[0].get("taxNo"),
@@ -761,24 +761,24 @@ def test_currency_pair():
     return results
 
 
-# ========== BusinessUnit API Tests ==========
+# ========== ManagementEntity API Tests ==========
 def test_business_unit():
-    """测试BusinessUnit CRUD"""
+    """测试ManagementEntity CRUD"""
     print("\n" + "-"*50)
-    print("[TEST] BusinessUnit API")
+    print("[TEST] ManagementEntity API")
     print("-"*50)
     results = []
 
     # Query
-    print("  [1] Query BusinessUnit List")
+    print("  [1] Query ManagementEntity List")
     resp, elapsed = curl_cmd_detailed("GET", "/api/v1/management-entities/page?pageNum=1&pageSize=5")
-    is_valid, msg = validate_response_data(resp, expected_fields=["records", "total"], entity_name="BusinessUnit")
+    is_valid, msg = validate_response_data(resp, expected_fields=["records", "total"], entity_name="ManagementEntity")
     if is_valid:
         records = resp.get("data", {}).get("records", [])
         total = resp.get("data", {}).get("total", 0)
         print(f"      [PASS] 返回 {len(records)} 条记录, total={total} (耗时: {elapsed}ms)")
         if records:
-            valid, _ = validate_record_data(records[0], ["id", "code", "name"], "BusinessUnit")
+            valid, _ = validate_record_data(records[0], ["id", "code", "name"], "ManagementEntity")
             if valid:
                 print(f"      [DEBUG] 示例记录: id={records[0].get('id')}, code={records[0].get('code')}")
         results.append(True)
@@ -788,9 +788,9 @@ def test_business_unit():
         return results
 
     # Create
-    print("  [2] Create BusinessUnit")
+    print("  [2] Create ManagementEntity")
     new_code = f"BU{int(time.time()) % 100000}"
-    new_bu = {"code": new_code, "name": f"TestBusinessUnit_{new_code}", "status": "1"}
+    new_bu = {"code": new_code, "name": f"TestManagementEntity_{new_code}", "status": "1"}
     resp, elapsed = curl_cmd_detailed("POST", "/api/v1/management-entities", new_bu)
     if resp and resp.get("code") == 200:
         print(f"      [PASS] 创建成功: {new_code} (耗时: {elapsed}ms)")
@@ -801,7 +801,7 @@ def test_business_unit():
         return results
 
     # Get single
-    print("  [3] Get Single BusinessUnit")
+    print("  [3] Get Single ManagementEntity")
     resp, elapsed = curl_cmd_detailed("GET", f"/api/v1/management-entities/page?keyword={new_code}&pageNum=1&pageSize=1")
     if resp and resp.get("code") == 200:
         records = resp.get("data", {}).get("records", [])
@@ -816,7 +816,7 @@ def test_business_unit():
                 results.append(False)
 
             # Update
-            print("  [4] Update BusinessUnit")
+            print("  [4] Update ManagementEntity")
             upd = dict(records[0])
             upd["name"] = f"Updated_{new_code}"
             resp3, elapsed3 = curl_cmd_detailed("POST", "/api/v1/management-entities/update", upd)
@@ -828,7 +828,7 @@ def test_business_unit():
                 results.append(False)
 
             # Delete
-            print("  [5] Delete BusinessUnit")
+            print("  [5] Delete ManagementEntity")
             resp4, elapsed4 = curl_cmd_detailed("POST", f"/api/v1/management-entities/delete/{bid}")
             if resp4 and resp4.get("code") == 200:
                 print(f"      [PASS] 删除成功 (耗时: {elapsed4}ms)")

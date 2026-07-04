@@ -24,8 +24,14 @@
         <el-table-column type="selection" width="50" align="center" />
         <el-table-column type="index" label="序号" width="60" align="center" />
         <el-table-column prop="pairCode" label="货币对编码" width="120" />
-        <el-table-column prop="baseCurrency" label="基础货币" width="100" align="center" />
-        <el-table-column prop="quoteCurrency" label="报价货币" width="100" align="center" />
+        <el-table-column prop="currency1" label="货币1" width="100" align="center" />
+        <el-table-column prop="currency2" label="货币2" width="100" align="center" />
+        <el-table-column prop="strongerCurrency" label="强势币种" width="100" align="center">
+          <template #default="{ row }">
+            <el-tag v-if="row.strongerCurrency" type="warning" size="small">★ {{ row.strongerCurrency }}</el-tag>
+            <span v-else style="color:#909399;">-</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="bidDecimal" label="买方小数位" width="100" align="center" />
         <el-table-column prop="askDecimal" label="卖方小数位" width="100" align="center" />
         <el-table-column prop="status" label="状态" width="80" align="center">
@@ -61,11 +67,17 @@
         <el-form-item label="货币对编码" prop="pairCode">
           <el-input v-model="formData.pairCode" placeholder="如: EURUSD" :disabled="isEdit" />
         </el-form-item>
-        <el-form-item label="基础货币" prop="baseCurrency">
-          <el-input v-model="formData.baseCurrency" placeholder="如: EUR" />
+        <el-form-item label="货币1" prop="currency1">
+          <el-input v-model="formData.currency1" placeholder="如: EUR" />
         </el-form-item>
-        <el-form-item label="报价货币" prop="quoteCurrency">
-          <el-input v-model="formData.quoteCurrency" placeholder="如: USD" />
+        <el-form-item label="货币2" prop="currency2">
+          <el-input v-model="formData.currency2" placeholder="如: USD" />
+        </el-form-item>
+        <el-form-item label="强势币种" prop="strongerCurrency">
+          <el-select v-model="formData.strongerCurrency" placeholder="(可选)从货币1/货币2 中选" clearable filterable allow-create style="width: 200px;">
+            <el-option v-for="ccy in [formData.currency1, formData.currency2].filter(Boolean)" :key="ccy" :label="ccy" :value="ccy" />
+          </el-select>
+          <span style="color:#909399; font-size:12px; margin-left:8px;">(用于显示惯例,可空)</span>
         </el-form-item>
         <el-form-item label="买方小数位" prop="bidDecimal">
           <el-input-number v-model="formData.bidDecimal" :min="0" :max="10" />
@@ -107,8 +119,9 @@ const pagination = reactive({ pageNum: 1, pageSize: 10, total: 0 })
 const formData = reactive({
   id: null,
   pairCode: '',
-  baseCurrency: '',
-  quoteCurrency: '',
+  currency1: '',
+  currency2: '',
+  strongerCurrency: '',
   bidDecimal: 4,
   askDecimal: 4,
   status: '1'
@@ -116,8 +129,9 @@ const formData = reactive({
 
 const rules = {
   pairCode: [{ required: true, message: '请输入货币对编码', trigger: 'blur' }],
-  baseCurrency: [{ required: true, message: '请输入基础货币', trigger: 'blur' }],
-  quoteCurrency: [{ required: true, message: '请输入报价货币', trigger: 'blur' }],
+  currency1: [{ required: true, message: '请输入货币1', trigger: 'blur' }],
+  currency2: [{ required: true, message: '请输入货币2', trigger: 'blur' }],
+  strongerCurrency: [],
   bidDecimal: [{ required: true, message: '请输入买方小数位', trigger: 'blur' }],
   askDecimal: [{ required: true, message: '请输入卖方小数位', trigger: 'blur' }]
 }
@@ -157,7 +171,7 @@ const handleReset = () => {
 
 const handleAdd = () => {
   Object.assign(formData, {
-    id: null, pairCode: '', baseCurrency: '', quoteCurrency: '', bidDecimal: 4, askDecimal: 4, status: '1'
+    id: null, pairCode: '', currency1: '', currency2: '', strongerCurrency: '', bidDecimal: 4, askDecimal: 4, status: '1'
   })
   formRef.value?.resetFields()
   drawerVisible.value = true

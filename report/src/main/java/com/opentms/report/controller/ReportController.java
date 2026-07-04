@@ -21,11 +21,11 @@ public class ReportController {
     public Result<Page<Report>> page(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long templateId,
-            @RequestParam(required = false) Long businessUnitId,
+            @RequestParam(required = false) Long managementEntityId,
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int pageSize) {
-        return Result.success(reportService.queryPage(keyword, templateId, businessUnitId, status, pageNum, pageSize));
+        return Result.success(reportService.queryPage(keyword, templateId, managementEntityId, status, pageNum, pageSize));
     }
 
     @GetMapping("/templates")

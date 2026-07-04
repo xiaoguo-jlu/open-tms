@@ -3,10 +3,10 @@ package com.opentms.basedata.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.opentms.basedata.entity.BusinessUnit;
-import com.opentms.basedata.mapper.BusinessUnitMapper;
-import com.opentms.basedata.service.BusinessUnitService;
-import com.opentms.basedata.vo.BusinessUnitVO;
+import com.opentms.basedata.entity.ManagementEntity;
+import com.opentms.basedata.mapper.ManagementEntityMapper;
+import com.opentms.basedata.service.ManagementEntityService;
+import com.opentms.basedata.vo.ManagementEntityVO;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -16,66 +16,66 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class BusinessUnitServiceImpl extends ServiceImpl<BusinessUnitMapper, BusinessUnit> implements BusinessUnitService {
+public class ManagementEntityServiceImpl extends ServiceImpl<ManagementEntityMapper, ManagementEntity> implements ManagementEntityService {
 
     @Override
-    public Page<BusinessUnit> queryPage(String keyword, String status, String entityType, int pageNum, int pageSize) {
-        LambdaQueryWrapper<BusinessUnit> wrapper = new LambdaQueryWrapper<>();
+    public Page<ManagementEntity> queryPage(String keyword, String status, String entityType, int pageNum, int pageSize) {
+        LambdaQueryWrapper<ManagementEntity> wrapper = new LambdaQueryWrapper<>();
 
         if (StringUtils.hasText(keyword)) {
-            wrapper.like(BusinessUnit::getCode, keyword)
+            wrapper.like(ManagementEntity::getCode, keyword)
                    .or()
-                   .like(BusinessUnit::getName, keyword);
+                   .like(ManagementEntity::getName, keyword);
         }
 
         if (StringUtils.hasText(status)) {
-            wrapper.eq(BusinessUnit::getStatus, status);
+            wrapper.eq(ManagementEntity::getStatus, status);
         }
 
         if (StringUtils.hasText(entityType)) {
-            wrapper.eq(BusinessUnit::getEntityType, entityType);
+            wrapper.eq(ManagementEntity::getEntityType, entityType);
         }
 
-        wrapper.orderByDesc(BusinessUnit::getCreatedAt);
+        wrapper.orderByDesc(ManagementEntity::getCreatedAt);
 
         return page(new Page<>(pageNum, pageSize), wrapper);
     }
 
     @Override
-    public BusinessUnit getBusinessUnitById(Long id) {
+    public ManagementEntity getManagementEntityById(Long id) {
         return getById(id);
     }
 
     @Override
-    public boolean saveBusinessUnit(BusinessUnit businessUnit) {
-        if (checkCodeExists(businessUnit.getCode(), null)) {
-            throw new RuntimeException("Business unit code already exists");
+    public boolean saveManagementEntity(ManagementEntity managementEntity) {
+        if (checkCodeExists(managementEntity.getCode(), null)) {
+            throw new RuntimeException("管理主体编码已存在");
         }
-        calculateHierarchyInfo(businessUnit);
-        return save(businessUnit);
+        calculateHierarchyInfo(managementEntity);
+        return save(managementEntity);
     }
 
     @Override
-    public boolean updateBusinessUnit(BusinessUnit businessUnit) {
-        if (businessUnit.getId() == null) {
-            throw new RuntimeException("BusinessUnit ID cannot be null");
+    public boolean updateManagementEntity(ManagementEntity managementEntity) {
+        if (managementEntity.getId() == null) {
+            throw new RuntimeException("ManagementEntity ID cannot be null");
         }
-        BusinessUnit existing = getById(businessUnit.getId());
+        ManagementEntity existing = getById(managementEntity.getId());
         if (existing == null) {
-            throw new RuntimeException("BusinessUnit not found");
+            throw new RuntimeException("ManagementEntity not found");
         }
-        if (checkCodeExists(businessUnit.getCode(), businessUnit.getId())) {
-            throw new RuntimeException("Business unit code already exists");
+        if (checkCodeExists(managementEntity.getCode(), managementEntity.getId())) {
+            throw new RuntimeException("管理主体编码已存在");
         }
-        calculateHierarchyInfo(businessUnit);
-        return updateById(businessUnit);
+        calculateHierarchyInfo(managementEntity);
+        return updateById(managementEntity);
     }
 
     @Override
-    public boolean deleteBusinessUnit(Long id) {
-        BusinessUnit existing = getById(id);
+    public boolean deleteManagementEntity(Long id) {
+        ManagementEntity existing = getById(id);
         if (existing == null) {
-            throw new RuntimeException("BusinessUnit not found");
+            throw new RuntimeException("ManagementEntity not found");
         }
         return removeById(id);
     }
@@ -85,34 +85,34 @@ public class BusinessUnitServiceImpl extends ServiceImpl<BusinessUnitMapper, Bus
         if (!StringUtils.hasText(code)) {
             return false;
         }
-        LambdaQueryWrapper<BusinessUnit> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(BusinessUnit::getCode, code);
+        LambdaQueryWrapper<ManagementEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ManagementEntity::getCode, code);
         if (excludeId != null) {
-            wrapper.ne(BusinessUnit::getId, excludeId);
+            wrapper.ne(ManagementEntity::getId, excludeId);
         }
         return count(wrapper) > 0;
     }
 
     @Override
-    public List<BusinessUnitVO> getHierarchyTree() {
-        LambdaQueryWrapper<BusinessUnit> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(BusinessUnit::getStatus, "1");
-        wrapper.orderByAsc(BusinessUnit::getLevelDepth, BusinessUnit::getCode);
-        List<BusinessUnit> allUnits = list(wrapper);
+    public List<ManagementEntityVO> getHierarchyTree() {
+        LambdaQueryWrapper<ManagementEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ManagementEntity::getStatus, "1");
+        wrapper.orderByAsc(ManagementEntity::getLevelDepth, ManagementEntity::getCode);
+        List<ManagementEntity> allUnits = list(wrapper);
 
-        Map<String, List<BusinessUnit>> parentChildrenMap = allUnits.stream()
+        Map<String, List<ManagementEntity>> parentChildrenMap = allUnits.stream()
                 .filter(u -> u.getParentCode() != null)
-                .collect(Collectors.groupingBy(BusinessUnit::getParentCode));
+                .collect(Collectors.groupingBy(ManagementEntity::getParentCode));
 
-        List<BusinessUnitVO> result = new ArrayList<>();
-        for (BusinessUnit unit : allUnits) {
-            BusinessUnitVO vo = convertToVO(unit);
+        List<ManagementEntityVO> result = new ArrayList<>();
+        for (ManagementEntity unit : allUnits) {
+            ManagementEntityVO vo = convertToVO(unit);
             if (unit.getParentCode() == null || unit.getParentCode().isEmpty()) {
                 result.add(vo);
             }
-            List<BusinessUnit> children = parentChildrenMap.get(unit.getCode());
+            List<ManagementEntity> children = parentChildrenMap.get(unit.getCode());
             if (children != null) {
-                List<BusinessUnitVO> childVOs = children.stream()
+                List<ManagementEntityVO> childVOs = children.stream()
                         .map(this::convertToVO)
                         .collect(Collectors.toList());
                 vo.setChildren(childVOs);
@@ -121,28 +121,28 @@ public class BusinessUnitServiceImpl extends ServiceImpl<BusinessUnitMapper, Bus
         return result;
     }
 
-    private void calculateHierarchyInfo(BusinessUnit businessUnit) {
-        String parentCode = businessUnit.getParentCode();
+    private void calculateHierarchyInfo(ManagementEntity managementEntity) {
+        String parentCode = managementEntity.getParentCode();
         if (!StringUtils.hasText(parentCode)) {
-            businessUnit.setLevelDepth(1);
-            businessUnit.setHierarchyPath("/" + businessUnit.getCode() + "/");
+            managementEntity.setLevelDepth(1);
+            managementEntity.setHierarchyPath("/" + managementEntity.getCode() + "/");
         } else {
-            BusinessUnit parent = getOne(new LambdaQueryWrapper<BusinessUnit>()
-                    .eq(BusinessUnit::getCode, parentCode));
+            ManagementEntity parent = getOne(new LambdaQueryWrapper<ManagementEntity>()
+                    .eq(ManagementEntity::getCode, parentCode));
             if (parent == null) {
-                throw new RuntimeException("Parent business unit not found: " + parentCode);
+                throw new RuntimeException("上级管理主体不存在: " + parentCode);
             }
             int newLevelDepth = parent.getLevelDepth() + 1;
             if (newLevelDepth > 6) {
-                throw new RuntimeException("Maximum hierarchy depth (6) exceeded");
+                throw new RuntimeException("管理层级深度超出最大限制(6)");
             }
-            businessUnit.setLevelDepth(newLevelDepth);
-            businessUnit.setHierarchyPath(parent.getHierarchyPath() + businessUnit.getCode() + "/");
+            managementEntity.setLevelDepth(newLevelDepth);
+            managementEntity.setHierarchyPath(parent.getHierarchyPath() + managementEntity.getCode() + "/");
         }
     }
 
-    private BusinessUnitVO convertToVO(BusinessUnit unit) {
-        BusinessUnitVO vo = new BusinessUnitVO();
+    private ManagementEntityVO convertToVO(ManagementEntity unit) {
+        ManagementEntityVO vo = new ManagementEntityVO();
         vo.setId(unit.getId());
         vo.setCode(unit.getCode());
         vo.setName(unit.getName());

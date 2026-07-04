@@ -98,7 +98,7 @@
 | Deal Type(交易类型) | VARCHAR(20) | Y | 交易大类 | 下拉选择 |
 | Deal Subtype(交易子类型) | VARCHAR(20) | Y | 交易小类 | 下拉选择 |
 | Instrument(金融工具) | VARCHAR(50) | Y | 金融工具 | 弹出框选择 |
-| Entity(资金管理主体) | VARCHAR(50) | Y | 业务单元 | 弹出框选择 |
+| Entity(资金管理主体) | VARCHAR(50) | Y | 管理主体 | 弹出框选择 |
 | Dealer(交易员) | VARCHAR(50) | Y | 交易员 | 弹出框选择 |
 | Counterparty(交易对手) | VARCHAR(50) | Y | 交易对手 | 弹出框选择 |
 | Counterparty Account(对手账户) | VARCHAR(50) | Y | 对手方银行账户 | 弹出框选择 |
@@ -120,7 +120,7 @@
 | Deal Type | VARCHAR(20) | Y | 存款 |
 | Deal Subtype | VARCHAR(20) | Y | 定期/活期/大额存单/通知 |
 | Instrument | VARCHAR(50) | Y | 弹出框选择金融工具 |
-| Entity | VARCHAR(50) | Y | 弹出框选择业务单元 |
+| Entity | VARCHAR(50) | Y | 弹出框选择管理主体 |
 | Dealer | VARCHAR(50) | Y | 弹出框选择交易员 |
 | Counterparty | VARCHAR(50) | Y | 弹出框选择交易对手 |
 | Counterparty Account | VARCHAR(50) | Y | 弹出框选择对手账户 |
@@ -141,7 +141,7 @@
 | Deal Type | VARCHAR(20) | Y | 贷款 |
 | Deal Subtype | VARCHAR(20) | Y | 短期/中长期/信用/抵押 |
 | Instrument | VARCHAR(50) | Y | 弹出框选择金融工具 |
-| Entity | VARCHAR(50) | Y | 弹出框选择业务单元 |
+| Entity | VARCHAR(50) | Y | 弹出框选择管理主体 |
 | Dealer | VARCHAR(50) | Y | 弹出框选择交易员 |
 | Counterparty | VARCHAR(50) | Y | 弹出框选择贷款银行 |
 | Settlement Currency | VARCHAR(10) | Y | 弹出框选择币种 |
@@ -160,7 +160,7 @@
 | Deal Type | VARCHAR(20) | Y | 外汇 |
 | Deal Subtype | VARCHAR(20) | Y | 即期 |
 | Instrument | VARCHAR(50) | Y | 弹出框选择金融工具 |
-| Entity | VARCHAR(50) | Y | 弹出框选择业务单元 |
+| Entity | VARCHAR(50) | Y | 弹出框选择管理主体 |
 | Dealer | VARCHAR(50) | Y | 弹出框选择交易员 |
 | Counterparty | VARCHAR(50) | Y | 弹出框选择交易对手 |
 | Buy Currency | VARCHAR(10) | Y | 买入币种 |
@@ -177,7 +177,7 @@
 | Deal Type | VARCHAR(20) | Y | 外汇 |
 | Deal Subtype | VARCHAR(20) | Y | 远期/NDF |
 | Instrument | VARCHAR(50) | Y | 弹出框选择金融工具 |
-| Entity | VARCHAR(50) | Y | 弹出框选择业务单元 |
+| Entity | VARCHAR(50) | Y | 弹出框选择管理主体 |
 | Dealer | VARCHAR(50) | Y | 弹出框选择交易员 |
 | Counterparty | VARCHAR(50) | Y | 弹出框选择交易对手 |
 | Buy Currency | VARCHAR(10) | Y | 买入币种 |
@@ -195,7 +195,7 @@
 | Deal Type | VARCHAR(20) | Y | 同业 |
 | Deal Subtype | VARCHAR(20) | Y | 同业存放/存放同业/同业拆借 |
 | Instrument | VARCHAR(50) | Y | 弹出框选择金融工具 |
-| Entity | VARCHAR(50) | Y | 弹出框选择业务单元 |
+| Entity | VARCHAR(50) | Y | 弹出框选择管理主体 |
 | Dealer | VARCHAR(50) | Y | 弹出框选择交易员 |
 | Counterparty | VARCHAR(50) | Y | 弹出框选择交易对手(银行) |
 | Settlement Currency | VARCHAR(10) | Y | 弹出框选择币种 |
@@ -211,7 +211,7 @@
 
 | 字段 | 选择器类型 | 数据来源 |
 |------|------------|----------|
-| Entity | 弹出框 | 基础数据-业务单元列表 |
+| Entity | 弹出框 | 基础数据-管理主体列表 |
 | Dealer | 弹出框 | 基础数据-交易员列表 |
 | Counterparty | 弹出框 | 基础数据-交易对手列表 |
 | Counterparty Account | 弹出框 | 基础数据-对手方银行账户(关联对手) |
@@ -351,7 +351,7 @@
 | 模块 | 关系 |
 |------|------|
 | 金融工具 | Instrument从金融工具模块选择 |
-| 业务单元 | Entity从组织架构模块选择 |
+| 管理主体 | Entity从组织架构模块选择 |
 | 交易员 | Dealer从基础数据模块选择 |
 | 交易对手 | Counterparty从基础数据模块选择 |
 | 对手方账户 | Counterparty Account从对手方银行账户选择 |

@@ -5,7 +5,7 @@ import com.opentms.basedata.entity.BankAccount;
 
 public interface BankAccountService {
 
-    Page<BankAccount> queryPage(String keyword, Long bankId, String currency, String accountType, Long businessUnitId, String status, int pageNum, int pageSize);
+    Page<BankAccount> queryPage(String keyword, Long bankId, String currency, String accountType, Long managementEntityId, String status, int pageNum, int pageSize);
 
     BankAccount getBankAccountById(Long id);
 

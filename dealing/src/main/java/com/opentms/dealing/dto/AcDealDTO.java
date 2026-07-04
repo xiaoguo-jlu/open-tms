@@ -20,8 +20,8 @@ public class AcDealDTO {
     /** 交易类型：固定 "AC" */
     private String dealType = "AC";
 
-    /** 业务主体编码（必填） */
-    private String businessUnit;
+    /** 管理主体编码（必填） */
+    private String managementEntity;
 
     /** 交易对手 ID */
     private Long counterpartyId;

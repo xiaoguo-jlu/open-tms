@@ -1,5 +1,5 @@
 <template>
-  <div class="business-unit-list">
+  <div class="management-entity-list">
     <el-card class="filter-card">
       <el-form :inline="true" :model="queryForm">
         <el-form-item label="关键字">
@@ -133,7 +133,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { listBusinessUnit, saveBusinessUnit, updateBusinessUnit, deleteBusinessUnit } from '@/api/basedata'
+import { listManagementEntity, saveManagementEntity, updateManagementEntity, deleteManagementEntity } from '@/api/basedata'
 
 const loading = ref(false)
 const drawerVisible = ref(false)
@@ -189,7 +189,7 @@ const fetchData = async () => {
       pageNum: pagination.pageNum,
       pageSize: pagination.pageSize
     }
-    const res = await listBusinessUnit(params)
+    const res = await listManagementEntity(params)
     tableData.value = res.data.records || res.data.list || []
     pagination.total = res.data.total || 0
   } catch (error) {
@@ -229,7 +229,7 @@ const handleEdit = (row) => {
 const handleDelete = async (row) => {
   try {
     await ElMessageBox.confirm('确定要删除该资金管理主体吗?', '提示', { type: 'warning' })
-    await deleteBusinessUnit(row.id)
+    await deleteManagementEntity(row.id)
     ElMessage.success('删除成功')
     fetchData()
   } catch (error) {
@@ -246,10 +246,10 @@ const handleSubmit = async () => {
       submitLoading.value = true
       try {
         if (formData.id) {
-          await updateBusinessUnit(formData)
+          await updateManagementEntity(formData)
           ElMessage.success('更新成功')
         } else {
-          await saveBusinessUnit(formData)
+          await saveManagementEntity(formData)
           ElMessage.success('新增成功')
         }
         drawerVisible.value = false
@@ -269,7 +269,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.business-unit-list { }
+.management-entity-list { }
 .filter-card { margin-bottom: 16px; }
 .table-card { }
 </style>

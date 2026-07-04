@@ -1,5 +1,7 @@
 # 市场风险VaR接口
 
+> ⚠️ [PLANNED — Not Implemented] M4 VaR
+
 **模块**: var  
 **版本**: v1.0  
 **路径**: `/api/v1/var-reports`
@@ -24,7 +26,7 @@ POST /api/v1/var-reports/calculate
   "varType": "历史模拟法",
   "confidenceLevel": 0.99,
   "holdingPeriod": 1,
-  "businessUnitIds": [1, 2]
+  "managementEntityIds": [1, 2]
 }
 ```
 
@@ -75,7 +77,7 @@ POST /api/v1/var-reports/stress-test
 ```json
 {
   "scenario": "USD+10%",
-  "businessUnitId": 1
+  "managementEntityId": 1
 }
 ```
 

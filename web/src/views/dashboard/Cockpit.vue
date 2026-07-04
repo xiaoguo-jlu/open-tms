@@ -8,7 +8,7 @@
     </el-row>
     <el-row :gutter="16">
       <el-col :span="12"><el-card><template #header><span>头寸趋势</span></template><div style="height:250px;">趋势图表</div></el-card></el-col>
-      <el-col :span="12"><el-card><template #header><span>业务单元头寸分布</span></template><div style="height:250px;">饼图</div></el-card></el-col>
+      <el-col :span="12"><el-card><template #header><span>管理主体头寸分布</span></template><div style="height:250px;">饼图</div></el-card></el-col>
     </el-row>
     <el-row :gutter="16" style="margin-top:16px;">
       <el-col :span="8"><el-card><template #header><span>交易统计</span></template><div class="stat-item">存款: {{depositCount}}笔</div><div class="stat-item">贷款: {{loanCount}}笔</div><div class="stat-item">外汇: {{fxCount}}笔</div></el-card></el-col>

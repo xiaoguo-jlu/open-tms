@@ -9,9 +9,9 @@ public interface FundPlanService {
 
     Page<FundPlan> queryPage(String keyword, Integer planYear, String planType, String status, int pageNum, int pageSize);
 
-    List<FundPlan> getAnnualPlans(Integer planYear, Long businessUnitId);
+    List<FundPlan> getAnnualPlans(Integer planYear, Long managementEntityId);
 
-    List<FundPlan> getMonthlyPlans(Integer planYear, Integer planMonth, Long businessUnitId);
+    List<FundPlan> getMonthlyPlans(Integer planYear, Integer planMonth, Long managementEntityId);
 
     FundPlan getFundPlanById(Long id);
 

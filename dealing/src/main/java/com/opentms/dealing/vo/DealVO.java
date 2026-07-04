@@ -15,7 +15,7 @@ public class DealVO {
 
     private String dealType;
 
-    private String businessUnit;
+    private String managementEntity;
 
     private Long counterpartyId;
 

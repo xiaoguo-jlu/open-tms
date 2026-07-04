@@ -56,7 +56,7 @@ CXF JAX-RS 无法将JSON请求体反序列化为Java对象，因为没有配置�
 所有基于数据模块的写操作接口：
 - POST `/currencies` - 新增币种
 - POST `/banks` - 新增银行
-- POST `/business-units` - 新增业务单元
+- POST `/management-entities` - 新增管理主体
 - POST `/traders` - 新增交易员
 - POST `/counterparties` - 新增交易对手
 - POST `/counterparty-accounts` - 新增对手账户

@@ -27,12 +27,12 @@ POST /api/v1/instruments
 
 ## 4. 更新
 ```
-PUT /api/v1/instruments
+POST /api/v1/instruments/update
 ```
 
 ## 5. 删除
 ```
-DELETE /api/v1/instruments/{id}
+POST /api/v1/instruments/delete/{id}
 ```
 
 ## 6. 批量删除

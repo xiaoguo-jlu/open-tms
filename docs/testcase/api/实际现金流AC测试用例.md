@@ -183,7 +183,7 @@
 2. 请求体：
 ```json
 {
-  "businessUnit": "BU001",
+  "managementEntity": "BU001",
   "bankAccount": "6222021234567890",
   "counterpartyAccount": "6222029876543210",
   "direction": "Inflow",
@@ -219,7 +219,7 @@
 2. 请求体：
 ```json
 {
-  "businessUnit": "BU001",
+  "managementEntity": "BU001",
   "bankAccount": "6222021234567890",
   "direction": "Outflow",
   "amount": 50000.00,
@@ -251,7 +251,7 @@
 2. 请求体：
 ```json
 {
-  "businessUnit": "",
+  "managementEntity": "",
   "bankAccount": "",
   "direction": "",
   "amount": null
@@ -277,7 +277,7 @@
 2. 请求体：
 ```json
 {
-  "businessUnit": "BU001",
+  "managementEntity": "BU001",
   "bankAccount": "6222021234567890",
   "direction": "Inflow",
   "amount": 0,
@@ -456,7 +456,7 @@
 
 | 字段 | 类型 | 正常值 | 异常值 |
 |------|------|--------|--------|
-| businessUnit | string | BU001 | null, 空字符串 |
+| managementEntity | string | BU001 | null, 空字符串 |
 | bankAccount | string | 6222021234567890 | null, 空字符串 |
 | direction | string | Inflow | null, 非法值 |
 | amount | decimal | 100000.00 | 0, 负数 |

@@ -28,8 +28,8 @@ public class DealImage {
 
     private Integer version;
 
-    @TableField("business_unit")
-    private String businessUnit;
+    @TableField("management_entity")
+    private String managementEntity;
 
     @TableField("counterparty_id")
     private Long counterpartyId;

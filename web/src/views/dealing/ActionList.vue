@@ -39,7 +39,7 @@
             <el-tag>{{ getTypeLabel(row.dealType) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="businessUnit" label="业务单元" width="120" />
+        <el-table-column prop="managementEntity" label="管理主体" width="120" />
         <el-table-column prop="amount" label="金额" align="right" width="150">
           <template #default="{ row }">
             {{ formatAmount(row.amount, row.currency) }}
@@ -76,7 +76,7 @@
         </el-descriptions-item>
         <el-descriptions-item label="交易编号">{{ currentAction.dealNumber }}</el-descriptions-item>
         <el-descriptions-item label="交易类型">{{ getTypeLabel(currentAction.dealType) }}</el-descriptions-item>
-        <el-descriptions-item label="业务单元">{{ currentAction.businessUnit }}</el-descriptions-item>
+        <el-descriptions-item label="管理主体">{{ currentAction.managementEntity }}</el-descriptions-item>
         <el-descriptions-item label="金额">{{ formatAmount(currentAction.amount, currentAction.currency) }}</el-descriptions-item>
         <el-descriptions-item label="操作人">{{ currentAction.operatorName }}</el-descriptions-item>
         <el-descriptions-item label="操作时间">{{ currentAction.operationTime }}</el-descriptions-item>

@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open-TMS FX 交易管理(SPOT/FWD/NDF) - 交互原型</title>
+<style>
+/* ========== Reset & Base ========== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 14px;
+  color: #303133;
+  background: #f5f7fa;
+  min-height: 100vh;
+}
+
+/* ========== Layout ========== */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+.sidebar {
+  width: 220px;
+  background: #001529;
+  color: #fff;
+  flex-shrink: 0;
+}
+.sidebar-logo {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.sidebar-menu { padding: 12px 0; }
+.menu-group { margin-bottom: 8px; }
+.menu-group-title {
+  padding: 8px 24px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.menu-item {
+  padding: 10px 24px;
+  cursor: pointer;
+  color: rgba(255,255,255,0.7);
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+}
+.menu-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.menu-item.active {
+  background: #1890ff;
+  color: #fff;
+  border-left-color: #fff;
+}
+.menu-item .icon { margin-right: 8px; }
+
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.header {
+  height: 60px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  box-shadow: 0 1px 4px rgba(0,21,41,.08);
+  z-index: 10;
+}
+.header-title { font-size: 18px; font-weight: 600; }
+.header-actions { display: flex; align-items: center; gap: 16px; }
+.user-info {
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer; padding: 4px 12px; border-radius: 4px;
+}
+.user-info:hover { background: #f5f7fa; }
+.user-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #1890ff; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 600; font-size: 14px;
+}
+.content { flex: 1; padding: 24px; overflow: auto; }
+
+/* ========== Page Switcher (Demo only) ========== */
+.page-switcher {
+  position: fixed; top: 70px; right: 24px; z-index: 1000;
+  background: #fff; padding: 8px; border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.page-switcher button {
+  padding: 6px 12px; border: none; border-radius: 4px;
+  background: #f0f0f0; cursor: pointer; font-size: 12px;
+  text-align: left; white-space: nowrap;
+}
+.page-switcher button.active { background: #1890ff; color: #fff; }
+
+/* ========== Card ========== */
+.card {
+  background: #fff;
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+.card-title {
+  font-size: 15px; font-weight: 600; margin-bottom: 16px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-title .actions { display: flex; gap: 8px; }
+
+/* ========== Stat Cards ========== */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.stat-card {
+  background: #fff;
+  border-radius: 4px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+.stat-card .label { color: #909399; font-size: 13px; margin-bottom: 6px; }
+.stat-card .value { font-size: 24px; font-weight: 600; color: #303133; }
+.stat-card .delta { font-size: 12px; color: #67c23a; margin-top: 4px; }
+.stat-card .delta.down { color: #f56c6c; }
+
+/* ========== Filter ========== */
+.filter-form {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px 16px;
+  margin-bottom: 12px;
+}
+.filter-actions { display: flex; gap: 8px; }
+
+/* ========== Buttons ========== */
+.btn {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: #fff;
+  color: #606266;
+  transition: all 0.2s;
+  user-select: none;
+}
+.btn:hover { opacity: 0.85; }
+.btn-primary { background: #1890ff; color: #fff; border-color: #1890ff; }
+.btn-primary:hover { background: #40a9ff; }
+.btn-success { background: #52c41a; color: #fff; border-color: #52c41a; }
+.btn-warning { background: #faad14; color: #fff; border-color: #faad14; }
+.btn-danger { background: #f5222d; color: #fff; border-color: #f5222d; }
+.btn-default { background: #fff; color: #606266; border-color: #d9d9d9; }
+.btn-default:hover { color: #1890ff; border-color: #1890ff; }
+.btn-text { background: transparent; color: #1890ff; padding: 4px 8px; border: none; }
+.btn-text.danger { color: #f5222d; }
+.btn-sm { padding: 4px 12px; font-size: 12px; }
+.btn-link { background: none; border: none; color: #1890ff; padding: 0; cursor: pointer; }
+.btn-link:hover { text-decoration: underline; }
+
+/* ========== Tabs ========== */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid #e4e7ed;
+  margin-bottom: 20px;
+  gap: 0;
+}
+.tab {
+  padding: 10px 20px;
+  cursor: pointer;
+  color: #606266;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.2s;
+  position: relative;
+}
+.tab:hover { color: #1890ff; }
+.tab.active {
+  color: #1890ff;
+  border-bottom-color: #1890ff;
+  font-weight: 500;
+}
+.tab .badge {
+  display: inline-block;
+  background: #f0f0f0;
+  color: #606266;
+  border-radius: 10px;
+  padding: 1px 8px;
+  font-size: 11px;
+  margin-left: 6px;
+}
+.tab.active .badge { background: #e6f7ff; color: #1890ff; }
+
+/* ========== Table ========== */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #ebeef5;
+  font-size: 13px;
+}
+th {
+  background: #fafafa;
+  color: #606266;
+  font-weight: 500;
+  white-space: nowrap;
+}
+tbody tr:hover { background: #f5f7fa; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.text-mono { font-family: "SF Mono", Consolas, monospace; }
+.text-success { color: #67c23a; }
+.text-danger { color: #f56c6c; }
+.text-primary { color: #1890ff; }
+.text-warning { color: #faad14; }
+.text-muted { color: #909399; font-size: 12px; }
+
+/* ========== Tag / Badge ========== */
+.tag {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  line-height: 20px;
+  border: 1px solid;
+}
+.tag-success { background: #f0f9ff; color: #67c23a; border-color: #b3e19d; }
+.tag-primary { background: #e6f7ff; color: #1890ff; border-color: #91d5ff; }
+.tag-warning { background: #fffbe6; color: #faad14; border-color: #ffe58f; }
+.tag-danger  { background: #fff1f0; color: #f5222d; border-color: #ffa39e; }
+.tag-info    { background: #f4f4f5; color: #909399; border-color: #d3d4d6; }
+
+/* ========== Form ========== */
+.form-row { display: flex; align-items: center; margin-bottom: 16px; gap: 8px; }
+.form-row .label {
+  width: 110px;
+  text-align: right;
+  color: #606266;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.form-row .label.required::before {
+  content: '*';
+  color: #f5222d;
+  margin-right: 4px;
+}
+.form-input, .form-select {
+  flex: 1;
+  padding: 6px 12px;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  font-size: 13px;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus, .form-select:focus { border-color: #1890ff; }
+.form-input:disabled, .form-input.readonly { background: #f5f7fa; color: #909399; }
+.form-input.text-right { text-align: right; }
+.form-row .suffix { color: #909399; font-size: 12px; min-width: 50px; }
+
+/* ========== Drawer ========== */
+.drawer-mask {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 999;
+  display: none;
+  animation: fadeIn 0.2s;
+}
+.drawer-mask.show { display: block; }
+.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0;
+  width: 520px;
+  background: #fff;
+  z-index: 1000;
+  display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s;
+  box-shadow: -2px 0 8px rgba(0,0,0,0.15);
+}
+.drawer.show { transform: translateX(0); }
+.drawer-header {
+  height: 56px;
+  padding: 0 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid #e4e7ed;
+  font-size: 16px; font-weight: 500;
+}
+.drawer-close {
+  cursor: pointer; font-size: 18px; color: #909399;
+  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+  border-radius: 4px;
+}
+.drawer-close:hover { background: #f5f7fa; color: #303133; }
+.drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
+.drawer-footer {
+  padding: 12px 20px;
+  border-top: 1px solid #e4e7ed;
+  display: flex; gap: 8px; justify-content: flex-end;
+}
+
+/* ========== Dialog ========== */
+.dialog-mask {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1001;
+  display: none;
+  align-items: center; justify-content: center;
+}
+.dialog-mask.show { display: flex; }
+.dialog {
+  background: #fff;
+  border-radius: 4px;
+  width: 480px;
+  max-width: 90%;
+  max-height: 80vh;
+  display: flex; flex-direction: column;
+}
+.dialog-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e4e7ed;
+  font-size: 15px; font-weight: 500;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.dialog-body { padding: 20px; overflow-y: auto; }
+.dialog-footer {
+  padding: 12px 20px;
+  border-top: 1px solid #e4e7ed;
+  display: flex; gap: 8px; justify-content: flex-end;
+}
+
+/* ========== Info Card (Detail Header) ========== */
+.info-card {
+  background: linear-gradient(135deg, #f0f5ff 0%, #f9fbff 100%);
+  border: 1px solid #d6e4ff;
+  border-radius: 6px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+.info-card .title-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.info-card .deal-num {
+  font-size: 18px; font-weight: 600; color: #303133;
+}
+.info-card .deal-meta {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px 24px;
+  padding-top: 12px;
+  border-top: 1px solid #e8e8e8;
+}
+.info-card .meta-item .label { font-size: 12px; color: #909399; }
+.info-card .meta-item .value { font-size: 14px; color: #303133; margin-top: 4px; font-weight: 500; }
+
+/* ========== Leg (BUY/SELL) ========== */
+.leg-block {
+  background: #fafbfc;
+  border: 1px solid #e4e7ed;
+  border-radius: 4px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+}
+.leg-block .leg-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.leg-block .leg-label { font-weight: 500; color: #303133; }
+.leg-row { display: flex; gap: 12px; align-items: center; }
+.leg-arrow { text-align: center; color: #1890ff; font-size: 18px; margin: 4px 0; }
+
+/* ========== Warning Card (NDF) ========== */
+.warning-card {
+  background: #fff7e6;
+  border: 1px solid #ffd591;
+  border-left: 4px solid #fa8c16;
+  border-radius: 4px;
+  padding: 14px 16px;
+  margin: 16px 0;
+}
+.warning-card .title {
+  font-weight: 600; color: #d46b08; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.warning-card ul { margin-left: 20px; color: #874d00; font-size: 13px; line-height: 22px; }
+
+/* ========== Limit Progress ========== */
+.limit-progress {
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+  border-radius: 4px;
+  padding: 12px 16px;
+  margin: 8px 0;
+}
+.limit-progress .progress-row {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 13px; margin-bottom: 6px;
+}
+.progress-bar {
+  width: 100%; height: 6px; background: #f0f0f0; border-radius: 3px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%; background: linear-gradient(90deg, #52c41a, #73d13d);
+  transition: width 0.3s;
+}
+
+/* ========== Timeline (DealMap) ========== */
+.timeline { padding: 0; }
+.timeline-item {
+  position: relative;
+  padding-left: 24px;
+  padding-bottom: 24px;
+  border-left: 2px solid #e4e7ed;
+  margin-left: 8px;
+}
+.timeline-item:last-child { border-left-color: transparent; padding-bottom: 0; }
+.timeline-dot {
+  position: absolute; left: -7px; top: 4px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: #1890ff; border: 2px solid #fff;
+  box-shadow: 0 0 0 2px #e4e7ed;
+}
+.timeline-dot.success { background: #52c41a; }
+.timeline-dot.warning { background: #faad14; }
+.timeline-dot.danger { background: #f5222d; }
+.timeline-dot.pending { background: #d9d9d9; }
+.timeline-content { background: #fafbfc; border-radius: 4px; padding: 12px 16px; }
+.timeline-header { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; flex-wrap: wrap; }
+.timeline-time { color: #909399; font-size: 12px; font-family: monospace; }
+.timeline-event { font-weight: 500; }
+.timeline-body { color: #606266; font-size: 13px; line-height: 22px; }
+.timeline-body .meta { color: #909399; font-size: 12px; margin-top: 4px; }
+
+/* ========== Voucher (Accounting) ========== */
+.voucher-card {
+  background: #fff;
+  border: 1px solid #e4e7ed;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.voucher-header {
+  background: #fafbfc;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e4e7ed;
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.voucher-header .title { font-weight: 600; color: #303133; }
+.voucher-body { padding: 12px 16px; }
+.voucher-table { width: 100%; border-collapse: collapse; }
+.voucher-table th, .voucher-table td {
+  padding: 8px 12px; font-size: 13px;
+  border-bottom: 1px solid #ebeef5;
+}
+.voucher-table th { background: #f5f7fa; color: #606266; font-weight: 500; }
+.voucher-table .dr { color: #52c41a; font-weight: 500; }
+.voucher-table .cr { color: #f5222d; font-weight: 500; }
+.voucher-footer {
+  padding: 10px 16px; background: #fafbfc;
+  border-top: 1px solid #e4e7ed;
+  font-size: 12px; color: #606266;
+  display: flex; justify-content: space-between;
+}
+
+/* ========== Pagination ========== */
+.pagination {
+  display: flex; align-items: center; justify-content: flex-end;
+  padding: 16px 0; gap: 8px; color: #606266; font-size: 13px;
+}
+.page-btn {
+  min-width: 32px; height: 32px; padding: 0 8px;
+  border: 1px solid #d9d9d9; background: #fff;
+  border-radius: 4px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.page-btn:hover { color: #1890ff; border-color: #1890ff; }
+.page-btn.active { background: #1890ff; color: #fff; border-color: #1890ff; }
+
+/* ========== Misc ========== */
+.flex { display: flex; }
+.flex-1 { flex: 1; }
+.gap-8 { gap: 8px; }
+.gap-16 { gap: 16px; }
+.mb-8 { margin-bottom: 8px; }
+.mb-16 { margin-bottom: 16px; }
+.mt-8 { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.divider { height: 1px; background: #e4e7ed; margin: 16px 0; }
+.divider-text {
+  position: relative; text-align: center; margin: 16px 0;
+  color: #909399; font-size: 12px;
+}
+.divider-text::before, .divider-text::after {
+  content: ''; position: absolute; top: 50%;
+  width: 40%; height: 1px; background: #e4e7ed;
+}
+.divider-text::before { left: 0; }
+.divider-text::after { right: 0; }
+.empty { text-align: center; color: #909399; padding: 40px 0; font-size: 13px; }
+
+/* Animation */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Section title with icon */
+.section-title {
+  font-size: 14px; font-weight: 600; color: #303133;
+  margin-bottom: 12px; padding-left: 8px;
+  border-left: 3px solid #1890ff;
+}
+
+/* ========== v3.2 Calculate (Backend Integration) ========== */
+.calc-panel {
+  background: #f0f5ff;
+  border: 1px solid #d6e4ff;
+  border-radius: 4px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+.calc-panel .calc-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.calc-panel .calc-title { font-weight: 600; color: #303133; font-size: 13px; }
+.calc-panel .calc-status { font-size: 12px; color: #909399; display: flex; align-items: center; gap: 6px; }
+.calc-panel .calc-status.loading { color: #1890ff; }
+.calc-panel .calc-status.success { color: #52c41a; }
+.calc-panel .calc-status.error { color: #f5222d; }
+.calc-panel .calc-spinner {
+  display: inline-block;
+  width: 12px; height: 12px;
+  border: 2px solid #1890ff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.calc-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px 16px;
+}
+.calc-grid .calc-item .label { font-size: 12px; color: #909399; }
+.calc-grid .calc-item .value {
+  font-size: 14px; color: #303133; font-weight: 500;
+  font-family: "SF Mono", Consolas, monospace;
+  margin-top: 2px;
+}
+.calc-grid .calc-item .value.muted { color: #909399; font-style: italic; font-family: inherit; font-size: 13px; }
+
+/* Readonly badge (showing backend-computed value) */
+.readonly-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  background: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
+  vertical-align: middle;
+}
+
+/* ========== v3.2 DealMap Table ========== */
+.dealmap-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.dealmap-table thead th {
+  background: #fafafa;
+  color: #606266;
+  font-weight: 500;
+  padding: 10px 12px;
+  border-bottom: 1px solid #ebeef5;
+  white-space: nowrap;
+  text-align: left;
+}
+.dealmap-table tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #ebeef5;
+}
+.dealmap-table tbody tr:hover { background: #f5f7fa; }
+.dealmap-type {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: "SF Mono", Consolas, monospace;
+}
+.dealmap-type-buy  { background: #f0f9ff; color: #67c23a; border: 1px solid #b3e19d; }
+.dealmap-type-sell { background: #fff1f0; color: #f5222d; border: 1px solid #ffa39e; }
+.dealmap-type-rate { background: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; }
+.dealmap-type-fix  { background: #fff7e6; color: #fa8c16; border: 1px solid #ffd591; }
+
+.cf-link {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 3px;
+  background: #e6f7ff;
+  color: #1890ff;
+  font-family: "SF Mono", Consolas, monospace;
+  font-size: 12px;
+  cursor: pointer;
+}
+.cf-link.no-cf { background: #f5f7fa; color: #909399; cursor: default; }
+
+/* v3.2 NDF FX_FIX highlight */
+.fix-event-block {
+  background: #fff7e6;
+  border: 1px solid #ffd591;
+  border-radius: 4px;
+  padding: 12px 16px;
+  margin: 12px 0;
+}
+.fix-event-block .fix-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.fix-event-block .fix-title { font-weight: 600; color: #d46b08; }
+.fix-event-block .fix-amount {
+  font-family: "SF Mono", Consolas, monospace;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">💰 Open-TMS 资金管理系统</div>
+    <nav class="sidebar-menu">
+      <div class="menu-group">
+        <div class="menu-group-title">M1 基础数据</div>
+        <div class="menu-item"><span class="icon">🌍</span>国家与币种</div>
+        <div class="menu-item"><span class="icon">🏦</span>银行账户</div>
+        <div class="menu-item"><span class="icon">🤝</span>交易对手</div>
+      </div>
+      <div class="menu-group">
+        <div class="menu-group-title">M1 交易管理</div>
+        <div class="menu-item"><span class="icon">💵</span>AC 交易</div>
+        <div class="menu-item"><span class="icon">🔄</span>AT 转账</div>
+        <div class="menu-item active"><span class="icon">💱</span>FX 外汇交易</div>
+        <div class="menu-item"><span class="icon">📋</span>Action 审批中心</div>
+      </div>
+      <div class="menu-group">
+        <div class="menu-group-title">M2 资金运营</div>
+        <div class="menu-item"><span class="icon">💰</span>存款交易</div>
+        <div class="menu-item"><span class="icon">🏛️</span>贷款交易</div>
+        <div class="menu-item"><span class="icon">📊</span>资金计划</div>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-title">💱 FX 外汇交易管理</div>
+      <div class="header-actions">
+        <span class="text-muted">M1 交易管理 / FX 外汇交易</span>
+        <div class="user-info">
+          <div class="user-avatar">ZS</div>
+          <span>赵六 (审批员)</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content (dynamic pages) -->
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<!-- Page Switcher (Demo Helper) -->
+<div class="page-switcher">
+  <div style="font-size: 11px; color: #909399; padding: 4px 8px;">📋 原型导航 (v3.2)</div>
+  <button class="active" onclick="showPage('list')">📋 列表页</button>
+  <button onclick="showPage('drawer-spot')">➕ 录入-SPOT</button>
+  <button onclick="showPage('drawer-fwd')">➕ 录入-FWD</button>
+  <button onclick="showPage('drawer-ndf')">➕ 录入-NDF</button>
+  <button onclick="showPage('detail-fwd')">📄 详情-FWD</button>
+  <button onclick="showPage('detail-ndf')">📄 详情-NDF</button>
+  <button onclick="showPage('rate-fix')">⚡ RATE_FIX 弹窗</button>
+</div>
+
+<!-- Drawer Container -->
+<div class="drawer-mask" id="drawerMask" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <span id="drawerTitle">新建外汇交易</span>
+    <span class="drawer-close" onclick="closeDrawer()">×</span>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-footer">
+    <button class="btn btn-default" onclick="closeDrawer()">取消</button>
+    <button class="btn btn-default" onclick="closeDrawer()">保存</button>
+    <button class="btn btn-primary" onclick="closeDrawer()">保存并提交审批</button>
+  </div>
+</div>
+
+<!-- Dialog Container -->
+<div class="dialog-mask" id="dialogMask" onclick="closeDialog()">
+  <div class="dialog" id="dialog" onclick="event.stopPropagation()">
+    <div class="dialog-header">
+      <span id="dialogTitle">审批</span>
+      <span class="drawer-close" onclick="closeDialog()">×</span>
+    </div>
+    <div class="dialog-body" id="dialogBody"></div>
+    <div class="dialog-footer" id="dialogFooter"></div>
+  </div>
+</div>
+
+<script>
+// ========== Page Templates ==========
+const pages = {
+  // ========== 列表页 ==========
+  'list': () => `
+    <!-- 统计卡 -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="label">今日成交笔数</div>
+        <div class="value">3</div>
+        <div class="delta">↑ 1 笔 (相比昨日)</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">名义本金合计(USD)</div>
+        <div class="value">2,500,000</div>
+        <div class="delta">↓ 15% (相比上周)</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">净敞口(USD)</div>
+        <div class="value text-danger">-150,000</div>
+        <div class="delta down">超预警 5%</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">锁汇额度占用</div>
+        <div class="value">1,200,000</div>
+        <div class="delta">12% / 总额度 10M</div>
+      </div>
+    </div>
+
+    <!-- Tab 切换 -->
+    <div class="card">
+      <div class="tabs" id="productTabs">
+        <div class="tab active" data-product="SPOT" onclick="switchProduct('SPOT')">
+          📊 即期(SPOT)<span class="badge">12</span>
+        </div>
+        <div class="tab" data-product="FWD" onclick="switchProduct('FWD')">
+          📅 远期(FWD)<span class="badge">8</span>
+        </div>
+        <div class="tab" data-product="NDF" onclick="switchProduct('NDF')">
+          💱 NDF<span class="badge">3</span>
+        </div>
+        <div class="tab" data-product="ALL" onclick="switchProduct('ALL')">
+          全部<span class="badge">23</span>
+        </div>
+      </div>
+
+      <!-- 筛选区 -->
+      <div class="filter-form">
+        <div>
+          <label class="text-muted" style="font-size:12px;">交易编号</label>
+          <input class="form-input" placeholder="请输入" />
+        </div>
+        <div>
+          <label class="text-muted" style="font-size:12px;">业务单元</label>
+          <select class="form-select"><option>华通集团总部</option></select>
+        </div>
+        <div>
+          <label class="text-muted" style="font-size:12px;">对手方</label>
+          <select class="form-select"><option>全部</option></select>
+        </div>
+        <div>
+          <label class="text-muted" style="font-size:12px;">状态</label>
+          <select class="form-select"><option>全部</option><option>Active</option><option>Approved</option></select>
+        </div>
+        <div>
+          <label class="text-muted" style="font-size:12px;">币种对</label>
+          <select class="form-select"><option>USD/CNY</option></select>
+        </div>
+        <div>
+          <label class="text-muted" style="font-size:12px;">期限</label>
+          <select class="form-select"><option>全部</option><option>1M</option><option>3M</option></select>
+        </div>
+        <div>
+          <label class="text-muted" style="font-size:12px;">起止日期</label>
+          <input class="form-input" placeholder="2026-06-01 至 2026-06-30" />
+        </div>
+        <div style="display:flex; align-items:flex-end;">
+          <button class="btn btn-primary" style="margin-right:8px;">🔍 查询</button>
+          <button class="btn btn-default">↺ 重置</button>
+        </div>
+      </div>
+
+      <!-- 工具栏 -->
+      <div style="display:flex; gap:8px; margin: 16px 0;">
+        <button class="btn btn-primary" onclick="openDrawer('SPOT')">+ 新建</button>
+        <button class="btn btn-default">📤 导出</button>
+        <button class="btn btn-default">⚡ 批量审批</button>
+        <button class="btn btn-default">📅 到期日查询</button>
+        <div style="flex:1"></div>
+        <span class="text-muted" style="align-self:center;">已选 0 项</span>
+      </div>
+
+      <!-- 表格(SPOT 默认) -->
+      <div class="table-wrap" id="dealTable">
+        ${renderTable('SPOT')}
+      </div>
+
+      <!-- 分页 -->
+      <div class="pagination">
+        <span>共 12 条</span>
+        <button class="page-btn"><</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">></button>
+        <select class="form-select" style="width:100px;"><option>20 条/页</option></select>
+      </div>
+    </div>
+  `,
+
+  // ========== 详情页 (FWD 完整版) ==========
+  'detail-fwd': () => `
+    <div style="margin-bottom: 12px;">
+      <button class="btn-link" onclick="showPage('list')">← 返回列表</button>
+    </div>
+
+    <div class="info-card">
+      <div class="title-row">
+        <div>
+          <span class="deal-num">📄 FX202606280001</span>
+          <span class="tag tag-success" style="margin-left:12px;">🟢 活跃</span>
+          <span class="tag tag-info" style="margin-left:6px;">📅 远期 (FWD)</span>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-default btn-sm">⚡ 手动 MTM</button>
+          <button class="btn btn-default btn-sm">📊 导出分录</button>
+          <button class="btn btn-danger btn-sm" onclick="openDialog('mtm')">🗑️ 撤销</button>
+        </div>
+      </div>
+      <div class="deal-meta">
+        <div class="meta-item">
+          <div class="label">卖出币种 / 金额</div>
+          <div class="value text-danger">USD 100,000.00</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">买入币种 / 金额</div>
+          <div class="value text-success">CNY 720,000.00</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">远期汇率</div>
+          <div class="value text-mono">7.2000</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">期限</div>
+          <div class="value">3M</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">签约日 / 起息日</div>
+          <div class="value">2026-06-28</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">到期日</div>
+          <div class="value">2026-09-28</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">当前公允价值</div>
+          <div class="value text-success">+5,200 CNY ↑</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">锁汇额度占用</div>
+          <div class="value">100,000 USD (10%)</div>
+        </div>
+      </div>
+      <div style="margin-top:12px; padding-top:12px; border-top:1px solid #e8e8e8; font-size:13px;">
+        <span class="text-muted">审批进度:</span>
+        <span class="tag tag-success" style="margin-left:6px;">✓ 李四 - 提交</span>
+        <span class="tag tag-success" style="margin-left:6px;">✓ 王五 - 初审通过</span>
+        <span class="tag tag-warning" style="margin-left:6px;">⏳ 赵六 - 复审(待审批)</span>
+      </div>
+    </div>
+
+    <!-- Tab 切换 -->
+    <div class="card">
+      <div class="tabs" id="detailTabs">
+        <div class="tab active" data-detail-tab="dealmap" onclick="switchDetailTab('dealmap')">📅 DealMap 时间线</div>
+        <div class="tab" data-detail-tab="cashflow" onclick="switchDetailTab('cashflow')">💰 Cashflow</div>
+        <div class="tab" data-detail-tab="accounting" onclick="switchDetailTab('accounting')">📊 会计分录<span class="badge">3</span></div>
+        <div class="tab" data-detail-tab="approval" onclick="switchDetailTab('approval')">✓ 审批记录</div>
+        <div class="tab" data-detail-tab="history" onclick="switchDetailTab('history')">🔄 变更历史</div>
+      </div>
+
+      <div id="detailContent">
+        ${renderDealMapTab()}
+      </div>
+    </div>
+  `,
+
+  // ========== 详情页 (NDF) ==========
+  'detail-ndf': () => `
+    <div style="margin-bottom: 12px;">
+      <button class="btn-link" onclick="showPage('list')">← 返回列表</button>
+    </div>
+
+    <div class="info-card" style="background:linear-gradient(135deg,#fff7e6 0%,#fffbf0 100%); border-color:#ffd591;">
+      <div class="title-row">
+        <div>
+          <span class="deal-num">📄 FX202606270001</span>
+          <span class="tag tag-success" style="margin-left:12px;">🟢 活跃</span>
+          <span class="tag tag-warning" style="margin-left:6px;">💱 NDF</span>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-default btn-sm">⚡ 手动 MTM</button>
+          <button class="btn btn-danger btn-sm">🗑️ 撤销</button>
+        </div>
+      </div>
+      <div class="deal-meta">
+        <div class="meta-item">
+          <div class="label">名义本金</div>
+          <div class="value text-danger">USD 100,000.00</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">结算币种</div>
+          <div class="value text-success">CNY</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">远期汇率</div>
+          <div class="value text-mono">7.1800</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">结算汇率(待定)</div>
+          <div class="value text-muted text-mono">— —</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">签约日 / 起息日</div>
+          <div class="value">2026-06-27</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">到期日</div>
+          <div class="value">2026-09-27</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">当前公允价值</div>
+          <div class="value text-success">+3,800 CNY ↑</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">锁汇额度占用</div>
+          <div class="value">100,000 USD (10%)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="tabs">
+        <div class="tab active">📅 DealMap 时间线</div>
+        <div class="tab">💰 Cashflow<span class="badge">1</span></div>
+        <div class="tab">📊 会计分录<span class="badge">3</span></div>
+      </div>
+      ${renderNdfDealMapTab()}
+    </div>
+  `,
+};
+
+// ========== Table Renderer ==========
+function renderTable(product) {
+  const allDeals = [
+    { num: 'FX202606290001', type: 'SPOT', sell: 'USD 13,750.00', buy: 'CNY 100,000.00', rate: '7.2727', valueDate: '2026-07-01', maturity: '—', status: 'Settled', tagType: 'success' },
+    { num: 'FX202606280005', type: 'SPOT', sell: 'USD 50,000.00', buy: 'CNY 363,500.00', rate: '7.2700', valueDate: '2026-06-30', maturity: '—', status: 'Settled', tagType: 'success' },
+    { num: 'FX202606280004', type: 'SPOT', sell: 'EUR 20,000.00', buy: 'CNY 158,000.00', rate: '7.9000', valueDate: '2026-06-30', maturity: '—', status: 'Settled', tagType: 'success' },
+    { num: 'FX202606280001', type: 'FWD',  sell: 'USD 100,000.00', buy: 'CNY 720,000.00', rate: '7.2000', valueDate: '2026-06-28', maturity: '2026-09-28', status: 'Active', tagType: 'success' },
+    { num: 'FX202606270002', type: 'FWD',  sell: 'USD 50,000.00',  buy: 'CNY 360,000.00', rate: '7.2000', valueDate: '2026-06-27', maturity: '2026-09-27', status: 'Active', tagType: 'success' },
+    { num: 'FX202606260001', type: 'FWD',  sell: 'EUR 80,000.00',  buy: 'CNY 632,000.00', rate: '7.9000', valueDate: '2026-06-26', maturity: '2026-12-26', status: 'Active', tagType: 'success' },
+    { num: 'FX202606250003', type: 'FWD',  sell: 'USD 200,000.00', buy: 'CNY 1,438,000.00', rate: '7.1900', valueDate: '2026-06-25', maturity: '2026-07-25', status: 'Matured', tagType: 'success' },
+    { num: 'FX202606270001', type: 'NDF',  sell: 'USD 100,000.00', buy: 'CNY(结算)', rate: '7.1800', valueDate: '2026-06-27', maturity: '2026-09-27', status: 'Active', tagType: 'success' },
+  ];
+  const deals = product === 'ALL' ? allDeals : allDeals.filter(d => d.type === product);
+  const statusLabel = { New: '⚪ 新建', Submitted: '🔵 已提交', Approved: '🟡 已审批', Active: '🟢 活跃', Settled: '✅ 已结算', Matured: '✅ 已到期', NDFSettled: '✅ 差额结算', Rejected: '🔴 已驳回', Canceled: '❌ 已撤销' };
+
+  let html = `<table>
+    <thead>
+      <tr>
+        <th style="width:32px;"><input type="checkbox" /></th>
+        <th>交易编号</th><th>类型</th><th>卖出</th><th>买入</th>
+        <th>汇率</th><th>起息日</th><th>到期日</th><th>状态</th><th>操作</th>
+      </tr>
+    </thead>
+    <tbody>`;
+  for (const d of deals) {
+    html += `<tr>
+      <td><input type="checkbox" /></td>
+      <td><a class="btn-link" href="javascript:;" onclick="showPage('${d.type === 'NDF' ? 'detail-ndf' : 'detail-fwd'}')">${d.num}</a></td>
+      <td><span class="tag ${d.type === 'SPOT' ? 'tag-primary' : d.type === 'FWD' ? 'tag-info' : 'tag-warning'}">${d.type === 'SPOT' ? '即期' : d.type === 'FWD' ? '远期' : 'NDF'}</span></td>
+      <td>${d.sell}</td><td>${d.buy}</td>
+      <td class="text-mono">${d.rate}</td>
+      <td>${d.valueDate}</td>
+      <td>${d.maturity}</td>
+      <td><span class="tag tag-${d.tagType}">${statusLabel[d.status] || d.status}</span></td>
+      <td>
+        <button class="btn-link" onclick="showPage('${d.type === 'NDF' ? 'detail-ndf' : 'detail-fwd'}')">详情</button>
+        <button class="btn-link" style="margin-left:8px;">编辑</button>
+        <button class="btn-link" style="margin-left:8px; color:#f5222d;">撤销</button>
+      </td>
+    </tr>`;
+  }
+  if (deals.length === 0) {
+    html += `<tr><td colspan="10" class="empty">暂无数据</td></tr>`;
+  }
+  html += `</tbody></table>`;
+  return html;
+}
+
+// ========== DealMap Tab Renderer ==========
+function renderDealMapTab() {
+  // v3.2:DealMap 改为表格形式,多行单字段,显示 4 种 dealmap_type
+  return `
+    <div class="section-title">📅 DealMap 多行明细 (v3.2)</div>
+    <div style="font-size:12px;color:#909399;margin-bottom:8px;">
+      一笔 FX 交易生成 3-4 行 DealMap,每行 1 字段 amount_or_rate,通过 dealmap_type 区分。1 DealMap 最多生成 1 条 Cashflow。
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>编号</th>
+            <th>dealmap_type</th>
+            <th class="text-right">amount_or_rate</th>
+            <th>币种/单位</th>
+            <th>触发 Action</th>
+            <th>触发 CF</th>
+            <th>创建时间</th>
+            <th>状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="text-mono">DMP202606280001</span></td>
+            <td><span class="tag tag-primary">FX_SELL_AMOUNT</span></td>
+            <td class="text-right">100,000.00</td>
+            <td>USD</td>
+            <td>ACT202606280001 (DEAL)</td>
+            <td>CF202606280001 (卖账)</td>
+            <td>2026-06-28 14:30</td>
+            <td><span class="tag tag-success">Active</span></td>
+          </tr>
+          <tr>
+            <td><span class="text-mono">DMP202606280002</span></td>
+            <td><span class="tag tag-success">FX_BUY_AMOUNT</span></td>
+            <td class="text-right">720,000.00</td>
+            <td>CNY</td>
+            <td>ACT202606280001 (DEAL)</td>
+            <td>CF202606280002 (买账)</td>
+            <td>2026-06-28 14:30</td>
+            <td><span class="tag tag-success">Active</span></td>
+          </tr>
+          <tr>
+            <td><span class="text-mono">DMP202606280003</span></td>
+            <td><span class="tag tag-info">FX_RATE</span></td>
+            <td class="text-right">7.2000</td>
+            <td>汇率</td>
+            <td>ACT202606280001 (DEAL)</td>
+            <td><span class="text-muted">— 仅记录</span></td>
+            <td>2026-06-28 14:30</td>
+            <td><span class="tag tag-success">Active</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top: 16px; padding: 12px; background: #f0f9ff; border-radius: 4px; font-size: 12px; color: #409eff;">
+      💡 <b>v3.2 说明</b>:
+      <ul style="margin: 4px 0 0 16px; padding: 0;">
+        <li>3 行 DealMap(卖金额/买金额/汇率)由 1 个 DEAL Action 触发</li>
+        <li>前 2 行各生成 1 条 Cashflow(SELL → 卖账 CF, BUY → 买账 CF)</li>
+        <li>第 3 行 FX_RATE 是汇率快照,<b>不</b>生成 CF</li>
+        <li>NDF 还会多 1 行 FX_FIX(RATE_FIX 后追加,生成 1 条差额 CF)</li>
+      </ul>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-title">💰 Cashflow (2 条,v3.2:1 DealMap → 1 CF)</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>编号</th><th>触发 DealMap</th><th>dealmap_type</th><th>币种</th><th>方向</th>
+            <th class="text-right">金额</th><th>交割日</th><th>状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="text-mono">CF202606280001</span></td>
+            <td><span class="text-mono">DMP202606280001</span></td>
+            <td><span class="tag tag-primary">FX_SELL_AMOUNT</span></td>
+            <td>USD</td>
+            <td>流出</td>
+            <td class="text-right">100,000.00</td>
+            <td>2026-09-28</td>
+            <td><span class="tag tag-success">Created</span></td>
+          </tr>
+          <tr>
+            <td><span class="text-mono">CF202606280002</span></td>
+            <td><span class="text-mono">DMP202606280002</span></td>
+            <td><span class="tag tag-success">FX_BUY_AMOUNT</span></td>
+            <td>CNY</td>
+            <td>流入</td>
+            <td class="text-right">720,000.00</td>
+            <td>2026-09-28</td>
+            <td><span class="tag tag-success">Created</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderAccountingEvents() {
+  return `
+    <div class="voucher-card">
+      <div class="voucher-header">
+        <span class="title">AE202606280001</span>
+        <span class="tag tag-primary">FxFwdBooking</span>
+        <span class="text-muted">签约日 · 期间 2026-06</span>
+        <span class="tag tag-success">✅ Posted</span>
+      </div>
+      <div class="voucher-body">
+        <table class="voucher-table">
+          <thead><tr><th style="width:50px;">行</th><th style="width:60px;">方向</th><th>科目</th><th>币种</th><th class="text-right">金额</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td class="dr">DR</td><td>衍生金融资产-外汇远期</td><td>CNY</td><td class="text-right">720,000.00</td></tr>
+            <tr><td>2</td><td class="cr">CR</td><td>衍生金融负债-外汇远期</td><td>CNY</td><td class="text-right">720,000.00</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="voucher-footer">
+        <span>借贷合计:1,440,000 CNY</span>
+        <span class="text-success">✓ 平衡</span>
+      </div>
+    </div>
+
+    <div class="voucher-card">
+      <div class="voucher-header">
+        <span class="title">AE202606280002</span>
+        <span class="tag tag-warning">FxMtmDecrement</span>
+        <span class="text-muted">MTM 调整 · 2026-06-28</span>
+        <span class="tag tag-success">✅ Posted</span>
+      </div>
+      <div class="voucher-body">
+        <table class="voucher-table">
+          <thead><tr><th>行</th><th>方向</th><th>科目</th><th>币种</th><th class="text-right">金额</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td class="dr">DR</td><td>公允价值变动损益</td><td>CNY</td><td class="text-right">800.00</td></tr>
+            <tr><td>2</td><td class="cr">CR</td><td>衍生金融资产-外汇远期</td><td>CNY</td><td class="text-right">800.00</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="voucher-footer">
+        <span>借贷合计:1,600 CNY</span>
+        <span class="text-success">✓ 平衡</span>
+      </div>
+    </div>
+
+    <div class="voucher-card">
+      <div class="voucher-header">
+        <span class="title">AE202606290001</span>
+        <span class="tag tag-warning">FxMtmIncrement</span>
+        <span class="text-muted">MTM 调整 · 2026-06-29</span>
+        <span class="tag tag-success">✅ Posted</span>
+      </div>
+      <div class="voucher-body">
+        <table class="voucher-table">
+          <thead><tr><th>行</th><th>方向</th><th>科目</th><th>币种</th><th class="text-right">金额</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td class="dr">DR</td><td>衍生金融资产-外汇远期</td><td>CNY</td><td class="text-right">1,500.00</td></tr>
+            <tr><td>2</td><td class="cr">CR</td><td>公允价值变动损益</td><td>CNY</td><td class="text-right">1,500.00</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="voucher-footer">
+        <span>借贷合计:3,000 CNY</span>
+        <span class="text-success">✓ 平衡</span>
+      </div>
+    </div>
+  `;
+}
+
+// ========== NDF Detail ==========
+function renderNdfDealMapTab() {
+  // v3.2:DealMap 改为表格,显示 4 行(BUY/SELL/RATE/FIX),1 条 Cashflow 由 FX_FIX 触发
+  return `
+    <div class="warning-card">
+      <div class="title">⚠️ NDF 业务特点</div>
+      <ul>
+        <li>到期只结算<b>差额</b>,不会发生本金交割</li>
+        <li>差额 = 名义本金 × (结算汇率 - 远期汇率) = 100,000 × (fixing - 7.1800)</li>
+        <li>结算汇率到到期日由市场决定,系统自动从报价行获取</li>
+        <li><b>v3.2:</b>DEAL 时 0 CF,RATE_FIX 后才生成 1 条差额 CF</li>
+      </ul>
+    </div>
+
+    <div class="section-title">📅 DealMap 多行明细 (v3.2 NDF 4 行)</div>
+    <div style="font-size:12px;color:#909399;margin-bottom:8px;">
+      NDF 创建时 3 行(BUY/SELL/RATE)+ 0 CF;到期 RATE_FIX 后追加第 4 行(FX_FIX)+ 1 CF。
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>编号</th>
+            <th>dealmap_type</th>
+            <th class="text-right">amount_or_rate</th>
+            <th>币种/单位</th>
+            <th>触发 Action</th>
+            <th>触发 CF</th>
+            <th>创建时间</th>
+            <th>状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="text-mono">DMP202606270001</span></td>
+            <td><span class="tag tag-primary">FX_SELL_AMOUNT</span></td>
+            <td class="text-right">100,000.00</td>
+            <td>USD</td>
+            <td>ACT202606270001 (DEAL)</td>
+            <td><span class="text-muted">— 等 RATE_FIX</span></td>
+            <td>2026-06-27 10:15</td>
+            <td><span class="tag tag-success">Active</span></td>
+          </tr>
+          <tr>
+            <td><span class="text-mono">DMP202606270002</span></td>
+            <td><span class="tag tag-success">FX_BUY_AMOUNT</span></td>
+            <td class="text-right">720,000.00</td>
+            <td>CNY</td>
+            <td>ACT202606270001 (DEAL)</td>
+            <td><span class="text-muted">— 等 RATE_FIX</span></td>
+            <td>2026-06-27 10:15</td>
+            <td><span class="tag tag-success">Active</span></td>
+          </tr>
+          <tr>
+            <td><span class="text-mono">DMP202606270003</span></td>
+            <td><span class="tag tag-info">FX_RATE</span></td>
+            <td class="text-right">7.1800</td>
+            <td>锁定汇率</td>
+            <td>ACT202606270001 (DEAL)</td>
+            <td><span class="text-muted">— 仅记录</span></td>
+            <td>2026-06-27 10:15</td>
+            <td><span class="tag tag-success">Active</span></td>
+          </tr>
+          <tr style="background: #fff7e6;">
+            <td><span class="text-mono">DMP202609270001</span></td>
+            <td><span class="tag tag-warning">FX_FIX</span> 🆕</td>
+            <td class="text-right">7.1500</td>
+            <td>fixing 汇率</td>
+            <td>ACT202609270001 (RATE_FIX)</td>
+            <td><b>CF202609270001 (差额)</b></td>
+            <td>2026-09-27 09:00</td>
+            <td><span class="tag tag-success">Settled</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top: 16px; padding: 12px; background: #f0f9ff; border-radius: 4px; font-size: 12px; color: #409eff;">
+      💡 <b>v3.2 NDF 双阶段</b>:
+      <ul style="margin: 4px 0 0 16px; padding: 0;">
+        <li><b>DEAL 阶段</b>:3 行 DealMap(BUY/SELL/RATE)+ 0 CF,等 RATE_FIX</li>
+        <li><b>RATE_FIX 阶段</b>:追加 1 行 FX_FIX DealMap(fixing=7.15)+ 1 条差额 CF</li>
+        <li>差额 = 100,000 × (7.15 - 7.18) = <b>-3,000 CNY</b>(我方应收)</li>
+      </ul>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-title">💰 Cashflow (1 条,v3.2:由 FX_FIX 触发)</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>编号</th><th>触发 DealMap</th><th>dealmap_type</th><th>币种</th><th>方向</th>
+            <th class="text-right">金额</th><th>交割日</th><th>状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="text-mono">CF202609270001</span></td>
+            <td><span class="text-mono">DMP202609270001</span></td>
+            <td><span class="tag tag-warning">FX_FIX</span></td>
+            <td>CNY</td>
+            <td>流入(我方应收)</td>
+            <td class="text-right">3,000.00</td>
+            <td>2026-09-27</td>
+            <td><span class="tag tag-success">Settled</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ========== Drawer Renderers ==========
+function renderDrawerSpot() {
+  return `
+    <div class="tabs" style="margin-bottom:16px;">
+      <div class="tab active">📊 即期 SPOT</div>
+      <div class="tab" onclick="openDrawer('FWD')">📅 远期 FWD</div>
+      <div class="tab" onclick="openDrawer('NDF')">💱 NDF</div>
+    </div>
+
+    <div class="section-title">基础信息</div>
+    <div class="form-row">
+      <span class="label required">管理主体</span>
+      <select class="form-select"><option>BU001 集团总部</option></select>
+    </div>
+    <div class="form-row">
+      <span class="label required">交易员</span>
+      <select class="form-select"><option>001 李四</option></select>
+    </div>
+    <div class="form-row">
+      <span class="label required">对手方</span>
+      <select class="form-select"><option>5001 中行总行</option></select>
+    </div>
+    <div class="form-row">
+      <span class="label required">金融工具</span>
+      <select class="form-select"><option>FX-SPOT-USD-CNY-T2</option></select>
+    </div>
+    <div class="form-row">
+      <span class="label required">币种对</span>
+      <select class="form-select"><option>USD/CNY</option></select>
+    </div>
+
+    <div class="divider-text">即期交易要素<span style="float:right;font-size:11px;color:#909399;">💡 后端 calculate 自动算(防抖 300ms)</span></div>
+
+    <div class="leg-block">
+      <div class="leg-header">
+        <span class="leg-label text-danger">↗ 卖出</span>
+        <span class="text-muted text-sm">外币付出</span>
+      </div>
+      <div class="leg-row">
+        <input class="form-input" style="width:80px;" value="USD" readonly />
+        <input class="form-input text-right text-mono" value="13,750.00" />
+        <span class="suffix">美元</span>
+      </div>
+    </div>
+
+    <div class="leg-arrow">↓ 计算中... ↓</div>
+
+    <div class="leg-block">
+      <div class="leg-header">
+        <span class="leg-label text-success">↙ 买入</span>
+        <span class="text-muted text-sm">本币收入(后端 calculate 算)</span>
+      </div>
+      <div class="leg-row">
+        <input class="form-input" style="width:80px;" value="CNY" readonly />
+        <input class="form-input text-right text-mono" value="100,000.00" readonly />
+        <span class="suffix">人民币</span>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <span class="label">成交汇率</span>
+      <input class="form-input text-right text-mono" value="7.2727" />
+      <span class="suffix">实时联动</span>
+    </div>
+    <div class="form-row">
+      <span class="label">市场汇率</span>
+      <input class="form-input text-right text-mono readonly" value="7.2717" readonly />
+      <span class="text-muted">点差:10 bp(后端 calculate 保证)</span>
+    </div>
+
+    <div class="divider-text">日期(在 tms_deals_t 公共表)</div>
+
+    <div class="form-row">
+      <span class="label required">交易日</span>
+      <input class="form-input" value="2026-07-04" />
+    </div>
+    <div class="form-row">
+      <span class="label required">交割日</span>
+      <input class="form-input" value="2026-07-06" />
+      <span class="tag tag-success" style="margin-left:8px;">T+2</span>
+      <span class="text-muted" style="margin-left:8px;">✓ 银行营业日</span>
+    </div>
+    <div class="form-row">
+      <span class="label">期限(天数)</span>
+      <input class="form-input text-right" value="2" readonly />
+      <span class="text-muted">= 交割日 - 交易日(后端算)</span>
+    </div>
+    <div class="form-row">
+      <span class="label">到期日</span>
+      <input class="form-input" value="2026-07-06" readonly />
+      <span class="text-muted">= 交割日(不可改)</span>
+    </div>
+
+    <div class="divider-text">其他</div>
+
+    <div class="form-row">
+      <span class="label">用途</span>
+      <input class="form-input" value="付货款" />
+    </div>
+    <div class="form-row">
+      <span class="label">备注</span>
+      <input class="form-input" />
+    </div>
+
+    <div style="margin-top: 16px; padding: 12px; background: #f0f9ff; border-radius: 4px; font-size: 12px; color: #409eff;">
+      💡 <b>v3.2 提示</b>:所有联动计算(买入金额/期限/到期日)由后端 <code>POST /api/v1/dealing/fx-deals/calculate</code> 统一计算,前端无计算逻辑。修改任一字段(卖出/买入/汇率/市场/点差/交易日/交割日)300ms 后自动重算。
+    </div>
+  `;
+}
+
+function renderDrawerFwd() {
+  return `
+    <div class="tabs" style="margin-bottom:16px;">
+      <div class="tab" onclick="openDrawer('SPOT')">📊 即期 SPOT</div>
+      <div class="tab active">📅 远期 FWD</div>
+      <div class="tab" onclick="openDrawer('NDF')">💱 NDF</div>
+    </div>
+
+    <div class="section-title">基础信息</div>
+    <div class="form-row">
+      <span class="label required">管理主体</span>
+      <select class="form-select"><option>BU001 集团总部</option></select>
+    </div>
+    <div class="form-row">
+      <span class="label required">交易员</span>
+      <select class="form-select"><option>001 李四</option></select>
+    </div>
+    <div class="form-row">
+      <span class="label required">对手方</span>
+      <select class="form-select"><option>5001 中行总行</option></select>
+    </div>
+    <div class="form-row">
+      <span class="label required">金融工具</span>
+      <select class="form-select"><option>FX-FWD-USD-CNY-3M</option></select>
+    </div>
+    <div class="form-row">
+      <span class="label required">币种对</span>
+      <select class="form-select"><option>USD/CNY</option></select>
+    </div>
+
+    <div class="divider-text">远期交易要素<span style="float:right;font-size:11px;color:#909399;">💡 后端 calculate 自动算</span></div>
+
+    <div class="leg-block">
+      <div class="leg-header">
+        <span class="leg-label text-danger">↗ 卖出</span>
+        <span class="text-muted text-sm">到约定日交割</span>
+      </div>
+      <div class="leg-row">
+        <input class="form-input" style="width:80px;" value="USD" readonly />
+        <input class="form-input text-right text-mono" value="100,000.00" />
+        <span class="suffix">美元</span>
+      </div>
+    </div>
+
+    <div class="leg-arrow">↓ 锁定汇率 ↓</div>
+
+    <div class="leg-block">
+      <div class="leg-header">
+        <span class="leg-label text-success">↙ 买入</span>
+        <span class="text-muted text-sm">后端 calculate 算</span>
+      </div>
+      <div class="leg-row">
+        <input class="form-input" style="width:80px;" value="CNY" readonly />
+        <input class="form-input text-right text-mono" value="720,000.00" readonly />
+        <span class="suffix">人民币</span>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <span class="label required">远期汇率</span>
+      <input class="form-input text-right text-mono" value="7.2000" />
+      <span class="suffix">后端 calculate 联动</span>
+    </div>
+    <div class="form-row">
+      <span class="label">市场汇率</span>
+      <input class="form-input text-right text-mono readonly" value="7.2015" readonly />
+      <span class="text-muted">远期点 +15 bp</span>
+    </div>
+
+    <div class="divider-text">日期(在 tms_deals_t 公共表)</div>
+
+    <div class="form-row">
+      <span class="label required">交易日</span>
+      <input class="form-input" value="2026-07-04" />
+    </div>
+    <div class="form-row">
+      <span class="label required">交割日</span>
+      <input class="form-input" value="2026-10-04" />
+      <span class="text-muted" style="margin-left:8px;">= 交易日 + 3M</span>
+    </div>
+    <div class="form-row">
+      <span class="label">期限(天数)</span>
+      <input class="form-input text-right" value="92" readonly />
+      <span class="text-muted">后端 calculate 算 = 交割日 - 交易日</span>
+    </div>
+    <div class="form-row">
+      <span class="label">到期日</span>
+      <input class="form-input" value="2026-10-04" readonly />
+      <span class="text-muted">= 交割日(不可改)</span>
+    </div>
+
+    <div class="divider-text">📋 NDF 特有(FWD 不需要)</div>
+
+    <div class="form-row" style="color:#909399;">
+      <span class="label">fixing 汇率来源</span>
+      <input class="form-input" value="—" disabled />
+      <span class="text-muted">FWD 不适用</span>
+    </div>
+
+    <div style="margin-top: 16px; padding: 12px; background: #f0f9ff; border-radius: 4px; font-size: 12px; color: #409eff;">
+      💡 <b>v3.2 提示</b>:所有联动计算(买入金额/期限/到期日)由后端 <code>POST /api/v1/dealing/fx-deals/calculate</code> 统一计算。FWD 创建即生成 3 行 DealMap(BUY/SELL/RATE)+ 2 条 Cashflow。
+    </div>
+
+    <div class="form-row">
+      <span class="label">用途</span>
+      <input class="form-input" value="锁定付汇成本" />
+    </div>
+    <div class="form-row">
+      <span class="label">备注</span>
+      <input class="form-input" />
+    </div>
+  `;
+}
+
+function renderDrawerNdf() {
+  return `
+    <div class="tabs" style="margin-bottom:16px;">
+      <div class="tab" onclick="openDrawer('SPOT')">📊 即期 SPOT</div>
+      <div class="tab" onclick="openDrawer('FWD')">📅 远期 FWD</div>
+      <div class="tab active">💱 NDF</div>
+    </div>
+
+    <div class="section-title">基础信息</div>
+    <div class="form-row">
+      <span class="label required">管理主体</span>
+      <select class="form-select"><option>BU001 集团总部</option></select>
+    </div>
+    <div class="form-row">
+      <span class="label required">交易员</span>
+      <select class="form-select"><option>001 李四</option></select>
+    </div>
+    <div class="form-row">
+      <span class="label required">对手方(报价行)</span>
+      <select class="form-select"><option>5002 汇丰银行</option></select>
+    </div>
+    <div class="form-row">
+      <span class="label required">金融工具</span>
+      <select class="form-select"><option>FX-NDF-USD-CNY-3M</option></select>
+    </div>
+    <div class="form-row">
+      <span class="label required">币种对</span>
+      <select class="form-select"><option>USD/CNY</option></select>
+    </div>
+
+    <div class="warning-card">
+      <div class="title">⚠️ NDF 业务特点(必读)</div>
+      <ul>
+        <li><b>到期只结算差额,不会发生本金交割</b></li>
+        <li>适用场景:汇率管制地区、无法交割的币种(如部分新兴市场货币)</li>
+        <li>差额 = 名义本金 × (结算汇率 - 锁定汇率)</li>
+        <li>例:100,000 USD × (7.1500 - 7.2000) = -5,000 CNY(我方应收)</li>
+        <li>结算汇率到到期日由市场决定,RATE_FIX Action 录入</li>
+        <li><b>v3.2:</b>创建不生成 CF,等 RATE_FIX 后才生成 1 条差额 CF</li>
+      </ul>
+    </div>
+
+    <div class="divider-text">NDF 交易要素<span style="float:right;font-size:11px;color:#909399;">💡 后端 calculate 自动算</span></div>
+
+    <div class="form-row">
+      <span class="label required">名义本金</span>
+      <input class="form-input" style="width:80px;" value="USD" readonly />
+      <input class="form-input text-right text-mono" value="100,000.00" />
+      <span class="suffix">不交割本金</span>
+    </div>
+    <div class="form-row">
+      <span class="label required">结算币种</span>
+      <input class="form-input" style="width:80px;" value="CNY" readonly />
+      <span class="text-muted">差额用此币种结算</span>
+    </div>
+
+    <div class="form-row">
+      <span class="label required">锁定汇率</span>
+      <input class="form-input text-right text-mono" value="7.2000" />
+      <span class="suffix">后端 calculate 联动</span>
+    </div>
+    <div class="form-row">
+      <span class="label">市场汇率</span>
+      <input class="form-input text-right text-mono readonly" value="7.1985" readonly />
+      <span class="text-muted">-15 bp(贴水)</span>
+    </div>
+
+    <div class="divider-text">日期(在 tms_deals_t 公共表)</div>
+
+    <div class="form-row">
+      <span class="label required">交易日</span>
+      <input class="form-input" value="2026-07-04" />
+    </div>
+    <div class="form-row">
+      <span class="label required">交割日</span>
+      <input class="form-input" value="2026-10-04" />
+      <span class="text-muted" style="margin-left:8px;">= 交易日 + 3M</span>
+    </div>
+    <div class="form-row">
+      <span class="label">期限(天数)</span>
+      <input class="form-input text-right" value="92" readonly />
+      <span class="text-muted">后端 calculate 算</span>
+    </div>
+    <div class="form-row">
+      <span class="label">到期日</span>
+      <input class="form-input" value="2026-10-04" readonly />
+      <span class="text-muted">= 交割日(不可改)</span>
+    </div>
+
+    <div class="divider-text">📋 NDF 特有</div>
+
+    <div class="form-row">
+      <span class="label required">fixing 汇率来源</span>
+      <select class="form-select"><option>BLOOMBERG BFIX</option></select>
+    </div>
+    <div class="form-row" style="color:#909399;">
+      <span class="label">fixing 汇率</span>
+      <input class="form-input" value="— —" disabled />
+      <span class="text-muted">RATE_FIX 时填入</span>
+    </div>
+    <div class="form-row" style="color:#909399;">
+      <span class="label">结算金额</span>
+      <input class="form-input" value="— —" disabled />
+      <span class="text-muted">RATE_FIX 时计算 = notional × (fixing - 锁定)</span>
+    </div>
+
+    <div style="margin-top: 16px; padding: 12px; background: #fff7e6; border-radius: 4px; font-size: 12px; color: #e6a23c; border: 1px solid #faecd8;">
+      ⚠️ <b>NDF v3.2 提示</b>:DEAL 创建时<b>不</b>生成 Cashflow,等到期日执行 RATE_FIX Action 后,生成第 4 行 DealMap(FX_FIX)+ 1 条差额 Cashflow。
+    </div>
+
+    <div class="form-row">
+      <span class="label">用途</span>
+      <input class="form-input" value="海外子公司利润汇回" />
+    </div>
+    <div class="form-row">
+      <span class="label">备注</span>
+      <input class="form-input" value="汇率管制地区,无法交割" />
+    </div>
+  `;
+}
+
+// ========== Dialogs ==========
+function renderApprovalDialog() {
+  return `
+    <div class="form-row"><span class="label">交易编号</span><span class="text-mono">FX202606280001 (FWD)</span></div>
+    <div class="form-row"><span class="label">金额</span><span>USD 100,000 ↔ CNY 720,000</span></div>
+    <div class="form-row"><span class="label">申请人</span><span>李四  2026-06-28 14:30</span></div>
+    <div class="form-row"><span class="label">当前状态</span><span class="tag tag-warning">🟡 已审批 - 待复审</span></div>
+    <div class="divider"></div>
+    <div class="form-row">
+      <span class="label required">审批动作</span>
+      <div>
+        <label style="margin-right:16px;"><input type="radio" name="appr" checked /> ✓ 通过</label>
+        <label style="margin-right:16px;"><input type="radio" name="appr" /> ✗ 驳回</label>
+        <label><input type="radio" name="appr" /> ↗ 转交</label>
+      </div>
+    </div>
+    <div class="form-row">
+      <span class="label">审批意见</span>
+      <textarea class="form-input" rows="3" placeholder="请输入审批意见">远期交易符合资金管理需要,通过。</textarea>
+    </div>
+  `;
+}
+
+function renderMtmDialog() {
+  return `
+    <div class="form-row"><span class="label">交易编号</span><span class="text-mono">FX202606280001 (FWD)</span></div>
+    <div class="form-row"><span class="label">当前公允价值</span><span class="text-success">+5,200 CNY</span></div>
+    <div class="divider"></div>
+    <div class="form-row">
+      <span class="label required">触发方式</span>
+      <div>
+        <label><input type="radio" name="mtm" /> 拉取实时市场汇率(自动)</label><br>
+        <label><input type="radio" name="mtm" checked /> 手动输入公允价值</label>
+      </div>
+    </div>
+    <div class="form-row">
+      <span class="label">新公允价值</span>
+      <input class="form-input text-right text-mono" value="+6,500" />
+      <span class="suffix">CNY</span>
+    </div>
+    <div class="form-row">
+      <span class="label">变动</span>
+      <span class="text-success text-mono">+1,300 CNY ↑</span>
+    </div>
+    <div class="form-row">
+      <span class="label">说明</span>
+      <textarea class="form-input" rows="2" placeholder="今日市场汇率波动较大,重新评估">USD 升值,远期合约公允价值上升</textarea>
+    </div>
+    <div class="warning-card" style="margin-top:16px;">
+      <div class="title">💡 提示</div>
+      <ul>
+        <li>手动 MTM 会立即触发会计分录(MTM Increment/Decrement)</li>
+        <li>系统每日 17:30 自动 MTM,无需手动触发</li>
+        <li>如有疑问请先与风控确认</li>
+      </ul>
+    </div>
+  `;
+}
+
+// ========== Page Switcher ==========
+function showPage(name) {
+  const content = document.getElementById('content');
+  document.querySelectorAll('.page-switcher button').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  content.innerHTML = pages[name]();
+}
+
+function switchProduct(p) {
+  document.querySelectorAll('#productTabs .tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`#productTabs .tab[data-product="${p}"]`).classList.add('active');
+  document.getElementById('dealTable').innerHTML = renderTable(p);
+}
+
+function switchDetailTab(t) {
+  document.querySelectorAll('#detailTabs .tab').forEach(tab => tab.classList.remove('active'));
+  document.querySelector(`#detailTabs .tab[data-detail-tab="${t}"]`).classList.add('active');
+  const map = {
+    'dealmap': renderDealMapTab,
+    'cashflow': () => `<div class="section-title">Cashflow</div>
+      <table><thead><tr><th>编号</th><th>关联 DM</th><th>币种</th><th>方向</th><th class="text-right">金额</th><th>起息日</th><th>状态</th></tr></thead>
+      <tbody><tr><td colspan="7" class="empty">FWD 签约日无现金流,到期交割时生成 2 条</td></tr></tbody></table>`,
+    'accounting': () => `<div class="section-title">📊 会计分录 (3 笔)</div>${renderAccountingEvents()}`,
+    'approval': () => `<div class="section-title">审批记录</div>
+      <div class="timeline">
+        <div class="timeline-item"><div class="timeline-dot success"></div><div class="timeline-content">
+          <div class="timeline-header"><span class="timeline-time">2026-06-28 14:30:25</span><span class="tag tag-info">ACT202606280001</span><span class="timeline-event">李四 - 提交</span><span class="tag tag-success">通过</span></div>
+        </div></div>
+        <div class="timeline-item"><div class="timeline-dot success"></div><div class="timeline-content">
+          <div class="timeline-header"><span class="timeline-time">2026-06-28 15:42:10</span><span class="tag tag-info">ACT202606280002</span><span class="timeline-event">王五 - 初审</span><span class="tag tag-success">通过</span></div>
+          <div class="timeline-body text-muted">意见:合约要素齐全,通过初审</div>
+        </div></div>
+        <div class="timeline-item"><div class="timeline-dot pending"></div><div class="timeline-content">
+          <div class="timeline-header"><span class="timeline-time">⏳</span><span class="tag tag-warning">待复审</span><span class="timeline-event">赵六 - 复审</span></div>
+        </div></div>
+      </div>`,
+    'history': () => `<div class="section-title">变更历史(Image 镜像)</div>
+      <table><thead><tr><th>版本</th><th>变更类型</th><th>操作人</th><th>变更时间</th><th>关键字段</th></tr></thead>
+      <tbody>
+        <tr><td>v1</td><td><span class="tag tag-primary">CREATE</span></td><td>李四</td><td>2026-06-28 14:30</td><td>签约金额 USD 100,000, 汇率 7.2000</td></tr>
+      </tbody></table>`,
+  };
+  document.getElementById('detailContent').innerHTML = map[t]();
+}
+
+// ========== Drawer / Dialog ==========
+function openDrawer(type) {
+  const drawer = document.getElementById('drawer');
+  const body = document.getElementById('drawerBody');
+  const title = document.getElementById('drawerTitle');
+  const map = {
+    'SPOT': ['新建即期外汇交易', renderDrawerSpot],
+    'FWD':  ['新建远期外汇交易', renderDrawerFwd],
+    'NDF':  ['新建 NDF 外汇交易', renderDrawerNdf],
+  };
+  title.textContent = map[type][0];
+  body.innerHTML = map[type][1]();
+  document.getElementById('drawerMask').classList.add('show');
+  drawer.classList.add('show');
+}
+
+function closeDrawer() {
+  document.getElementById('drawerMask').classList.remove('show');
+  document.getElementById('drawer').classList.remove('show');
+}
+
+function openDialog(type) {
+  const dialog = document.getElementById('dialog');
+  const body = document.getElementById('dialogBody');
+  const title = document.getElementById('dialogTitle');
+  const footer = document.getElementById('dialogFooter');
+  const map = {
+    'mtm': ['手动触发 MTM 调整', renderMtmDialog, '<button class="btn btn-default" onclick="closeDialog()">取消</button><button class="btn btn-primary" onclick="closeDialog()">确认触发</button>'],
+    'approval': ['审批外汇交易', renderApprovalDialog, '<button class="btn btn-default" onclick="closeDialog()">取消</button><button class="btn btn-primary" onclick="closeDialog()">确认提交</button>'],
+  };
+  title.textContent = map[type][0];
+  body.innerHTML = map[type][1]();
+  footer.innerHTML = map[type][2];
+  document.getElementById('dialogMask').classList.add('show');
+}
+
+function closeDialog() {
+  document.getElementById('dialogMask').classList.remove('show');
+}
+
+// ========== Init ==========
+document.getElementById('content').innerHTML = pages['list']();
+
+// Show approval dialog button on detail page
+function showApprovalDialog() { openDialog('approval'); }
+
+</script>
+
+</body>
+</html>

@@ -1,8 +1,8 @@
 package com.opentms.basedata.controller;
 
-import com.opentms.basedata.entity.BusinessUnit;
-import com.opentms.basedata.service.BusinessUnitService;
-import com.opentms.basedata.vo.BusinessUnitVO;
+import com.opentms.basedata.entity.ManagementEntity;
+import com.opentms.basedata.service.ManagementEntityService;
+import com.opentms.basedata.vo.ManagementEntityVO;
 import com.opentms.common.model.Result;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.ws.rs.*;
@@ -15,10 +15,10 @@ import java.util.List;
 @Component
 @Path("/api/v1/management-entities")
 @Produces(MediaType.APPLICATION_JSON)
-public class BusinessUnitResource {
+public class ManagementEntityResource {
 
     @Autowired
-    private BusinessUnitService businessUnitService;
+    private ManagementEntityService managementEntityService;
 
     @GET
     @Path("/page")
@@ -28,13 +28,13 @@ public class BusinessUnitResource {
             @QueryParam("entityType") String entityType,
             @QueryParam("pageNum") @DefaultValue("1") int pageNum,
             @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
-        return Result.success(businessUnitService.queryPage(keyword, status, entityType, pageNum, pageSize));
+        return Result.success(managementEntityService.queryPage(keyword, status, entityType, pageNum, pageSize));
     }
 
     @GET
     @Path("/tree")
     public Object tree() {
-        List<BusinessUnitVO> tree = businessUnitService.getHierarchyTree();
+        List<ManagementEntityVO> tree = managementEntityService.getHierarchyTree();
         return Result.success(tree);
     }
 
@@ -46,11 +46,11 @@ public class BusinessUnitResource {
             if (parseId <= 0) {
                 return Result.badRequest("ID必须为正整数");
             }
-            BusinessUnit businessUnit = businessUnitService.getBusinessUnitById(parseId);
-            if (businessUnit == null) {
+            ManagementEntity managementEntity = managementEntityService.getManagementEntityById(parseId);
+            if (managementEntity == null) {
                 return Result.notFound("Management entity not found");
             }
-            return Result.success(businessUnit);
+            return Result.success(managementEntity);
         } catch (NumberFormatException e) {
             return Result.badRequest("ID参数格式不正确");
         }
@@ -58,9 +58,9 @@ public class BusinessUnitResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Object save(BusinessUnit businessUnit) {
+    public Object save(ManagementEntity managementEntity) {
         try {
-            businessUnitService.saveBusinessUnit(businessUnit);
+            managementEntityService.saveManagementEntity(managementEntity);
             return Result.success();
         } catch (Exception e) {
             return Result.error(e.getMessage());
@@ -70,9 +70,9 @@ public class BusinessUnitResource {
     @POST
     @Path("/update")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Object update(BusinessUnit businessUnit) {
+    public Object update(ManagementEntity managementEntity) {
         try {
-            businessUnitService.updateBusinessUnit(businessUnit);
+            managementEntityService.updateManagementEntity(managementEntity);
             return Result.success();
         } catch (Exception e) {
             return Result.error(e.getMessage());
@@ -87,7 +87,7 @@ public class BusinessUnitResource {
             if (parseId <= 0) {
                 return Result.badRequest("ID必须为正整数");
             }
-            businessUnitService.deleteBusinessUnit(parseId);
+            managementEntityService.deleteManagementEntity(parseId);
             return Result.success();
         } catch (NumberFormatException e) {
             return Result.badRequest("ID参数格式不正确");

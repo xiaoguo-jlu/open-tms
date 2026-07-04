@@ -304,7 +304,7 @@ SELECT image_type FROM tms_deals_image_t WHERE deal_number = 'AC202606210004' AN
 
 ### 7.2 相关文档
 
-- PRD：`docs/prd/M1/M1-DealMap 生命周期事件PRD.md`
+- PRD：`docs/prd/M1/M1-DealMapPRD-v2.md` (renamed from `M1-DealMap 生命周期事件PRD.md`)
 - API 文档：`docs/api/dealing/M1-AC交易API.md`
 - UX 原型：`docs/原型/M1/M1-AC交易UX原型.md`
 - 测试用例：`docs/testcase/dealing/AC交易测试用例.md`

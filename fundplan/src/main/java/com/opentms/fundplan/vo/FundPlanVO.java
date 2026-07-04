@@ -14,7 +14,7 @@ public class FundPlanVO {
 
     private Integer planMonth;
 
-    private Long businessUnitId;
+    private Long managementEntityId;
 
     private BigDecimal totalIncome;
 

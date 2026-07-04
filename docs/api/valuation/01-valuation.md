@@ -1,5 +1,7 @@
 # 金融工具估值接口
 
+> ⚠️ [PLANNED — Not Implemented] M3 估值
+
 **模块**: valuation  
 **版本**: v1.0  
 **路径**: `/api/v1/valuations`
@@ -57,7 +59,7 @@ GET /api/v1/valuations/{id}
 
 ```
 GET /api/v1/valuations/parameters
-PUT /api/v1/valuations/parameters
+POST /api/v1/valuations/parameters/update
 ```
 
 ```json

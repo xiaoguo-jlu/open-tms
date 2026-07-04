@@ -1,4 +1,17 @@
 {
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python F:/code/opencode/opentrm/scripts/maintain/export_conversations.py"
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "allow": [
       "Bash(cmd *)",
@@ -38,7 +51,12 @@
       "Bash(when \"D:/Program Files/JetBrains/IntelliJ IDEA 2026.1.2/plugins/maven/lib/maven3/bin/mvn.cmd\" *)",
       "Bash(\"D:/Program Files/JetBrains/IntelliJ IDEA 2026.1.2/plugins/maven/lib/maven3/bin/mvn.cmd\" package -pl basedata -am -DskipTests)",
       "Bash(tasklist)",
-      "Skill(update-config)"
+      "Skill(update-config)",
+      "Bash(mkdir -p ~/.claude/skills-backup)",
+      "Bash(mv ~/.claude/skills/canvas-design ~/.claude/skills-backup/)",
+      "Bash(mv ~/.claude/skills/claude-api ~/.claude/skills-backup/)",
+      "Bash(mv ~/.claude/skills/skill-creator ~/.claude/skills-backup/)",
+      "Bash(mv ~/.claude/skills/skill-optimization ~/.claude/skills-backup/)"
     ]
   }
 }

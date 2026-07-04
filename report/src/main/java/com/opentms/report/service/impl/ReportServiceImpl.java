@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class ReportServiceImpl extends ServiceImpl<ReportMapper, Report> implements ReportService {
 
     @Override
-    public Page<Report> queryPage(String keyword, Long templateId, Long businessUnitId,
+    public Page<Report> queryPage(String keyword, Long templateId, Long managementEntityId,
                                  String status, int pageNum, int pageSize) {
         LambdaQueryWrapper<Report> wrapper = new LambdaQueryWrapper<>();
 
@@ -27,8 +27,8 @@ public class ReportServiceImpl extends ServiceImpl<ReportMapper, Report> impleme
             wrapper.eq(Report::getTemplateId, templateId);
         }
 
-        if (businessUnitId != null) {
-            wrapper.eq(Report::getBusinessUnitId, businessUnitId);
+        if (managementEntityId != null) {
+            wrapper.eq(Report::getManagementEntityId, managementEntityId);
         }
 
         if (StringUtils.hasText(status)) {

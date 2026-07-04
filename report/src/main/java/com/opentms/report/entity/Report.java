@@ -22,7 +22,7 @@ public class Report {
 
     private String reportTemplate;
 
-    private Long businessUnitId;
+    private Long managementEntityId;
 
     private String currency;
 

@@ -4,9 +4,9 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import App from './App.vue'
 
-// 页面组件 - 业务单元
-import BusinessUnitList from './views/basedata/BusinessUnitList.vue'
-import BusinessUnitForm from './views/basedata/BusinessUnitForm.vue'
+// 页面组件 - 管理主体
+import ManagementEntityList from './views/basedata/ManagementEntityList.vue'
+import ManagementEntityForm from './views/basedata/ManagementEntityForm.vue'
 
 // 页面组件 - 币种
 import CurrencyList from './views/basedata/CurrencyList.vue'
@@ -35,10 +35,10 @@ import TraderForm from './views/basedata/TraderForm.vue'
 // 路由配置
 const routes = [
   { path: '/', redirect: '/basedata/currency' },
-  // 业务单元
-  { path: '/basedata/business-unit', component: BusinessUnitList },
-  { path: '/basedata/business-unit/add', component: BusinessUnitForm },
-  { path: '/basedata/business-unit/edit/:id', component: BusinessUnitForm },
+  // 管理主体
+  { path: '/basedata/management-entity', component: ManagementEntityList },
+  { path: '/basedata/management-entity/add', component: ManagementEntityForm },
+  { path: '/basedata/management-entity/edit/:id', component: ManagementEntityForm },
   // 币种
   { path: '/basedata/currency', component: CurrencyList },
   { path: '/basedata/currency/add', component: CurrencyForm },

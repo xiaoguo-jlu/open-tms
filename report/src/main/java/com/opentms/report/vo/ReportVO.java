@@ -18,9 +18,9 @@ public class ReportVO {
 
     private LocalDate reportDate;
 
-    private Long businessUnitId;
+    private Long managementEntityId;
 
-    private String businessUnitName;
+    private String managementEntityName;
 
     private LocalDate startDate;
 

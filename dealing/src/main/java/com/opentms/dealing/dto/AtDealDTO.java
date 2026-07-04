@@ -21,7 +21,7 @@ public class AtDealDTO {
     /** 转账类型：SAME_COMPANY / CROSS_COMPANY / CROSS_BORDER */
     private String transferType;
 
-    private String businessUnit;
+    private String managementEntity;
 
     /** 付出方银行账户 ID */
     private Long sourceAccountId;

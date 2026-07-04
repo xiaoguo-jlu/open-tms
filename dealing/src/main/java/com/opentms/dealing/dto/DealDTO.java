@@ -14,7 +14,7 @@ public class DealDTO {
 
     private String dealType;
 
-    private String businessUnit;
+    private String managementEntity;
 
     private Long counterpartyId;
 

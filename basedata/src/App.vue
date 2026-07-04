@@ -12,7 +12,7 @@
           <template #title>
             <span>基础数据</span>
           </template>
-          <el-menu-item index="/basedata/business-unit">业务单元</el-menu-item>
+          <el-menu-item index="/basedata/management-entity">管理主体</el-menu-item>
           <el-menu-item index="/basedata/trader">交易员</el-menu-item>
           <el-menu-item index="/basedata/currency">币种</el-menu-item>
           <el-menu-item index="/basedata/country">国家/地区</el-menu-item>

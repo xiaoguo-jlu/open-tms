@@ -73,13 +73,3 @@ export function importManagementEntity(formData) {
     headers: { 'Content-Type': 'multipart/form-data' }
   })
 }
-
-// 兼容旧API名称 (别名)
-export const listBusinessUnit = listManagementEntity
-export const getBusinessUnit = getManagementEntity
-export const saveBusinessUnit = saveManagementEntity
-export const updateBusinessUnit = updateManagementEntity
-export const deleteBusinessUnit = deleteManagementEntity
-export const batchDeleteBusinessUnit = batchDeleteManagementEntity
-export const exportBusinessUnit = exportManagementEntity
-export const importBusinessUnit = importManagementEntity

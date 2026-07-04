@@ -40,21 +40,21 @@ public class FundPlanServiceImpl extends ServiceImpl<FundPlanMapper, FundPlan> i
     }
 
     @Override
-    public List<FundPlan> getAnnualPlans(Integer planYear, Long businessUnitId) {
+    public List<FundPlan> getAnnualPlans(Integer planYear, Long managementEntityId) {
         LambdaQueryWrapper<FundPlan> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(FundPlan::getPlanType, "ANNUAL");
         if (planYear != null) {
             wrapper.eq(FundPlan::getPlanNo, planYear);
         }
-        if (businessUnitId != null) {
-            wrapper.eq(FundPlan::getBusinessUnitId, businessUnitId);
+        if (managementEntityId != null) {
+            wrapper.eq(FundPlan::getManagementEntityId, managementEntityId);
         }
         wrapper.orderByDesc(FundPlan::getPlanNo);
         return list(wrapper);
     }
 
     @Override
-    public List<FundPlan> getMonthlyPlans(Integer planYear, Integer planMonth, Long businessUnitId) {
+    public List<FundPlan> getMonthlyPlans(Integer planYear, Integer planMonth, Long managementEntityId) {
         LambdaQueryWrapper<FundPlan> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(FundPlan::getPlanType, "MONTHLY");
         if (planYear != null) {
@@ -63,8 +63,8 @@ public class FundPlanServiceImpl extends ServiceImpl<FundPlanMapper, FundPlan> i
         if (planMonth != null) {
             wrapper.eq(FundPlan::getPlanName, planMonth);
         }
-        if (businessUnitId != null) {
-            wrapper.eq(FundPlan::getBusinessUnitId, businessUnitId);
+        if (managementEntityId != null) {
+            wrapper.eq(FundPlan::getManagementEntityId, managementEntityId);
         }
         wrapper.orderByDesc(FundPlan::getPlanNo, FundPlan::getPlanName);
         return list(wrapper);

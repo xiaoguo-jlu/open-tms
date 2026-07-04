@@ -107,7 +107,7 @@ AT Deal（1 笔）
 
 | 功能 | 说明 | 优先级 |
 |------|------|--------|
-| **同/跨公司识别** | 根据源账户与目标账户的 business_unit 自动判断 transfer_type | P0 |
+| **同/跨公司识别** | 根据源账户与目标账户的 management_entity 自动判断 transfer_type | P0 |
 | **同/跨币种识别** | 根据源账户与目标账户的 currency 自动判断是否启用 exchange_rate | P0 |
 | **跨境标记** | 根据源账户与目标账户的 country_code 自动标记 transfer_type=CROSS_BORDER | P0 |
 | **汇率录入** | 跨币种时录入 exchange_rate + 自动计算 dest_amount | P0 |
@@ -138,8 +138,8 @@ CREATE TABLE tms_at_deals_t (
     -- ============================================================
     -- 业务主体
     -- ============================================================
-    business_unit            VARCHAR(50)     NOT NULL,
-    -- 关联交易主体（业务单元 code，如 BU001 集团总部）
+    management_entity            VARCHAR(50)     NOT NULL,
+    -- 关联交易主体（管理主体 code，如 BU001 集团总部）
 
     -- ============================================================
     -- 转账类型（AT 特有）
@@ -231,7 +231,7 @@ CREATE TABLE tms_at_deals_t (
 );
 
 -- 索引
-CREATE INDEX idx_atd_business_unit      ON tms_at_deals_t(business_unit);
+CREATE INDEX idx_atd_management_entity      ON tms_at_deals_t(management_entity);
 CREATE INDEX idx_atd_transfer_type      ON tms_at_deals_t(transfer_type);
 CREATE INDEX idx_atd_source_account     ON tms_at_deals_t(source_account_id);
 CREATE INDEX idx_atd_dest_account       ON tms_at_deals_t(dest_account_id);
@@ -245,7 +245,7 @@ CREATE INDEX idx_atd_deleted            ON tms_at_deals_t(deleted);
 | 字段 | 类型 | 必填 | 校验规则 | 说明 |
 |------|------|------|---------|------|
 | deal_number | VARCHAR(50) | 系统 | 系统生成（AT+yyyyMMdd+序号） | 唯一 |
-| business_unit | VARCHAR(50) | Y | 业务单元必须启用 | 对齐 tms_business_unit_t |
+| management_entity | VARCHAR(50) | Y | 管理主体必须启用 | 对齐 tms_management_entity_t |
 | transfer_type | VARCHAR(20) | Y | 枚举 | 系统可自动识别 |
 | source_account_id | BIGINT | Y | 必须存在且启用 | 银行账户 ID |
 | source_account_no | VARCHAR(50) | Y | - | 银行账户编号 |
@@ -267,7 +267,7 @@ CREATE INDEX idx_atd_deleted            ON tms_at_deals_t(deleted);
 ```sql
 -- tms_deals_t 增加一条记录（与 AT Deal 共享 deal_number）
 INSERT INTO tms_deals_t (
-    deal_number, deal_type, business_unit,
+    deal_number, deal_type, management_entity,
     amount, currency,
     deal_date, value_date, status, latest_action_number,
     created_by, created_at
@@ -495,8 +495,8 @@ UPDATE tms_actions_t SET approval_status1='Approved'
 
 | transfer_type | 业务描述 | transfer_type 判定逻辑 |
 |---------------|---------|---------------------|
-| **SAME_COMPANY** | 同公司内账户转账 | source_account.business_unit = dest_account.business_unit |
-| **CROSS_COMPANY** | 跨公司账户转账（不同 BU） | source_account.business_unit ≠ dest_account.business_unit |
+| **SAME_COMPANY** | 同公司内账户转账 | source_account.management_entity = dest_account.management_entity |
+| **CROSS_COMPANY** | 跨公司账户转账（不同 BU） | source_account.management_entity ≠ dest_account.management_entity |
 | **CROSS_BORDER** | 跨境转账 | source_account.country ≠ dest_account.country |
 
 ### 6.2 按币种分类
@@ -529,7 +529,7 @@ UPDATE tms_actions_t SET approval_status1='Approved'
 | 同币种汇率=1 | source_currency = dest_currency 时 exchange_rate=1.0 | 后端自动设置 |
 | dest_amount 计算 | dest_amount = source_amount × exchange_rate | 前端实时计算 + 后端校验 |
 | 跨境业务必填 SWIFT | 跨境时需要 SWIFT code（M1+ 暂留空，M2+ 引入） | 预留字段 |
-| 跨公司业务记录对方 BU | dest_account.business_unit 与 source_account.business_unit 不一致 | 自动记录 |
+| 跨公司业务记录对方 BU | dest_account.management_entity 与 source_account.management_entity 不一致 | 自动记录 |
 
 ---
 
@@ -643,7 +643,7 @@ INSERT INTO tms_deal_map_t (
 ```sql
 -- CF1: 关联 SOURCE TRANSFER DealMap
 INSERT INTO tms_cashflow_t (
-    cflow_number, deal_number, business_unit,
+    cflow_number, deal_number, management_entity,
     bank_account, direction, amount, currency,
     cflow_date, value_date, source_type, source_ref, status,
     dealmap_number, account_role,
@@ -658,7 +658,7 @@ INSERT INTO tms_cashflow_t (
 
 -- CF2: 关联 DESTINATION TRANSFER DealMap
 INSERT INTO tms_cashflow_t (
-    cflow_number, deal_number, business_unit,
+    cflow_number, deal_number, management_entity,
     bank_account, direction, amount, currency,
     cflow_date, value_date, source_type, source_ref, status,
     dealmap_number, account_role,
@@ -697,7 +697,7 @@ INSERT INTO tms_cashflow_t (
 | dest_amount = source_amount × exchange_rate | 自动计算并校验 | 后端 |
 | 金额 > 0 | amount > 0 | 前端 + 后端 |
 | 起息日合法 | value_date 不能早于今天 | 前端 |
-| 业务单元必填 | business_unit 必填 | 前端 |
+| 管理主体必填 | management_entity 必填 | 前端 |
 
 ### 8.3 transfer_type 自动识别规则
 
@@ -709,7 +709,7 @@ public String detectTransferType(BankAccount source, BankAccount dest) {
         return "CROSS_BORDER";
     }
     // 跨公司
-    if (!source.getBusinessUnit().equals(dest.getBusinessUnit())) {
+    if (!source.getManagementEntity().equals(dest.getManagementEntity())) {
         return "CROSS_COMPANY";
     }
     // 同公司
@@ -840,7 +840,7 @@ New (新建) ──→ Pending (待审批) ──→ Approved (已审批)
 
 ```json
 {
-  "businessUnit": "BU001",
+  "managementEntity": "BU001",
   "transferType": "CROSS_COMPANY",
   "sourceAccountId": 201,
   "sourceAccountNo": "BANK_ACC_201",
@@ -898,7 +898,7 @@ New (新建) ──→ Pending (待审批) ──→ Approved (已审批)
 | 37 | tms_at_deals_t 子表 | AT 单独建表 tms_at_deals_t | 与 AcDeal 对齐 |
 | 38 | Cashflow 关联 TRANSFER | Cashflow 只关联 AccountTransfer DealMap（不关联 ActualCashflow） | 保持 Cashflow 与账户一一对应 |
 | 39 | dest_amount 联动计算 | 跨币种时后端校验 dest_amount = source_amount × exchange_rate | 防止数据不一致 |
-| 40 | transfer_type 自动识别 | 系统按 business_unit + country 自动判断 | 减少用户输入 |
+| 40 | transfer_type 自动识别 | 系统按 management_entity + country 自动判断 | 减少用户输入 |
 
 ### v1.0 历史决策（已被 v2.0 取代）
 

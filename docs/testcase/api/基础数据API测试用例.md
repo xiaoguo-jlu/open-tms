@@ -39,19 +39,19 @@
 | TC_CY_010 | 币种状态筛选 | API | P1 | GET /currencies?status=1 |
 | TC_CY_011 | 币种关键字搜索 | API | P1 | GET /currencies?keyword=CNY |
 
-### 2.2 业务单元管理 (Business Units) - `/api/v1/business-units`
+### 2.2 管理主体管理 (Business Units) - `/api/v1/management-entities`
 
 | 用例编号 | 用例名称 | 测试类型 | 优先级 | 接口 |
 |----------|----------|----------|--------|------|
-| TC_BU_001 | 业务单元列表查询 | API | P0 | GET /business-units |
-| TC_BU_002 | 业务单元分页查询 | API | P0 | GET /business-units/page |
-| TC_BU_003 | 业务单元详情查询 | API | P0 | GET /business-units/{id} |
-| TC_BU_004 | 业务单元新增成功 | API | P0 | POST /business-units |
-| TC_BU_005 | 业务单元编码重复校验 | API | P0 | POST /business-units |
-| TC_BU_006 | 业务单元必填字段校验 | API | P0 | POST /business-units |
-| TC_BU_007 | 业务单元编辑成功 | API | P0 | PUT /business-units |
-| TC_BU_008 | 业务单元删除成功 | API | P0 | DELETE /business-units/{id} |
-| TC_BU_009 | 业务单元停用状态验证 | API | P1 | GET /business-units?status=0 |
+| TC_BU_001 | 管理主体列表查询 | API | P0 | GET /management-entities |
+| TC_BU_002 | 管理主体分页查询 | API | P0 | GET /management-entities/page |
+| TC_BU_003 | 管理主体详情查询 | API | P0 | GET /management-entities/{id} |
+| TC_BU_004 | 管理主体新增成功 | API | P0 | POST /management-entities |
+| TC_BU_005 | 管理主体编码重复校验 | API | P0 | POST /management-entities |
+| TC_BU_006 | 管理主体必填字段校验 | API | P0 | POST /management-entities |
+| TC_BU_007 | 管理主体编辑成功 | API | P0 | PUT /management-entities |
+| TC_BU_008 | 管理主体删除成功 | API | P0 | DELETE /management-entities/{id} |
+| TC_BU_009 | 管理主体停用状态验证 | API | P1 | GET /management-entities?status=0 |
 
 ### 2.3 交易员管理 (Traders) - `/api/v1/traders`
 
@@ -414,23 +414,23 @@
 
 ---
 
-### 3.2 业务单元管理
+### 3.2 管理主体管理
 
-#### TC_BU_001 业务单元列表查询
+#### TC_BU_001 管理主体列表查询
 
 | 项目 | 内容 |
 |------|------|
 | 用例编号 | TC_BU_001 |
-| 用例名称 | 业务单元列表查询 |
+| 用例名称 | 管理主体列表查询 |
 | 测试类型 | API功能测试 |
 | 优先级 | P0 |
-| 接口 | GET /api/v1/business-units |
+| 接口 | GET /api/v1/management-entities |
 
 **前置条件**
 1. basedata服务已启动（端口8081）
 
 **测试步骤**
-1. 发送GET请求至 `http://localhost:8081/api/v1/business-units`
+1. 发送GET请求至 `http://localhost:8081/api/v1/management-entities`
 2. 验证响应状态码为200
 
 **预期结果**
@@ -486,7 +486,7 @@
 | 4 | JPY | 日元 | ¥ | 0 | 1 |
 | 5 | GBP | 英镑 | £ | 2 | 0 |
 
-### 4.2 业务单元测试数据
+### 4.2 管理主体测试数据
 
 | ID | code | name | englishName | legalRep | status |
 |----|------|------|-------------|---------|--------|

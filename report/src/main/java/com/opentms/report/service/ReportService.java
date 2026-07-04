@@ -5,7 +5,7 @@ import com.opentms.report.entity.Report;
 
 public interface ReportService {
 
-    Page<Report> queryPage(String keyword, Long templateId, Long businessUnitId, 
+    Page<Report> queryPage(String keyword, Long templateId, Long managementEntityId, 
                           String status, int pageNum, int pageSize);
 
     Report getReportById(Long id);

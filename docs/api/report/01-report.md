@@ -1,5 +1,7 @@
 # 报表分析接口
 
+> ⚠️ [PLANNED — Not Implemented] M5 报表
+
 **模块**: report  
 **版本**: v1.0  
 **路径**: `/api/v1/reports`
@@ -28,7 +30,7 @@ POST /api/v1/reports/generate
 {
   "templateId": 1,
   "reportName": "资金日报20260411",
-  "businessUnitId": 1,
+  "managementEntityId": 1,
   "startDate": "2026-04-11",
   "endDate": "2026-04-11",
   "parameters": {}
@@ -76,7 +78,7 @@ GET /api/v1/reports/{id}/export?format=EXCEL
 ```
 GET /api/v1/reports/schedules
 POST /api/v1/reports/schedules
-DELETE /api/v1/reports/schedules/{id}
+POST /api/v1/reports/schedules/delete/{id}
 ```
 
 ---

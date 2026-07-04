@@ -93,27 +93,27 @@
 
 ---
 
-### BUG-002: 业务单元管理-新增接口返回500错误
+### BUG-002: 管理主体管理-新增接口返回500错误
 
 | 项目 | 内容 |
 |------|------|
 | Bug编号 | BUG-002 |
-| 模块 | 业务单元管理 (Business Unit) |
-| 接口 | POST /api/v1/business-units |
+| 模块 | 管理主体管理 (Business Unit) |
+| 接口 | POST /api/v1/management-entities |
 | 严重级别 | 高 |
 | 优先级 | P0 |
 | 状态 | 待修复 |
 
 **缺陷描述**
-调用业务单元新增接口时，服务器返回500内部错误。
+调用管理主体新增接口时，服务器返回500内部错误。
 
 **复现步骤**
-1. 发送POST请求至 `http://localhost:8081/api/v1/business-units`
+1. 发送POST请求至 `http://localhost:8081/api/v1/management-entities`
 2. 请求体：
 ```json
 {
   "unitCode": "BU_TEST",
-  "unitName": "测试业务单元",
+  "unitName": "测试管理主体",
   "unitNameEn": "Test Unit",
   "status": "1"
 }
@@ -123,10 +123,10 @@
 - HTTP状态码：500
 
 **期望结果**
-- HTTP状态码：200 或 201，返回新增成功的业务单元数据
+- HTTP状态码：200 或 201，返回新增成功的管理主体数据
 
 **影响范围**
-- 无法新增业务单元
+- 无法新增管理主体
 
 ---
 

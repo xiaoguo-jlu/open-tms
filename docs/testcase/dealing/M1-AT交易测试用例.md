@@ -52,7 +52,7 @@
 | 用例 ID | TC-AT-001 |
 | 标题 | 创建同公司同币种 AT，验证自动生成 4 条 DealMap + 2 条 Cashflow |
 | 优先级 | P0 |
-| 前置条件 | (1) basedata/dealing 后端运行正常；(2) 已有业务单元 BU001；(3) 已有银行账户 source_account_id、dest_account_id（同币种 CNY） |
+| 前置条件 | (1) basedata/dealing 后端运行正常；(2) 已有管理主体 BU001；(3) 已有银行账户 source_account_id、dest_account_id（同币种 CNY） |
 | 测试步骤 | 1. POST `/api/v1/dealing/at-deals` 创建 AT<br>2. 响应断言：HTTP 200，data.dealNumber 符合 `AT+yyyyMMdd+` 格式<br>3. GET `/api/v1/dealing/dealmap/by-deal/{dealNumber}` 查询 DealMap 列表<br>4. 断言：DealMap 数量 = **4**（2×AccountTransfer + 2×ActualCashflow）<br>5. 断言：DealMap.event_status 全部为 `Active`<br>6. 断言：DealMap.action_number = 当前 Action 编号<br>7. GET `/api/v1/dealing/cashflows/by-deal/{dealNumber}` 或经 dealmap_number 间接查询<br>8. 断言：Cashflow 数量 = **2**（SOURCE + DESTINATION）<br>9. 数据库验证 `tms_at_deals_image_t` 无新增（CREATE 不生成 Image） |
 | 预期结果 | (1) 状态码 200，code=200；(2) data 中 dealNumber/transferType=SAME_COMPANY/exchangeRate=1.0；(3) DealMap 4 条，方向分别为 SOURCE Outflow / DESTINATION Inflow；(4) Cashflow 2 条，dealmap_number 指向对应 DealMap；(5) `tms_at_deals_image_t` 计数 = 0 |
 | 实际结果 | （执行时填写） |
@@ -138,7 +138,7 @@
 | 用例 ID | TC-AT-007 |
 | 标题 | 创建跨公司同币种 AT |
 | 优先级 | P0 |
-| 前置条件 | 存在属于不同业务单元的两个银行账户 |
+| 前置条件 | 存在属于不同管理主体的两个银行账户 |
 | 测试步骤 | 1. POST `/api/v1/dealing/at-deals` 传入 transfer_type=CROSS_COMPANY，source_account 与 dest_account 属于不同 BU<br>2. 断言：code=200<br>3. 断言：data.transferType='CROSS_COMPANY' |
 | 预期结果 | 跨公司转账创建成功 |
 | 实际结果 | （执行时填写） |

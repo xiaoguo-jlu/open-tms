@@ -173,7 +173,7 @@
 ```json
 {
   "dealType": "AC",
-  "businessUnit": "BU001",
+  "managementEntity": "BU001",
   "traderId": 1,
   "counterpartyId": 5001,
   "instrumentId": 301,
@@ -228,7 +228,7 @@
 
 #### TC_AC_API_011 创建-必填项缺失
 
-**请求体**：`{"businessUnit": ""}`（缺 amount/currency/direction 等）
+**请求体**：`{"managementEntity": ""}`（缺 amount/currency/direction 等）
 
 **预期结果**：code = 400, message 含具体错误
 
@@ -560,7 +560,7 @@ POST /api/v1/dealing/actions/ACT202606210001/reject
 
 | 字段 | 类型 | 正常值 | 异常值 |
 |------|------|--------|--------|
-| businessUnit | string | BU001 | 空字符串 |
+| managementEntity | string | BU001 | 空字符串 |
 | direction | string | Outflow | 非法值 |
 | amount | decimal | 1000000.00 | 0, -100 |
 | currency | string | CNY | 空字符串 |

@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class BusinessUnitVO extends BaseVO {
+public class ManagementEntityVO extends BaseVO {
 
     private String enName;
 
@@ -33,5 +33,5 @@ public class BusinessUnitVO extends BaseVO {
 
     private String taxNo;
 
-    private List<BusinessUnitVO> children;
+    private List<ManagementEntityVO> children;
 }

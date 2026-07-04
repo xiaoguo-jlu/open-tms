@@ -145,7 +145,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { listWorkflowTemplate, saveWorkflowTemplate, updateWorkflowTemplate, deleteWorkflowTemplate, listWorkflowNode, saveWorkflowNode, deleteWorkflowNode } from '@/api/approval'
-import { listBusinessUnit } from '@/api/basedata'
+import { listManagementEntity } from '@/api/basedata'
 
 const loading = ref(false)
 const drawerVisible = ref(false)
@@ -189,7 +189,7 @@ const getApproverTypeLabel = (type) => {
 }
 
 const fetchEntityList = async () => {
-  entityList.value = (await listBusinessUnit({ pageSize: 1000 })).data.list || []
+  entityList.value = (await listManagementEntity({ pageSize: 1000 })).data.list || []
 }
 
 const fetchData = async () => {

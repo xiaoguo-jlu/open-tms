@@ -44,7 +44,7 @@
 |--------|------|------|------|
 | dealId | BIGINT | 系统 | 主键 |
 | dealNumber | VARCHAR(50) | 系统 | 自动生成，格式: AC + yyyyMMdd + 序号(4位) |
-| businessUnit | VARCHAR(50) | Y | 关联业务单元代码 |
+| managementEntity | VARCHAR(50) | Y | 关联管理主体代码 |
 | bankAccount | VARCHAR(50) | Y | 银行账户编号 |
 | counterpartyId | BIGINT | Y | 交易对手 |
 | direction | VARCHAR(10) | Y | Inflow(流入)/Outflow(流出) |
@@ -169,7 +169,7 @@ ACDeal.execute() → 生成 Cashflow
 |------|------|------|
 | **Cashflow** | AC执行生成Cashflow | 一对一生成 |
 | **ApprovalRule** | 审批层级判断 | 提交时调用 |
-| **BusinessUnit** | 交易归属 | businessUnit字段 |
+| **ManagementEntity** | 交易归属 | managementEntity字段 |
 | **BankAccount** | 收付账户 | bankAccount字段 |
 | **Counterparty** | 交易对手 | counterparty字段 |
 

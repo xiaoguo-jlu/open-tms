@@ -13,7 +13,7 @@
         <el-table-column type="index" label="序号" width="60" align="center"/>
         <el-table-column prop="dealNo" label="存款编号" width="160"/>
         <el-table-column prop="depositType" label="存款类型" width="100"><template #default="{row}"><el-tag>{{getTypeLabel(row.depositType)}}</el-tag></template></el-table-column>
-        <el-table-column prop="entityName" label="业务单元" width="120"/>
+        <el-table-column prop="entityName" label="管理主体" width="120"/>
         <el-table-column prop="counterpartyName" label="存款银行" width="120"/>
         <el-table-column prop="amount" label="金额" align="right" width="150"><template #default="{row}">{{formatAmount(row.amount)}}</template></el-table-column>
         <el-table-column prop="interestRate" label="利率" width="100"><template #default="{row}">{{row.interestRate}}%</template></el-table-column>

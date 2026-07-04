@@ -184,7 +184,7 @@ CREATE INDEX idx_dm_deleted          ON tms_deal_map_t(deleted);
 | ❌ instrument_id | 金融工具 | 通过 Deal 反查 |
 | ❌ rate | 利率/汇率 | 通过 Deal / Instrument 反查 |
 | ❌ quantity, price, security_code | 证券字段 | 通过 Deal 反查 |
-| ❌ business_unit, product_type, account_role | 业务维度 | 通过 Deal 反查 |
+| ❌ management_entity, product_type, account_role | 业务维度 | 通过 Deal 反查 |
 | ❌ event_time | 时间戳 | 简化（保留 event_date） |
 | ❌ business_date | 业务日期 | 简化 |
 | ❌ remark | 备注 | 合并到 description |
@@ -316,7 +316,7 @@ INSERT INTO tms_actions_t (
 
 -- ② Deal
 INSERT INTO tms_deals_t (
-    deal_number, deal_type, business_unit, counterparty_id,
+    deal_number, deal_type, management_entity, counterparty_id,
     instrument_id, trader_id, direction, amount, currency,
     deal_date, value_date, status, latest_action_number,
     created_by, created_at
@@ -351,7 +351,7 @@ INSERT INTO tms_deal_map_t (
 
 -- ⑤ Cashflow（自动创建，dealmap_number 关联）
 INSERT INTO tms_cashflow_t (
-    cflow_number, deal_number, business_unit, bank_account,
+    cflow_number, deal_number, management_entity, bank_account,
     counterparty_account, direction, amount, currency,
     cflow_date, value_date, source_type, source_ref, status,
     dealmap_number,

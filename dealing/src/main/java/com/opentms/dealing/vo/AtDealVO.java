@@ -22,7 +22,7 @@ public class AtDealVO {
 
     private String transferType;
 
-    private String businessUnit;
+    private String managementEntity;
 
     private Long sourceAccountId;
     private Long destAccountId;

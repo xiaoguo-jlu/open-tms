@@ -1,4 +1,4 @@
-export * from './businessUnit'
+export * from './managementEntity'
 export * from './trader'
 export * from './currency'
 export * from './country'

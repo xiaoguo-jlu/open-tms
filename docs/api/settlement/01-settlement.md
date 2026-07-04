@@ -1,5 +1,7 @@
 # 支付结算接口
 
+> ⚠️ [PLANNED — Not Implemented] M2 结算
+
 **模块**: settlement  
 **版本**: v1.0  
 **路径**: `/api/v1/settlements`

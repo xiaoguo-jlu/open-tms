@@ -17,7 +17,7 @@ public class ReportDTO {
 
     private LocalDate reportDate;
 
-    private Long businessUnitId;
+    private Long managementEntityId;
 
     private LocalDate startDate;
 

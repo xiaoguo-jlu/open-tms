@@ -16,11 +16,14 @@ public class CurrencyPair {
     @TableField("pair_code")
     private String pairCode;
 
-    @TableField("base_currency")
-    private String baseCurrency;
+    @TableField("currency1")
+    private String currency1;
 
-    @TableField("quote_currency")
-    private String quoteCurrency;
+    @TableField("currency2")
+    private String currency2;
+
+    @TableField("stronger_currency")
+    private String strongerCurrency;
 
     @TableField("bid_decimal")
     private Integer bidDecimal;

@@ -90,7 +90,7 @@ export function listCurrency(params) {
 }
 
 // 注意:basedata 实际端点是 /api/v1/management-entities(不是 /business-units)
-export function listBusinessUnit(params) {
+export function listManagementEntity(params) {
   return request({
     url: '/api/v1/management-entities/page',
     method: 'get',

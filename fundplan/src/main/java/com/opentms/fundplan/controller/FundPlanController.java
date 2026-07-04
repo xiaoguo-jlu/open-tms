@@ -30,16 +30,16 @@ public class FundPlanController {
     @GetMapping("/annual")
     public Result<List<FundPlan>> annual(
             @RequestParam(required = false) Integer planYear,
-            @RequestParam(required = false) Long businessUnitId) {
-        return Result.success(fundPlanService.getAnnualPlans(planYear, businessUnitId));
+            @RequestParam(required = false) Long managementEntityId) {
+        return Result.success(fundPlanService.getAnnualPlans(planYear, managementEntityId));
     }
 
     @GetMapping("/monthly")
     public Result<List<FundPlan>> monthly(
             @RequestParam(required = false) Integer planYear,
             @RequestParam(required = false) Integer planMonth,
-            @RequestParam(required = false) Long businessUnitId) {
-        return Result.success(fundPlanService.getMonthlyPlans(planYear, planMonth, businessUnitId));
+            @RequestParam(required = false) Long managementEntityId) {
+        return Result.success(fundPlanService.getMonthlyPlans(planYear, planMonth, managementEntityId));
     }
 
     @GetMapping("/{id}")

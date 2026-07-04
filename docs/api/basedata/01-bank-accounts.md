@@ -44,7 +44,7 @@
 | bankId | bank_id | BIGINT | ✓ | 银行ID |
 | currency | currency | VARCHAR | ✓ | 币种 |
 | accountType | account_type | VARCHAR |  | Savings/Current |
-| businessUnitId | business_unit_id | BIGINT | ✓ | 业务单元 |
+| managementEntityId | management_entity_id | BIGINT | ✓ | 管理主体 |
 | status | status | CHAR(1) |  | 1=启用 0=禁用 |
 | remark | remark | VARCHAR |  | 备注 |
 | 审计字段 | created_by, created_at, updated_by, updated_at, version, deleted | | | 必含审计字段 |
@@ -62,7 +62,7 @@
 | bankId | Long |  |  | 银行ID |
 | currency | String |  |  | 币种 |
 | accountType | String |  |  | 账户类型 |
-| businessUnitId | Long |  |  | 业务单元 |
+| managementEntityId | Long |  |  | 管理主体 |
 | status | String |  |  | 1=启用 0=禁用 |
 | pageNum | int |  | 1 | 页码 |
 | pageSize | int |  | 10 | 每页大小 |

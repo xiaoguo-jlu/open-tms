@@ -19,7 +19,7 @@ public class DealImageVO {
 
     private Integer version;
 
-    private String businessUnit;
+    private String managementEntity;
 
     private Long counterpartyId;
 

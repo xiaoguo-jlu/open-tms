@@ -74,7 +74,7 @@ updateById(existingDeal);  // ← existingDeal 的 dealNumber 可能被 BeanUtil
 - `AtDealServiceImpl.java:543-612`
 
 ```java
-"SELECT name FROM tms_business_unit_t WHERE code = ? AND deleted = '0'"
+"SELECT name FROM tms_management_entity_t WHERE code = ? AND deleted = '0'"
 ```
 
 **问题**:

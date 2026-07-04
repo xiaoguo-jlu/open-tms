@@ -41,7 +41,7 @@
 | 02 | [银行管理](./06-bank.md) | `/api/v1/banks` |
 | 03 | [交易对手](./07-counterparty.md) | `/api/v1/counterparties` |
 | 04 | [对手账户](./08-counterparty-account.md) | `/api/v1/counterparty-accounts` |
-| 05 | [业务单元](./01-business-unit.md) | `/api/v1/business-units` |
+| 05 | [管理主体](./01-business-unit.md) | `/api/v1/management-entities` |
 | 06 | [交易员](./02-trader.md) | `/api/v1/traders` |
 | 07 | [国家/地区](./04-country.md) | `/api/v1/countries` |
 | 08 | [节假日](./05-holiday.md) | `/api/v1/holidays` |

@@ -33,7 +33,7 @@
 | dealId | BIGINT | 系统 | 主键 |
 | dealNumber | VARCHAR(50) | 系统 | 自动生成，格式: DEAL + yyyyMMdd + 序号(4位) |
 | dealType | VARCHAR(20) | Y | 交易类型：AC/AT/FX/ST等 |
-| businessUnit | VARCHAR(50) | Y | 资金管理主体 |
+| managementEntity | VARCHAR(50) | Y | 资金管理主体 |
 | counterpartyId | BIGINT | Y | 交易对手 |
 | instrumentId | BIGINT | Y | 金融工具 |
 | traderId | BIGINT | Y | 交易员 |
@@ -190,7 +190,7 @@ AC交易的个性化信息存储在 `tms_ac_deals_t` 表：
 | dealNumber | VARCHAR(50) | 关联交易编号 |
 | dealType | VARCHAR(20) | 交易类型 |
 | version | INT | 版本号，从1开始，每次数据变化+1 |
-| businessUnit | VARCHAR(50) | 资金管理主体（旧值） |
+| managementEntity | VARCHAR(50) | 资金管理主体（旧值） |
 | counterpartyId | BIGINT | 交易对手（旧值） |
 | instrumentId | BIGINT | 金融工具（旧值） |
 | traderId | BIGINT | 交易员（旧值） |
@@ -332,7 +332,7 @@ CREATE TABLE tms_deals_t (
     id BIGSERIAL PRIMARY KEY,
     deal_number VARCHAR(50) NOT NULL UNIQUE,
     deal_type VARCHAR(20) NOT NULL,
-    business_unit VARCHAR(50) NOT NULL,
+    management_entity VARCHAR(50) NOT NULL,
     counterparty_id BIGINT NOT NULL,
     instrument_id BIGINT NOT NULL,
     trader_id BIGINT NOT NULL,
@@ -355,7 +355,7 @@ CREATE TABLE tms_deals_t (
 CREATE INDEX idx_deal_number ON tms_deals_t(deal_number);
 CREATE INDEX idx_deal_type ON tms_deals_t(deal_type);
 CREATE INDEX idx_deal_status ON tms_deals_t(status);
-CREATE INDEX idx_deal_unit ON tms_deals_t(business_unit);
+CREATE INDEX idx_deal_unit ON tms_deals_t(management_entity);
 CREATE INDEX idx_deal_latest_action ON tms_deals_t(latest_action_number);
 ```
 
@@ -419,7 +419,7 @@ CREATE TABLE tms_deals_image_t (
     deal_number VARCHAR(50) NOT NULL,
     deal_type VARCHAR(20) NOT NULL,
     version INT NOT NULL,
-    business_unit VARCHAR(50),
+    management_entity VARCHAR(50),
     counterparty_id BIGINT,
     instrument_id BIGINT,
     trader_id BIGINT,
@@ -472,7 +472,7 @@ CREATE INDEX idx_ac_image_version ON tms_ac_deals_image_t(deal_number, version);
 | 模块 | 关系 | 说明 |
 |------|------|------|
 | **Cashflow** | Deal执行生成Cashflow | 一对一生成 |
-| **BusinessUnit** | 交易归属 | businessUnit字段 |
+| **ManagementEntity** | 交易归属 | managementEntity字段 |
 | **Counterparty** | 交易对手 | counterparty字段 |
 | **Instrument** | 金融工具 | instrument字段 |
 | **Trader** | 交易员 | trader字段 |

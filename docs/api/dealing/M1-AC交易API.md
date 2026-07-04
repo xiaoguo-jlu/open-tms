@@ -58,7 +58,7 @@ GET /api/v1/dealing/ac-deals/page
 | dealType | string | 否 | 交易类型（默认 AC） |
 | status | string | 否 | Deal 状态（New / Approved / Canceled） |
 | direction | string | 否 | Inflow / Outflow |
-| businessUnit | string | 否 | 业务主体 |
+| managementEntity | string | 否 | 业务主体 |
 | startDate | date | 否 | 交易开始日期 |
 | endDate | date | 否 | 交易结束日期 |
 | pageNum | int | 否 | 页码，默认 1 |
@@ -75,7 +75,7 @@ GET /api/v1/dealing/ac-deals/page
         "id": 1,
         "dealNumber": "AC202606210001",
         "dealType": "AC",
-        "businessUnit": "BU001",
+        "managementEntity": "BU001",
         "counterpartyId": 5001,
         "counterpartyName": "工商银行",
         "instrumentId": 301,
@@ -134,7 +134,7 @@ GET /api/v1/dealing/ac-deals/{id}
     "id": 1,
     "dealNumber": "AC202606210001",
     "dealType": "AC",
-    "businessUnit": "BU001",
+    "managementEntity": "BU001",
     "direction": "Outflow",
     "amount": 1000000.00,
     "currency": "CNY",
@@ -182,7 +182,7 @@ Content-Type: application/json
 | 字段 | 类型 | 必填 | 校验规则 |
 |------|------|------|----------|
 | dealType | string | 是 | 固定 "AC" |
-| businessUnit | string | 是 | 业务主体编码（启用状态） |
+| managementEntity | string | 是 | 业务主体编码（启用状态） |
 | counterpartyId | long | 否 | 交易对手 ID |
 | instrumentId | long | 否 | 金融工具 ID |
 | traderId | long | 是 | 交易员 ID |
@@ -202,7 +202,7 @@ Content-Type: application/json
 ```json
 {
   "dealType": "AC",
-  "businessUnit": "BU001",
+  "managementEntity": "BU001",
   "counterpartyId": 5001,
   "instrumentId": 301,
   "traderId": 401,
@@ -251,7 +251,7 @@ Content-Type: application/json
 
 | code | message | 触发条件 |
 |------|---------|----------|
-| 400 | businessUnit 不能为空 | 业务主体为空 |
+| 400 | managementEntity 不能为空 | 业务主体为空 |
 | 400 | amount 必须大于 0 | 金额 ≤ 0 |
 | 400 | valueDate 不能早于 dealDate | 起息日 < 交易日期 |
 | 400 | bankAccountId 不能为空 | 本方账户为空 |
@@ -272,7 +272,7 @@ Content-Type: application/json
 {
   "dealNumber": "AC202606210001",
   "dealType": "AC",
-  "businessUnit": "BU001",
+  "managementEntity": "BU001",
   "traderId": 401,
   "direction": "Outflow",
   "amount": 2000000.00,

@@ -21,7 +21,7 @@ public class FundPlan {
 
     private String planType;
 
-    private Long businessUnitId;
+    private Long managementEntityId;
 
     private String currency;
 

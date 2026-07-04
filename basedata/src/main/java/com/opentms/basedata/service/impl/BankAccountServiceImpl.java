@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class BankAccountServiceImpl extends ServiceImpl<BankAccountMapper, BankAccount> implements BankAccountService {
 
     @Override
-    public Page<BankAccount> queryPage(String keyword, Long bankId, String currency, String accountType, Long businessUnitId, String status, int pageNum, int pageSize) {
+    public Page<BankAccount> queryPage(String keyword, Long bankId, String currency, String accountType, Long managementEntityId, String status, int pageNum, int pageSize) {
         LambdaQueryWrapper<BankAccount> wrapper = new LambdaQueryWrapper<>();
 
         if (bankId != null) {
@@ -30,8 +30,8 @@ public class BankAccountServiceImpl extends ServiceImpl<BankAccountMapper, BankA
             wrapper.eq(BankAccount::getAccountType, accountType);
         }
 
-        if (businessUnitId != null) {
-            wrapper.eq(BankAccount::getBusinessUnitId, businessUnitId);
+        if (managementEntityId != null) {
+            wrapper.eq(BankAccount::getManagementEntityId, managementEntityId);
         }
 
         if (StringUtils.hasText(status)) {

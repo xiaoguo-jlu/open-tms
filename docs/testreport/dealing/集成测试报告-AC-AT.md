@@ -18,7 +18,7 @@
 
 ## 二、测试数据准备
 
-### 2.1 业务单元（已有）
+### 2.1 管理主体（已有）
 - BU001 集团总部（HEADQUARTER）
 - BU_TEST_NEW 等
 
@@ -112,7 +112,7 @@ Pass Rate: 5%  (待修复)
 ```bash
 curl -X POST http://localhost:8082/api/v1/dealing/at-deals \
   -H "Content-Type: application/json" \
-  -d '{"dealType":"AT","transferType":"SAME_COMPANY","businessUnit":"BU001",
+  -d '{"dealType":"AT","transferType":"SAME_COMPANY","managementEntity":"BU001",
        "sourceAccountId":5,"destAccountId":6,
        "sourceAmount":1000000.00,"destAmount":1000000.00,
        "sourceCurrency":"CNY","destCurrency":"CNY","exchangeRate":1.0,

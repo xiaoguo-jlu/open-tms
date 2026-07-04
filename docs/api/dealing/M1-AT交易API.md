@@ -5,7 +5,7 @@
 **版本**: v1.0
 **日期**: 2026-06-21
 **路径前缀**: `/api/v1/dealing/at-deals`
-**依据 PRD**: `M1-DealMap 生命周期事件PRD v2.0`
+**依据 PRD**: `M1-DealMapPRD-v2.md` (renamed from `M1-DealMap 生命周期事件PRD.md`)
 
 ---
 
@@ -106,7 +106,7 @@ Content-Type: application/json
 | keyword | string | 否 | 关键字（dealNumber / purpose 模糊搜索） |
 | transferType | string | 否 | 转账类型：INTERNAL / CROSS_BORDER / INTERBANK |
 | status | string | 否 | 状态：New / Pending / Approved / Rejected / Deleted |
-| businessUnit | string | 否 | 业务单元编码 |
+| managementEntity | string | 否 | 管理主体编码 |
 | sourceAccountId | long | 否 | 源账户 ID |
 | destAccountId | long | 否 | 目标账户 ID |
 | startDate | string | 否 | 起息日开始日期（yyyy-MM-dd） |
@@ -123,7 +123,7 @@ Content-Type: application/json
         "id": 1001,
         "dealNumber": "AT202606210001",
         "transferType": "CROSS_BORDER",
-        "businessUnit": "BU001",
+        "managementEntity": "BU001",
         "sourceAccountId": 201,
         "sourceAccountName": "招行纽约 USD账户",
         "destAccountId": 301,
@@ -179,7 +179,7 @@ GET /api/v1/dealing/at-deals/{id}
     "id": 1001,
     "dealNumber": "AT202606210001",
     "transferType": "CROSS_BORDER",
-    "businessUnit": "BU001",
+    "managementEntity": "BU001",
     "sourceAccountId": 201,
     "sourceAccountName": "招行纽约 USD账户",
     "destAccountId": 301,
@@ -251,7 +251,7 @@ Content-Type: application/json
 
 ```json
 {
-  "businessUnit": "BU001",
+  "managementEntity": "BU001",
   "transferType": "CROSS_BORDER",
   "sourceAccountId": 201,
   "destAccountId": 301,
@@ -271,7 +271,7 @@ Content-Type: application/json
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| businessUnit | string | 是 | 业务单元编码 |
+| managementEntity | string | 是 | 管理主体编码 |
 | transferType | string | 是 | 转账类型：INTERNAL / CROSS_BORDER / INTERBANK |
 | sourceAccountId | long | 是 | 源账户 ID |
 | destAccountId | long | 是 | 目标账户 ID（不能等于 sourceAccountId） |
@@ -385,7 +385,7 @@ Content-Type: application/json
 {
   "id": 1001,
   "dealNumber": "AT202606210001",
-  "businessUnit": "BU001",
+  "managementEntity": "BU001",
   "transferType": "CROSS_BORDER",
   "sourceAccountId": 201,
   "destAccountId": 302,
@@ -654,7 +654,7 @@ GET /api/v1/dealing/at-deals/{dealNumber}/cashflow
       "cflowNumber": "CF202606210001",
       "dealNumber": "AT202606210001",
       "dealmapNumber": "DMP202606210003",
-      "businessUnit": "BU001",
+      "managementEntity": "BU001",
       "bankAccount": "BANK_ACC_201",
       "counterpartyAccount": "BANK_ACC_301",
       "direction": "Outflow",
@@ -937,7 +937,7 @@ Content-Type: application/json
 |------|------|------|------|
 | id | long | 否 | 更新时必填 |
 | dealNumber | string | 否 | 更新时必填 |
-| businessUnit | string | 是 | 业务单元编码 |
+| managementEntity | string | 是 | 管理主体编码 |
 | transferType | string | 是 | INTERNAL / CROSS_BORDER / INTERBANK |
 | sourceAccountId | long | 是 | 源账户 ID |
 | destAccountId | long | 是 | 目标账户 ID |
@@ -958,7 +958,7 @@ Content-Type: application/json
 | id | long | 主键 |
 | dealNumber | string | AT 交易编号 |
 | transferType | string | 转账类型 |
-| businessUnit | string | 业务单元 |
+| managementEntity | string | 管理主体 |
 | sourceAccountId | long | 源账户 ID |
 | sourceAccountName | string | 源账户名称 |
 | destAccountId | long | 目标账户 ID |
@@ -1005,7 +1005,7 @@ Content-Type: application/json
 | cflowNumber | string | Cashflow 编号 |
 | dealNumber | string | 关联 Deal 编号 |
 | dealmapNumber | string | **反向关联 DealMap 编号（v2.0 新增）** |
-| businessUnit | string | 业务单元 |
+| managementEntity | string | 管理主体 |
 | bankAccount | string | 银行账户 |
 | counterpartyAccount | string | 对手/目标账户 |
 | direction | string | Inflow / Outflow |
@@ -1148,7 +1148,7 @@ Content-Type: application/json
 |--------|--------|------|------|
 | AT 控制器 | basedata-账户 | 校验账户状态 | GET /api/v1/bank-accounts/{id}/active |
 | AT 控制器 | basedata-币种 | 校验币种有效性 | GET /api/v1/currencies/{code}/valid |
-| AT 控制器 | basedata-业务单元 | 校验 BU 存在 | GET /api/v1/business-units/{code} |
+| AT 控制器 | basedata-管理主体 | 校验 BU 存在 | GET /api/v1/management-entities/{code} |
 
 ### 8.2 对外契约（v1.0 不开放）
 

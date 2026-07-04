@@ -27,9 +27,10 @@ public class HolidayResource {
     public Object page(
             @QueryParam("countryCode") String countryCode,
             @QueryParam("year") Integer year,
+            @QueryParam("keyword") String keyword,
             @QueryParam("pageNum") @DefaultValue("1") int pageNum,
             @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
-        return Result.success(holidayService.queryPage(countryCode, year, pageNum, pageSize));
+        return Result.success(holidayService.queryPage(countryCode, year, keyword, pageNum, pageSize));
     }
 
     @GET

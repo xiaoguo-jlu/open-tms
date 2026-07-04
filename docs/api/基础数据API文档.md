@@ -13,11 +13,11 @@
 
 ---
 
-## 1. 业务单元管理 (Business Unit)
+## 1. 管理主体管理 (Business Unit)
 
 ### 1.1 分页查询
 
-**GET** `/api/v1/business-units/page`
+**GET** `/api/v1/management-entities/page`
 
 **Query Parameters**:
 
@@ -44,7 +44,7 @@
 
 ### 1.2 获取详情
 
-**GET** `/api/v1/business-units/{id}`
+**GET** `/api/v1/management-entities/{id}`
 
 **Response**:
 ```json
@@ -69,7 +69,7 @@
 
 ### 1.3 新增
 
-**POST** `/api/v1/business-units`
+**POST** `/api/v1/management-entities`
 
 **Request Body**:
 ```json
@@ -86,13 +86,13 @@
 
 ### 1.4 更新
 
-**POST** `/api/v1/business-units/update`
+**POST** `/api/v1/management-entities/update`
 
 **Request Body**: 同新增，需包含id
 
 ### 1.5 删除
 
-**POST** `/api/v1/business-units/delete/{id}`
+**POST** `/api/v1/management-entities/delete/{id}`
 
 ---
 

@@ -1,5 +1,7 @@
 # 管理驾驶舱接口
 
+> ⚠️ [PLANNED — Not Implemented] M5 报表管理
+
 **模块**: cockpit  
 **版本**: v1.0  
 **路径**: `/api/v1/cockpit`

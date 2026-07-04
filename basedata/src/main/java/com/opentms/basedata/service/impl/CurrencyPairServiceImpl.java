@@ -27,9 +27,9 @@ public class CurrencyPairServiceImpl extends ServiceImpl<CurrencyPairMapper, Cur
         if (StringUtils.hasText(keyword)) {
             wrapper.like(CurrencyPair::getPairCode, keyword)
                    .or()
-                   .like(CurrencyPair::getBaseCurrency, keyword)
+                   .like(CurrencyPair::getCurrency1, keyword)
                    .or()
-                   .like(CurrencyPair::getQuoteCurrency, keyword);
+                   .like(CurrencyPair::getCurrency2, keyword);
         }
 
         if (StringUtils.hasText(status)) {
@@ -101,8 +101,9 @@ public class CurrencyPairServiceImpl extends ServiceImpl<CurrencyPairMapper, Cur
             throw new BusinessException("币种对不存在");
         }
 
-        entity.setBaseCurrency(dto.getBaseCurrency());
-        entity.setQuoteCurrency(dto.getQuoteCurrency());
+        entity.setCurrency1(dto.getCurrency1());
+        entity.setCurrency2(dto.getCurrency2());
+        entity.setStrongerCurrency(dto.getStrongerCurrency());
         entity.setBidDecimal(dto.getBidDecimal());
         entity.setAskDecimal(dto.getAskDecimal());
         entity.setStatus(dto.getStatus());
@@ -140,8 +141,9 @@ public class CurrencyPairServiceImpl extends ServiceImpl<CurrencyPairMapper, Cur
         CurrencyPairVO vo = new CurrencyPairVO();
         vo.setId(entity.getId());
         vo.setPairCode(entity.getPairCode());
-        vo.setBaseCurrency(entity.getBaseCurrency());
-        vo.setQuoteCurrency(entity.getQuoteCurrency());
+        vo.setCurrency1(entity.getCurrency1());
+        vo.setCurrency2(entity.getCurrency2());
+        vo.setStrongerCurrency(entity.getStrongerCurrency());
         vo.setBidDecimal(entity.getBidDecimal());
         vo.setAskDecimal(entity.getAskDecimal());
         vo.setStatus(entity.getStatus());
@@ -155,8 +157,9 @@ public class CurrencyPairServiceImpl extends ServiceImpl<CurrencyPairMapper, Cur
         CurrencyPair entity = new CurrencyPair();
         entity.setId(dto.getId());
         entity.setPairCode(dto.getPairCode());
-        entity.setBaseCurrency(dto.getBaseCurrency());
-        entity.setQuoteCurrency(dto.getQuoteCurrency());
+        entity.setCurrency1(dto.getCurrency1());
+        entity.setCurrency2(dto.getCurrency2());
+        entity.setStrongerCurrency(dto.getStrongerCurrency());
         entity.setBidDecimal(dto.getBidDecimal());
         entity.setAskDecimal(dto.getAskDecimal());
         entity.setStatus(dto.getStatus());

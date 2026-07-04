@@ -23,8 +23,8 @@ public class Deal {
     @TableField("deal_type")
     private String dealType;
 
-    @TableField("business_unit")
-    private String businessUnit;
+    @TableField("management_entity")
+    private String managementEntity;
 
     @TableField("counterparty_id")
     private Long counterpartyId;

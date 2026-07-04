@@ -25,7 +25,7 @@ GET /api/v1/deals?pageNo=1&pageSize=20&keyword=xxx&dealType=xxx&status=xxx&start
 | startDate | string | 否 | 交易开始日期 |
 | endDate | string | 否 | 交易结束日期 |
 | counterpartyId | long | 否 | 对手方ID |
-| businessUnitId | long | 否 | 业务单元ID |
+| managementEntityId | long | 否 | 管理主体ID |
 
 ### 响应
 ```json
@@ -84,7 +84,7 @@ Content-Type: application/json
   "dealSubtype": "定期存款",
   "instrumentId": 1,
   "counterpartyId": 1,
-  "businessUnitId": 1,
+  "managementEntityId": 1,
   "amount": 1000000.00,
   "currency": "CNY",
   "valueDate": "2026-04-15",
@@ -100,7 +100,7 @@ Content-Type: application/json
 
 ### 请求
 ```
-PUT /api/v1/deals
+POST /api/v1/deals/update
 ```
 
 ---
@@ -109,7 +109,7 @@ PUT /api/v1/deals
 
 ### 请求
 ```
-DELETE /api/v1/deals/{id}
+POST /api/v1/deals/delete/{id}
 ```
 
 ---

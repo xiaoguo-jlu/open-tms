@@ -20,13 +20,16 @@ public class CurrencyPairDTO extends BasedataDTO {
     @Size(max = 20, message = "货币对编码长度不能超过20位")
     private String pairCode;
 
-    @NotBlank(message = "基础货币不能为空")
-    @Size(max = 10, message = "基础货币长度不能超过10位")
-    private String baseCurrency;
+    @NotBlank(message = "货币1不能为空")
+    @Size(max = 10, message = "货币1长度不能超过10位")
+    private String currency1;
 
-    @NotBlank(message = "报价货币不能为空")
-    @Size(max = 10, message = "报价货币长度不能超过10位")
-    private String quoteCurrency;
+    @NotBlank(message = "货币2不能为空")
+    @Size(max = 10, message = "货币2长度不能超过10位")
+    private String currency2;
+
+    @Size(max = 10, message = "强势币种长度不能超过10位")
+    private String strongerCurrency;
 
     @Min(value = 0, message = "买方小数位最小值为0")
     private Integer bidDecimal;

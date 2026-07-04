@@ -104,8 +104,8 @@ async def test_t03_fill_deal_form(page):
 
     try:
         # 选择交易类型 (默认是AC)
-        # 选择业务单元 - 点击输入框打开选择器
-        bu_input = page.locator("input[placeholder*='业务单元']").first
+        # 选择管理主体 - 点击输入框打开选择器
+        bu_input = page.locator("input[placeholder*='管理主体']").first
         await bu_input.click()
         await page.wait_for_timeout(500)
 
@@ -113,7 +113,7 @@ async def test_t03_fill_deal_form(page):
         dialog = page.locator(".el-dialog:visible")
         await expect(dialog).to_be_visible(timeout=3000)
 
-        # 选择第一行业务单元
+        # 选择第一行管理主体
         first_row = dialog.locator(".el-table__body tr").first
         await first_row.click()
         await page.wait_for_timeout(500)
