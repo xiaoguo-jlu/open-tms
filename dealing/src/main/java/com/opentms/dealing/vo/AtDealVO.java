@@ -24,8 +24,15 @@ public class AtDealVO {
 
     private String managementEntity;
 
+    /** 2026-07-05: 详情响应补全的管理主体可读名称 (前端 BaseDataPicker preloadRow) */
+    private String managementEntityName;
+
     private Long sourceAccountId;
     private Long destAccountId;
+
+    /** 2026-07-05: 详情响应补全的源/目标账户可读名称 */
+    private String sourceAccountName;
+    private String destAccountName;
 
     private BigDecimal sourceAmount;
     private BigDecimal destAmount;

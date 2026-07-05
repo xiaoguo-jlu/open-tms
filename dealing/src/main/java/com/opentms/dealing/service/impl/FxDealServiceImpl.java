@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.opentms.dealing.dto.FxCalculateRequest;
 import com.opentms.dealing.dto.FxCalculateResponse;
 import com.opentms.dealing.dto.FxDealDTO;
+import com.opentms.dealing.dto.RateFixRequest;
 import com.opentms.dealing.entity.Action;
 import com.opentms.dealing.entity.Cashflow;
 import com.opentms.dealing.entity.Deal;
@@ -16,6 +17,7 @@ import com.opentms.dealing.mapper.CashflowMapper;
 import com.opentms.dealing.mapper.DealMapMapper;
 import com.opentms.dealing.mapper.DealMapper;
 import com.opentms.dealing.mapper.FxDealMapper;
+import com.opentms.dealing.service.EntityNameLookup;
 import com.opentms.dealing.service.FxDealService;
 import com.opentms.dealing.vo.ActionVO;
 import com.opentms.dealing.vo.CashflowVO;
@@ -61,6 +63,10 @@ public class FxDealServiceImpl implements FxDealService {
     private final ActionMapper actionMapper;
     private final DealMapMapper dealMapMapper;
     private final CashflowMapper cashflowMapper;
+    /**
+     * 跨模块关联实体名称查询 (用于 copy 端点补全名称字段, 2026-07-05)
+     */
+    private final EntityNameLookup entityNameLookup;
 
     // ====== 常量 ======
     private static final String DEAL_TYPE = "FX";
@@ -106,12 +112,14 @@ public class FxDealServiceImpl implements FxDealService {
                              FxDealMapper fxDealMapper,
                              ActionMapper actionMapper,
                              DealMapMapper dealMapMapper,
-                             CashflowMapper cashflowMapper) {
+                             CashflowMapper cashflowMapper,
+                             EntityNameLookup entityNameLookup) {
         this.dealMapper = dealMapper;
         this.fxDealMapper = fxDealMapper;
         this.actionMapper = actionMapper;
         this.dealMapMapper = dealMapMapper;
         this.cashflowMapper = cashflowMapper;
+        this.entityNameLookup = entityNameLookup;
     }
 
     // ======================== Calculate ========================
@@ -273,6 +281,11 @@ public class FxDealServiceImpl implements FxDealService {
             vo.setFixingSource(fxDeal.getFixingSource());
             vo.setFixingRate(fxDeal.getFixingRate());
             vo.setSettlementAmount(fxDeal.getSettlementAmount());
+            vo.setFixDate(fxDeal.getFixDate());
+            vo.setFixCurrency(fxDeal.getFixCurrency());
+            vo.setFixMarketRate(fxDeal.getFixMarketRate());
+            vo.setVerifierBy(fxDeal.getVerifierBy());
+            vo.setFixRemark(fxDeal.getFixRemark());
         }
 
         // 日期字段从 Deal 取（v3.2 移到公共表）
@@ -291,7 +304,53 @@ public class FxDealServiceImpl implements FxDealService {
         vo.setCashflowList(listCashflowsByDeal(dealNumber));
         vo.setActionList(listActionsByDeal(dealNumber));
 
+        // ===== 2026-07-05: 补全关联实体名称 (前端 BaseDataPicker preloadRow 需求) =====
+        populateEntityNames(vo, deal, fxDeal);
+
         return vo;
+    }
+
+    /**
+     * FX 详情响应补全 *Name 字段 (失败容错)
+     */
+    private void populateEntityNames(FxDealDetailVO vo, Deal deal, FxDeal fxDeal) {
+        Long mgmtEntityId = fxDeal != null ? fxDeal.getManagementEntityId() : null;
+        try {
+            Map<String, Object> me = entityNameLookup.findManagementEntity(mgmtEntityId);
+            vo.setManagementEntityName(formatCodeName(me, "code", "name"));
+        } catch (Exception ignore) {
+        }
+        try {
+            Map<String, Object> cp = entityNameLookup.findCounterparty(deal.getCounterpartyId());
+            vo.setCounterpartyName(formatCodeName(cp, "code", "name"));
+        } catch (Exception ignore) {
+        }
+        try {
+            Map<String, Object> tr = entityNameLookup.findTrader(deal.getTraderId());
+            vo.setTraderName(formatCodeName(tr, "code", "name"));
+        } catch (Exception ignore) {
+        }
+        try {
+            Map<String, Object> inst = entityNameLookup.findInstrument(deal.getInstrumentId());
+            vo.setInstrumentName(formatCodeName(inst, "instrumentCode", "instrumentName"));
+        } catch (Exception ignore) {
+        }
+        try {
+            Map<String, Object> pair = entityNameLookup.findCurrencyPair(fxDeal != null ? fxDeal.getCurrencyPairId() : null);
+            if (pair != null) {
+                Object pc = pair.get("pairCode");
+                Object c1 = pair.get("currency1");
+                Object c2 = pair.get("currency2");
+                StringBuilder sb = new StringBuilder();
+                if (pc != null) sb.append(pc);
+                if (c1 != null && c2 != null) {
+                    if (sb.length() > 0) sb.append(" ");
+                    sb.append(c1).append("/").append(c2);
+                }
+                vo.setCurrencyPairName(sb.length() == 0 ? null : sb.toString());
+            }
+        } catch (Exception ignore) {
+        }
     }
 
     @Override
@@ -301,7 +360,8 @@ public class FxDealServiceImpl implements FxDealService {
         FxDeal fxDeal = getFxDealByNumber(dealNumber);
 
         FxDealDTO dto = new FxDealDTO();
-        dto.setManagementEntityId(fxDeal != null ? fxDeal.getManagementEntityId() : null);
+        Long mgmtEntityId = fxDeal != null ? fxDeal.getManagementEntityId() : null;
+        dto.setManagementEntityId(mgmtEntityId);
         dto.setCounterpartyId(deal.getCounterpartyId());
         dto.setTraderId(deal.getTraderId());
         dto.setInstrumentId(deal.getInstrumentId());
@@ -323,7 +383,50 @@ public class FxDealServiceImpl implements FxDealService {
         dto.setId(null);
         dto.setDealNumber(null);
         dto.setOperator("");
+
+        // ===== v3.3: 补全关联实体名称 (跨模块 JdbcTemplate) =====
+        Map<String, Object> me = entityNameLookup.findManagementEntity(mgmtEntityId);
+        if (me != null) dto.setManagementEntityName(formatCodeName(me, "code", "name"));
+
+        Map<String, Object> cp = entityNameLookup.findCounterparty(deal.getCounterpartyId());
+        if (cp != null) dto.setCounterpartyName(formatCodeName(cp, "code", "name"));
+
+        Map<String, Object> inst = entityNameLookup.findInstrument(deal.getInstrumentId());
+        if (inst != null) dto.setInstrumentName(formatCodeName(inst, "instrumentCode", "instrumentName"));
+
+        Map<String, Object> tr = entityNameLookup.findTrader(deal.getTraderId());
+        if (tr != null) dto.setTraderName(formatCodeName(tr, "code", "name"));
+
+        Map<String, Object> pair = entityNameLookup.findCurrencyPair(fxDeal != null ? fxDeal.getCurrencyPairId() : null);
+        if (pair != null) {
+            // pairCode (currency1/currency2) - 与 picker displayFormat 一致
+            Object pc = pair.get("pairCode");
+            Object c1 = pair.get("currency1");
+            Object c2 = pair.get("currency2");
+            StringBuilder sb = new StringBuilder();
+            if (pc != null) sb.append(pc);
+            if (c1 != null && c2 != null) {
+                if (sb.length() > 0) sb.append(" ");
+                sb.append(c1).append("/").append(c2);
+            }
+            dto.setCurrencyPairName(sb.toString());
+        }
+
         return dto;
+    }
+
+    /** "code (name)" 形式展示，与 BaseDataPicker displayFormat 风格对齐 */
+    private static String formatCodeName(Map<String, Object> row, String codeKey, String nameKey) {
+        if (row == null) return null;
+        Object code = row.get(codeKey);
+        Object name = row.get(nameKey);
+        StringBuilder sb = new StringBuilder();
+        if (code != null && !code.toString().isEmpty()) sb.append(code);
+        if (name != null && !name.toString().isEmpty()) {
+            if (sb.length() > 0) sb.append(" ");
+            sb.append("(").append(name).append(")");
+        }
+        return sb.length() == 0 ? null : sb.toString();
     }
 
     @Override
@@ -693,11 +796,11 @@ public class FxDealServiceImpl implements FxDealService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> rateFix(Long id, BigDecimal fixingRate, String operator) {
-        if (fixingRate == null || fixingRate.compareTo(BigDecimal.ZERO) <= 0) {
+    public Map<String, Object> rateFix(Long id, RateFixRequest req) {
+        if (req.getFixingRate() == null || req.getFixingRate().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("fixingRate 必须 > 0");
         }
-        if (!StringUtils.hasText(operator)) {
+        if (!StringUtils.hasText(req.getOperator())) {
             throw new IllegalArgumentException("operator 不能为空");
         }
 
@@ -720,11 +823,22 @@ public class FxDealServiceImpl implements FxDealService {
             throw new IllegalArgumentException("RATE_FIX 仅适用于 NDF Deal(需 fixingSource)");
         }
 
+        // Phase 1: 解析 fixDate/fixCurrency 默认值
+        LocalDate fixDate = req.getFixDate() != null ? req.getFixDate() : deal.getValueDate();
+        String fixCurrency = StringUtils.hasText(req.getFixCurrency()) ? req.getFixCurrency() : fxDeal.getBuyCurrency();
+
+        // 校验 fixCurrency 必须是 buyCurrency 或 sellCurrency 之一
+        if (!fixCurrency.equals(fxDeal.getBuyCurrency()) && !fixCurrency.equals(fxDeal.getSellCurrency())) {
+            throw new IllegalArgumentException("fixCurrency 必须是 " + fxDeal.getBuyCurrency() + " 或 " + fxDeal.getSellCurrency());
+        }
+
         LocalDateTime now = LocalDateTime.now();
         String dealNumber = deal.getDealNumber();
+        String operator = req.getOperator();
         int newVersion = (fxDeal.getVersion() == null ? 0 : fxDeal.getVersion()) + 1;
+        BigDecimal fixingRate = req.getFixingRate();
 
-        // 1. INSERT Action(RATE_FIX)
+        // 1. INSERT Action(RATE_FIX) — 直接 Approved（FX 无审批流）
         String actionNumber = generateActionNumber();
         Action action = new Action();
         action.setActionNumber(actionNumber);
@@ -734,6 +848,7 @@ public class FxDealServiceImpl implements FxDealService {
         action.setActionStatus(ACTION_STATUS_APPROVED);
         action.setOperator(operator);
         action.setOperateAt(now);
+        action.setRemark(req.getFixRemark());
         action.setApprovalStatus1(ACTION_STATUS_APPROVED);
         action.setApprovalStatus2(ACTION_STATUS_APPROVED);
         action.setCreatedBy(operator);
@@ -750,8 +865,8 @@ public class FxDealServiceImpl implements FxDealService {
         fixDm.setActionNumber(actionNumber);
         fixDm.setEventType(EVENT_TYPE_FX);
         fixDm.setEventStatus(EVENT_STATUS_ACTIVE);
-        fixDm.setEventDate(deal.getValueDate());
-        fixDm.setValueDate(deal.getValueDate());
+        fixDm.setEventDate(fixDate);
+        fixDm.setValueDate(fixDate);
         fixDm.setIsReversal(NOT_DELETED);
         fixDm.setDealmapType(DEALMAP_TYPE_FX_FIX);
         fixDm.setAmountOrRate(fixingRate);
@@ -767,18 +882,20 @@ public class FxDealServiceImpl implements FxDealService {
         BigDecimal settlementAmount = notional.multiply(fixingRate.subtract(fxDeal.getExchangeRate()))
                 .setScale(AMOUNT_SCALE, RoundingMode.HALF_UP);
 
-        // 4. INSERT Cashflow(差额)
+        String direction = settlementAmount.compareTo(BigDecimal.ZERO) >= 0 ? DIRECTION_INFLOW : DIRECTION_OUTFLOW;
+
+        // 4. INSERT Cashflow(差额) — currency 使用 fixCurrency（而非写死 buyCurrency）
         String cflowNumber = generateCflowNumber();
         Cashflow cf = new Cashflow();
         cf.setCflowNumber(cflowNumber);
         cf.setDealNumber(dealNumber);
         cf.setDealmapNumber(dealmapNumber);
         cf.setManagementEntity(String.valueOf(fxDeal.getManagementEntityId()));
-        cf.setDirection(settlementAmount.compareTo(BigDecimal.ZERO) >= 0 ? DIRECTION_INFLOW : DIRECTION_OUTFLOW);
+        cf.setDirection(direction);
         cf.setAmount(settlementAmount.abs());
-        cf.setCurrency(fxDeal.getBuyCurrency()); // NDF 差额以 buy currency 结算
-        cf.setCflowDate(deal.getValueDate());
-        cf.setValueDate(deal.getValueDate());
+        cf.setCurrency(fixCurrency);
+        cf.setCflowDate(fixDate);
+        cf.setValueDate(fixDate);
         cf.setSourceType(CFLOW_SOURCE_TYPE);
         cf.setSourceRef(dealNumber);
         cf.setStatus(CFLOW_STATUS_CREATED);
@@ -789,9 +906,20 @@ public class FxDealServiceImpl implements FxDealService {
         cf.setDeleted(NOT_DELETED);
         cashflowMapper.insert(cf);
 
-        // 5. UPDATE FxDeal（fixingRate + settlementAmount + status）
+        // 5. UPDATE FxDeal（fixingRate + settlementAmount + 新增 Phase 1 字段）
         fxDeal.setFixingRate(fixingRate);
         fxDeal.setSettlementAmount(settlementAmount);
+        fxDeal.setFixDate(fixDate);
+        fxDeal.setFixCurrency(fixCurrency);
+        if (req.getFixMarketRate() != null) {
+            fxDeal.setFixMarketRate(req.getFixMarketRate());
+        }
+        if (StringUtils.hasText(req.getVerifierBy())) {
+            fxDeal.setVerifierBy(req.getVerifierBy());
+        }
+        if (StringUtils.hasText(req.getFixRemark())) {
+            fxDeal.setFixRemark(req.getFixRemark());
+        }
         fxDeal.setUpdatedBy(operator);
         fxDeal.setUpdatedAt(now);
         fxDeal.setVersion(newVersion);
@@ -810,7 +938,19 @@ public class FxDealServiceImpl implements FxDealService {
         result.put("status", DEAL_STATUS_ACTIVE);
         result.put("settlementAmount", settlementAmount);
         result.put("dealmapNumber", dealmapNumber);
+        result.put("currency", fixCurrency);
+        result.put("direction", direction);
         return result;
+    }
+
+    @Override
+    @Deprecated
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> rateFix(Long id, BigDecimal fixingRate, String operator) {
+        RateFixRequest req = new RateFixRequest();
+        req.setFixingRate(fixingRate);
+        req.setOperator(operator);
+        return rateFix(id, req);
     }
 
     // ======================== Helper: DealMap / Cashflow ========================

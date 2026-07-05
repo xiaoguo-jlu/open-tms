@@ -18,6 +18,7 @@ import com.opentms.dealing.mapper.DealMapMapper;
 import com.opentms.dealing.mapper.DealMapper;
 import com.opentms.dealing.service.AtDealService;
 import com.opentms.dealing.service.BankAccountLookup;
+import com.opentms.dealing.service.EntityNameLookup;
 import com.opentms.dealing.vo.ActionVO;
 import com.opentms.dealing.vo.AtDealImageVO;
 import com.opentms.dealing.vo.AtDealVO;
@@ -54,6 +55,10 @@ public class AtDealServiceImpl implements AtDealService {
     private final DealMapMapper dealMapMapper;
     private final CashflowMapper cashflowMapper;
     private final BankAccountLookup bankAccountLookup;
+    /**
+     * 跨模块关联实体名称查询 (用于详情响应补全名称, 2026-07-05)
+     */
+    private final EntityNameLookup entityNameLookup;
 
     private static final String DEAL_TYPE = "AT";
     private static final String DEAL_STATUS_NEW = "New";
@@ -91,7 +96,8 @@ public class AtDealServiceImpl implements AtDealService {
                              ActionMapper actionMapper,
                              DealMapMapper dealMapMapper,
                              CashflowMapper cashflowMapper,
-                             BankAccountLookup bankAccountLookup) {
+                             BankAccountLookup bankAccountLookup,
+                             EntityNameLookup entityNameLookup) {
         this.dealMapper = dealMapper;
         this.atDealMapper = atDealMapper;
         this.atDealImageMapper = atDealImageMapper;
@@ -99,6 +105,7 @@ public class AtDealServiceImpl implements AtDealService {
         this.bankAccountLookup = bankAccountLookup;
         this.dealMapMapper = dealMapMapper;
         this.cashflowMapper = cashflowMapper;
+        this.entityNameLookup = entityNameLookup;
     }
 
     // ======================== Page / Query ========================
@@ -946,7 +953,64 @@ public class AtDealServiceImpl implements AtDealService {
         }
         // 附加双腿 DealMap
         vo.setLegs(listDealMapsByDeal(deal.getDealNumber()));
+
+        // ===== 2026-07-05: 详情响应补全关联实体名称 (前端 BaseDataPicker preloadRow 需求) =====
+        populateEntityNames(vo, atDeal);
+
         return vo;
+    }
+
+    /**
+     * AT 详情响应补全 *Name 字段 (失败容错: 单个 lookup 失败不影响其他字段)
+     */
+    private void populateEntityNames(AtDealVO vo, AtDeal atDeal) {
+        String mgmtEntity = vo.getManagementEntity();
+        // managementEntity (code 字符串反查)
+        if (StringUtils.hasText(mgmtEntity)) {
+            try {
+                Map<String, Object> me = entityNameLookup.findManagementEntityByCode(mgmtEntity);
+                vo.setManagementEntityName(formatCodeName(me, "code", "name"));
+            } catch (Exception ignore) {
+            }
+        }
+        if (atDeal != null) {
+            try {
+                Map<String, Object> src = entityNameLookup.findBankAccount(atDeal.getSourceAccountId());
+                vo.setSourceAccountName(formatAccountName(src));
+            } catch (Exception ignore) {
+            }
+            try {
+                Map<String, Object> dst = entityNameLookup.findBankAccount(atDeal.getDestAccountId());
+                vo.setDestAccountName(formatAccountName(dst));
+            } catch (Exception ignore) {
+            }
+        }
+    }
+
+    private static String formatCodeName(Map<String, Object> row, String codeKey, String nameKey) {
+        if (row == null) return null;
+        Object code = row.get(codeKey);
+        Object name = row.get(nameKey);
+        StringBuilder sb = new StringBuilder();
+        if (code != null && !code.toString().isEmpty()) sb.append(code);
+        if (name != null && !name.toString().isEmpty()) {
+            if (sb.length() > 0) sb.append(" ");
+            sb.append("(").append(name).append(")");
+        }
+        return sb.length() == 0 ? null : sb.toString();
+    }
+
+    private static String formatAccountName(Map<String, Object> row) {
+        if (row == null) return null;
+        Object no = row.get("accountNo");
+        Object name = row.get("accountName");
+        StringBuilder sb = new StringBuilder();
+        if (no != null && !no.toString().isEmpty()) sb.append(no);
+        if (name != null && !name.toString().isEmpty()) {
+            if (sb.length() > 0) sb.append(" ");
+            sb.append("(").append(name).append(")");
+        }
+        return sb.length() == 0 ? null : sb.toString();
     }
 
     private DealMapVO convertDealMapToVO(DealMap dm) {

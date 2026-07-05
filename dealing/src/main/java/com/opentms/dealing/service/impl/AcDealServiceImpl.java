@@ -10,6 +10,7 @@ import com.opentms.dealing.mapper.*;
 import com.opentms.dealing.service.AcDealService;
 import com.opentms.dealing.service.CashflowService;
 import com.opentms.dealing.service.DealMapService;
+import com.opentms.dealing.service.EntityNameLookup;
 import com.opentms.dealing.vo.ActionVO;
 import com.opentms.dealing.vo.CashflowVO;
 import com.opentms.dealing.vo.DealMapVO;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -58,19 +60,25 @@ public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements 
     private final AcDealImageMapper acDealImageMapper;
     private final DealMapService dealMapService;
     private final CashflowService cashflowService;
+    /**
+     * 跨模块关联实体名称查询 (用于 copy 端点补全名称字段, 2026-07-05)
+     */
+    private final EntityNameLookup entityNameLookup;
 
     public AcDealServiceImpl(AcDealMapper acDealMapper,
                              ActionMapper actionMapper,
                              DealImageMapper dealImageMapper,
                              AcDealImageMapper acDealImageMapper,
                              @Lazy DealMapService dealMapService,
-                             @Lazy CashflowService cashflowService) {
+                             @Lazy CashflowService cashflowService,
+                             EntityNameLookup entityNameLookup) {
         this.acDealMapper = acDealMapper;
         this.actionMapper = actionMapper;
         this.dealImageMapper = dealImageMapper;
         this.acDealImageMapper = acDealImageMapper;
         this.dealMapService = dealMapService;
         this.cashflowService = cashflowService;
+        this.entityNameLookup = entityNameLookup;
     }
 
     // ==================== Query ====================
@@ -146,8 +154,52 @@ public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements 
         List<ActionVO> actionList = listActionsByDealNumber(deal.getDealNumber());
         vo.setActionList(actionList);
 
+        // ===== 2026-07-05: 补全关联实体名称 (前端 BaseDataPicker preloadRow 需求) =====
+        // 复用 getCopyData() 同样的 EntityNameLookup 逻辑,但写到 AcDealDetailVO 上
+        populateEntityNames(vo, deal, acDeal);
+
         return vo;
     }
+
+    /**
+     * 详情响应中补全 *Name 字段 (跨模块 JdbcTemplate, 失败容错: 单个 lookup 失败不影响其他字段)
+     * 注: AcDealDetailVO.managementEntity 是 code 字符串(非 ID),无对应 Name 字段,跳过
+     */
+    private void populateEntityNames(AcDealDetailVO vo, Deal deal, AcDeal acDeal) {
+        // counterparty
+        try {
+            Map<String, Object> cp = entityNameLookup.findCounterparty(deal.getCounterpartyId());
+            vo.setCounterpartyName(nameOf(cp));
+        } catch (Exception ignore) {
+        }
+        // trader
+        try {
+            Map<String, Object> tr = entityNameLookup.findTrader(deal.getTraderId());
+            vo.setTraderName(nameOf(tr));
+        } catch (Exception ignore) {
+        }
+        // instrument
+        try {
+            Map<String, Object> inst = entityNameLookup.findInstrument(deal.getInstrumentId());
+            vo.setInstrumentName(instrumentDisplay(inst));
+        } catch (Exception ignore) {
+        }
+        // bankAccount
+        if (acDeal != null) {
+            try {
+                Map<String, Object> ba = entityNameLookup.findBankAccount(acDeal.getBankAccountId());
+                vo.setBankAccountName(bankAccountDisplay(ba));
+            } catch (Exception ignore) {
+            }
+            try {
+                Map<String, Object> ca = entityNameLookup.findCounterpartyAccount(acDeal.getCounterpartyAccountId());
+                vo.setCounterpartyAccountName(bankAccountDisplay(ca));
+            } catch (Exception ignore) {
+            }
+        }
+    }
+
+    // (公用 nameOf / instrumentDisplay / bankAccountDisplay 已声明于下方 getCopyData 附近)
 
     // ==================== v2.0 Create ====================
 
@@ -668,6 +720,12 @@ public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements 
 
     // ==================== Copy ====================
 
+    /**
+     * 复制 AC 交易 (v2.1 - 2026-07-05: 补全关联实体名称)
+     * <p>问题: 旧版只返回 ID，前端 BaseDataPicker 只能显示 ID 数字。</p>
+     * <p>修复: 利用 EntityNameLookup (跨模块 JdbcTemplate) 查询名称并填入 DTO,
+     * 前端在 copy 模式下用 preloadRow 传给 Picker 直接展示名称。</p>
+     */
     @Override
     public AcDealDTO getCopyData(String dealNumber) {
         Deal deal = getByDealNumber(dealNumber);
@@ -698,10 +756,73 @@ public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements 
             dto.setPaymentMethod(acDeal.getPaymentMethod());
         }
 
+        // ===== v2.1: 补全关联实体名称 (跨模块 JdbcTemplate) =====
+        // 用 managedEntity code 查名称 (Deal.managementEntity 是 code 字符串)
+        if (StringUtils.hasText(deal.getManagementEntity())) {
+            Map<String, Object> me = entityNameLookup.findManagementEntityByCode(deal.getManagementEntity());
+            if (me != null) dto.setManagementEntityName(nameOf(me));
+        }
+        Map<String, Object> cp = entityNameLookup.findCounterparty(deal.getCounterpartyId());
+        if (cp != null) dto.setCounterpartyName(nameOf(cp));
+
+        Map<String, Object> inst = entityNameLookup.findInstrument(deal.getInstrumentId());
+        if (inst != null) dto.setInstrumentName(instrumentDisplay(inst));
+
+        Map<String, Object> tr = entityNameLookup.findTrader(deal.getTraderId());
+        if (tr != null) dto.setTraderName(nameOf(tr));
+
+        Map<String, Object> ba = entityNameLookup.findBankAccount(acDeal != null ? acDeal.getBankAccountId() : null);
+        if (ba != null) dto.setBankAccountName(bankAccountDisplay(ba));
+
+        Map<String, Object> ca = entityNameLookup.findCounterpartyAccount(acDeal != null ? acDeal.getCounterpartyAccountId() : null);
+        if (ca != null) dto.setCounterpartyAccountName(bankAccountDisplay(ca));
+
         // operator 留空，让用户自行填写
         dto.setOperator("");
 
         return dto;
+    }
+
+    /** "code (name)" 形式展示 (Picker.displayFormat 风格) */
+    private static String nameOf(Map<String, Object> row) {
+        if (row == null) return null;
+        Object code = row.get("code");
+        Object name = row.get("name");
+        StringBuilder sb = new StringBuilder();
+        if (code != null && !code.toString().isEmpty()) sb.append(code);
+        if (name != null && !name.toString().isEmpty()) {
+            if (sb.length() > 0) sb.append(" ");
+            sb.append("(").append(name).append(")");
+        }
+        return sb.length() == 0 ? null : sb.toString();
+    }
+
+    /** 金融工具展示: "code (name)" */
+    private static String instrumentDisplay(Map<String, Object> row) {
+        if (row == null) return null;
+        Object code = row.get("instrumentCode");
+        Object name = row.get("instrumentName");
+        StringBuilder sb = new StringBuilder();
+        if (code != null && !code.toString().isEmpty()) sb.append(code);
+        if (name != null && !name.toString().isEmpty()) {
+            if (sb.length() > 0) sb.append(" ");
+            sb.append("(").append(name).append(")");
+        }
+        return sb.length() == 0 ? null : sb.toString();
+    }
+
+    /** 银行账户/对手方账户展示: "accountNo (accountName)" */
+    private static String bankAccountDisplay(Map<String, Object> row) {
+        if (row == null) return null;
+        Object no = row.get("accountNo");
+        Object name = row.get("accountName");
+        StringBuilder sb = new StringBuilder();
+        if (no != null && !no.toString().isEmpty()) sb.append(no);
+        if (name != null && !name.toString().isEmpty()) {
+            if (sb.length() > 0) sb.append(" ");
+            sb.append("(").append(name).append(")");
+        }
+        return sb.length() == 0 ? null : sb.toString();
     }
 
     private String generateImageNumber() {
