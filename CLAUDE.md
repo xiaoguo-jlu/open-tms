@@ -98,3 +98,29 @@ POST   /api/v1/{resource}/delete/{id}       # 删除
 
 ## Vite Proxy Map
 basedata 路径 → `http://localhost:8081/opentms/basedata`, dealing → `http://localhost:8082`
+
+## 研发审核规范(2026-07-05 新增)
+
+Open-TMS 采用 **6 维度审核门禁体系**,每个 Phase 出口必须运行审核,
+P0 问题不通过不能进入下一阶段。
+
+**审核公共规范**: `.claude/skills/opentms-review-common/SKILL.md`
+
+**6 个审核 Skill**:
+
+| 审核维度 | Skill | 触发位置 | P0 必做 |
+|---------|-------|---------|---------|
+| 需求 | opentms-review-requirement | Phase 1 → 2 | ✓ |
+| UX | opentms-review-ux | Phase 2 → 3 | — |
+| DB | opentms-review-db | Phase 3 → 4 | ✓ |
+| API | opentms-review-api | Phase 4 → 5 | ✓ |
+| 后端 | opentms-review-backend | Phase 5 → 6 | — |
+| 前端 | opentms-review-frontend | Phase 6 → 7 | — |
+| 测试 | opentms-test-execution | Phase 8 → 9 | ✓ |
+| **6 维全量复审** | **6 个 skill 联调** | **Phase 9 交付前** | **✓** |
+
+**评级**: A(无问题) / B(仅 P2) / C(有 P1) / D(有 P0, 返工)
+
+**报告路径**: `docs/reviews/{feature}/{dimension}-review.md`
+
+详细门禁规则见 `.agents/skills/opentms-feature-dev/SKILL.md` 第 5.4 节"审核门禁体系"。
