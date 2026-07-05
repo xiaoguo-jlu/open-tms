@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -81,6 +82,26 @@ public class FxDeal {
     /** NDF 结算金额 = notional × (fixingRate - exchangeRate) */
     @TableField("settlement_amount")
     private BigDecimal settlementAmount;
+
+    /** NDF fixing 执行日期(默认=value_date) */
+    @TableField("fix_date")
+    private LocalDate fixDate;
+
+    /** NDF fixing 结算币种(默认=buyCurrency) */
+    @TableField("fix_currency")
+    private String fixCurrency;
+
+    /** NDF fixing 时的市场参考汇率(可选) */
+    @TableField("fix_market_rate")
+    private BigDecimal fixMarketRate;
+
+    /** NDF fixing 复核人(可空) */
+    @TableField("verifier_by")
+    private String verifierBy;
+
+    /** NDF RATE_FIX 备注 */
+    @TableField("fix_remark")
+    private String fixRemark;
 
     private String description;
 

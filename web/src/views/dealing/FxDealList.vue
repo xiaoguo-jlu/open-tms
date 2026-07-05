@@ -95,10 +95,13 @@
     </el-card>
 
     <!-- RATE_FIX 对话框 -->
-    <el-dialog v-model="rateFixVisible" title="NDF RATE_FIX" width="420px" destroy-on-close>
+    <el-dialog v-model="rateFixVisible" title="NDF RATE_FIX" width="440px" destroy-on-close>
       <el-form :model="rateFixForm" label-width="100px">
         <el-form-item label="Fixing 汇率">
           <el-input-number v-model="rateFixForm.fixingRate" :min="0" :precision="8" :controls="false" style="width: 100%;" placeholder="例: 7.1500" />
+        </el-form-item>
+        <el-form-item label="Fixing 日期">
+          <el-date-picker v-model="rateFixForm.fixDate" type="date" value-format="YYYY-MM-DD" style="width: 100%;" placeholder="默认=交割日" />
         </el-form-item>
         <el-form-item label="操作人">
           <el-input v-model="rateFixForm.operator" placeholder="操作人" />
@@ -126,7 +129,7 @@ const tableData = ref([])
 const rateFixVisible = ref(false)
 const rateFixing = ref(false)
 const fixingDeal = ref(null)
-const rateFixForm = reactive({ fixingRate: null, operator: 'admin' })
+const rateFixForm = reactive({ fixingRate: null, fixDate: '', operator: 'admin' })
 
 const queryForm = reactive({
   managementEntityId: null,
@@ -185,6 +188,7 @@ const handleCopy = (row) => {
 const handleRateFix = (row) => {
   fixingDeal.value = row
   rateFixForm.fixingRate = null
+  rateFixForm.fixDate = row.valueDate || ''
   rateFixForm.operator = 'admin'
   rateFixVisible.value = true
 }
@@ -195,8 +199,15 @@ const doRateFix = async () => {
   }
   rateFixing.value = true
   try {
-    const res = await rateFixFxDeal(fixingDeal.value.id, rateFixForm)
-    ElMessage.success(`RATE_FIX 完成,差额: ${res.data?.settlementAmount}`)
+    const payload = {
+      fixingRate: rateFixForm.fixingRate,
+      fixDate: rateFixForm.fixDate || null,
+      operator: rateFixForm.operator || 'admin'
+    }
+    const res = await rateFixFxDeal(fixingDeal.value.id, payload)
+    const data = res.data || res
+    const dirLabel = data.direction === 'Inflow' ? '流入' : '流出'
+    ElMessage.success(`RATE_FIX 完成 | 差额: ${Number(data.settlementAmount).toFixed(2)} ${data.currency || ''} (${dirLabel})`)
     rateFixVisible.value = false
     fetchData()
   } catch (e) {

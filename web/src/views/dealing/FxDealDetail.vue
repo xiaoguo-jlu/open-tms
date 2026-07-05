@@ -9,7 +9,7 @@
       </div>
       <div class="right">
         <template v-if="mode === 'readonly'">
-          <el-button v-if="isNdfForDetail && !detail.fixingRate" type="warning" size="small" :icon="MagicStick" @click="rateFixVisible = true">RATE_FIX</el-button>
+          <el-button v-if="isNdfForDetail && !detail.fixingRate" type="warning" size="small" :icon="MagicStick" @click="openRateFixDialog">RATE_FIX</el-button>
           <el-button type="success" size="small" :icon="CopyDocument" @click="enterCopy">复制</el-button>
           <el-button v-if="detail.status !== 'Canceled'" type="primary" size="small" :icon="Edit" @click="enterEdit">编辑</el-button>
           <el-button v-if="detail.status === 'New' || detail.status === 'Pending'" type="primary" size="small" :icon="Check" @click="handleApprove">审批</el-button>
@@ -113,27 +113,38 @@
           <el-row :gutter="12">
             <el-col :xs="24" :sm="12" :md="6">
               <el-form-item label="管理主体" prop="managementEntityId">
-                <BaseDataPicker v-model="form.managementEntityId" entity="management-entity" placeholder="管理主体" size="small" @change="onManagementEntityChange" />
+                <BaseDataPicker v-model="form.managementEntityId" entity="management-entity" placeholder="管理主体" size="small" :preload-row="preloadRows.managementEntity" @change="onManagementEntityChange" />
               </el-form-item>
             </el-col>
             <el-col :xs="24" :sm="12" :md="6">
               <el-form-item label="交易对手" prop="counterpartyId">
-                <BaseDataPicker v-model="form.counterpartyId" entity="counterparty" placeholder="交易对手" size="small" />
+                <BaseDataPicker v-model="form.counterpartyId" entity="counterparty" placeholder="交易对手" size="small" :preload-row="preloadRows.counterparty" />
               </el-form-item>
             </el-col>
             <el-col :xs="24" :sm="12" :md="6">
               <el-form-item label="交易员" prop="traderId">
-                <BaseDataPicker v-model="form.traderId" entity="trader" placeholder="交易员" size="small" />
+                <BaseDataPicker v-model="form.traderId" entity="trader" placeholder="交易员" size="small" :preload-row="preloadRows.trader" />
               </el-form-item>
             </el-col>
             <el-col :xs="24" :sm="12" :md="6">
               <el-form-item label="金融工具" prop="instrumentId">
-                <BaseDataPicker v-model="form.instrumentId" entity="instrument" placeholder="金融工具" size="small" @change="onInstrumentChange" />
+                <BaseDataPicker v-model="form.instrumentId" entity="instrument" placeholder="金融工具" size="small" :preload-row="preloadRows.instrument" @change="onInstrumentChange" />
               </el-form-item>
             </el-col>
             <el-col :xs="24" :sm="12" :md="6">
               <el-form-item label="币种对" prop="currencyPairId">
-                <BaseDataPicker v-model="form.currencyPairId" entity="currency-pair" placeholder="币种对" size="small" @change="onCurrencyPairChange" />
+                <BaseDataPicker v-model="form.currencyPairId" entity="currency-pair" placeholder="币种对" size="small" :preload-row="preloadRows.currencyPair" @change="onCurrencyPairChange" />
+              </el-form-item>
+            </el-col>
+            <!-- 2026-07-05 修复 #3: 买卖币种分开显示 (默认根据货币对联动) -->
+            <el-col :xs="24" :sm="12" :md="6">
+              <el-form-item label="卖出币种" prop="sellCurrency">
+                <el-input v-model="form.sellCurrency" placeholder="由币种对自动联动" size="small" readonly />
+              </el-form-item>
+            </el-col>
+            <el-col :xs="24" :sm="12" :md="6">
+              <el-form-item label="买入币种" prop="buyCurrency">
+                <el-input v-model="form.buyCurrency" placeholder="由币种对自动联动" size="small" readonly />
               </el-form-item>
             </el-col>
             <el-col :xs="24" :sm="12" :md="6">
@@ -312,14 +323,29 @@
       </div>
     </transition>
 
-    <!-- RATE_FIX 对话框 -->
-    <el-dialog v-model="rateFixVisible" title="NDF RATE_FIX" width="420px" destroy-on-close>
-      <el-form :model="rateFixForm" label-width="100px">
+    <!-- RATE_FIX 对话框 (Phase 1: fixDate/fixCurrency/fixMarketRate/fixRemark) -->
+    <el-dialog v-model="rateFixVisible" title="NDF RATE_FIX" width="480px" destroy-on-close>
+      <el-form :model="rateFixForm" label-width="110px">
         <el-form-item label="Fixing 汇率">
           <el-input-number v-model="rateFixForm.fixingRate" :min="0" :precision="8" :controls="false" style="width: 100%;" placeholder="例: 7.1500" />
         </el-form-item>
+        <el-form-item label="Fixing 日期">
+          <el-date-picker v-model="rateFixForm.fixDate" type="date" value-format="YYYY-MM-DD" style="width: 100%;" placeholder="默认=交割日" />
+        </el-form-item>
+        <el-form-item label="Fixing 币种">
+          <el-select v-model="rateFixForm.fixCurrency" style="width: 100%;" placeholder="默认=买入币种">
+            <el-option :label="detail.buyCurrency" :value="detail.buyCurrency" />
+            <el-option :label="detail.sellCurrency" :value="detail.sellCurrency" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="市场参考汇率">
+          <el-input-number v-model="rateFixForm.fixMarketRate" :min="0" :precision="8" :controls="false" style="width: 100%;" placeholder="可选,参考值" />
+        </el-form-item>
         <el-form-item label="操作人">
           <el-input v-model="rateFixForm.operator" placeholder="操作人" />
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input v-model="rateFixForm.fixRemark" type="textarea" :rows="2" placeholder="可选" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -422,7 +448,14 @@ const entityNames = reactive({
 // RATE_FIX
 const rateFixVisible = ref(false)
 const rateFixing = ref(false)
-const rateFixForm = reactive({ fixingRate: null, operator: 'admin' })
+const rateFixForm = reactive({
+  fixingRate: null,
+  fixDate: '',
+  fixCurrency: '',
+  fixMarketRate: null,
+  operator: 'admin',
+  fixRemark: ''
+})
 
 // 审批
 const approvalVisible = ref(false)
@@ -443,10 +476,15 @@ let calculateTimer = null
 const emptyForm = () => ({
   dealNumber: '',
   managementEntityId: null,
+  managementEntityName: '',
   counterpartyId: null,
+  counterpartyName: '',
   traderId: null,
+  traderName: '',
   instrumentId: null,
+  instrumentName: '',
   currencyPairId: null,
+  currencyPairName: '',
   sellCurrency: '',
   sellAmount: null,
   buyCurrency: '',
@@ -489,10 +527,15 @@ const fillFormFromObject = (src) => {
   Object.assign(form, {
     dealNumber: src.dealNumber || '',
     managementEntityId: src.managementEntityId ?? null,
+    managementEntityName: src.managementEntityName || '',
     counterpartyId: src.counterpartyId ?? null,
+    counterpartyName: src.counterpartyName || '',
     traderId: src.traderId ?? null,
+    traderName: src.traderName || '',
     instrumentId: src.instrumentId ?? null,
+    instrumentName: src.instrumentName || '',
     currencyPairId: src.currencyPairId ?? null,
+    currencyPairName: src.currencyPairName || '',
     sellCurrency: src.sellCurrency || '',
     sellAmount: src.sellAmount ?? null,
     buyCurrency: src.buyCurrency || '',
@@ -510,6 +553,67 @@ const fillFormFromObject = (src) => {
     remark: src.remark || '',
     operator: src.operator || 'admin'
   })
+}
+
+/**
+ * 2026-07-05 修复 #2: FX 复制后 BaseDataPicker 显示 ID
+ * <p>原因: Picker v-model 接收 ID，没有 preloadRow 时只显示 ID 数字。</p>
+ * <p>修复: 注入 preloadRows - 把后端返回的关联实体名称预填到 Picker,
+ * mount 时直接展示 "code (name)" 形式, 也修复 #3 buy/sell 币种对联动。</p>
+ */
+const preloadRows = reactive({
+  managementEntity: null,
+  counterparty: null,
+  trader: null,
+  instrument: null,
+  currencyPair: null
+})
+
+function splitCodeName(nameStr) {
+  if (!nameStr) return { code: null, name: null }
+  if (nameStr.includes('(')) {
+    return {
+      code: nameStr.substring(0, nameStr.indexOf('(')).trim(),
+      name: nameStr.substring(nameStr.indexOf('(') + 1, nameStr.lastIndexOf(')')).trim()
+    }
+  }
+  return { code: null, name: nameStr }
+}
+
+function applyPreloadFromCopyData(src) {
+  if (src.managementEntityId && src.managementEntityName) {
+    const { code, name } = splitCodeName(src.managementEntityName)
+    preloadRows.managementEntity = { id: src.managementEntityId, code, name }
+  }
+  if (src.counterpartyId && src.counterpartyName) {
+    const { code, name } = splitCodeName(src.counterpartyName)
+    preloadRows.counterparty = { id: src.counterpartyId, code, name }
+  }
+  if (src.traderId && src.traderName) {
+    const { code, name } = splitCodeName(src.traderName)
+    preloadRows.trader = { id: src.traderId, code, name }
+  }
+  if (src.instrumentId && src.instrumentName) {
+    if (src.instrumentName.includes('(')) {
+      preloadRows.instrument = {
+        id: src.instrumentId,
+        instrumentCode: src.instrumentName.substring(0, src.instrumentName.indexOf('(')).trim(),
+        instrumentName: src.instrumentName.substring(src.instrumentName.indexOf('(') + 1, src.instrumentName.lastIndexOf(')')).trim()
+      }
+    } else {
+      preloadRows.instrument = { id: src.instrumentId, instrumentCode: src.instrumentName, instrumentName: '' }
+    }
+  }
+  if (src.currencyPairId && src.currencyPairName) {
+    // 格式 "EURUSD EUR/USD" - pairCode + 币种对
+    const parts = src.currencyPairName.split(' ')
+    preloadRows.currencyPair = {
+      id: src.currencyPairId,
+      pairCode: parts[0],
+      currency1: form.sellCurrency,
+      currency2: form.buyCurrency
+    }
+  }
 }
 
 const isDirty = computed(() => {
@@ -615,6 +719,7 @@ const enterCopy = async () => {
     const res = await copyFxDeal(detail.value.dealNumber)
     const data = res.data || res
     fillFormFromObject(data)
+    applyPreloadFromCopyData(data)
     form.dealNumber = ''
     router.replace({ path: '/dealing/fx-deal/detail', query: { copyFrom: detail.value.dealNumber } })
   } catch (e) {
@@ -729,6 +834,16 @@ const doReject = async (action) => {
   }
 }
 
+const openRateFixDialog = () => {
+  rateFixForm.fixingRate = null
+  rateFixForm.fixDate = detail.value.valueDate || ''
+  rateFixForm.fixCurrency = detail.value.buyCurrency || ''
+  rateFixForm.fixMarketRate = null
+  rateFixForm.operator = 'admin'
+  rateFixForm.fixRemark = ''
+  rateFixVisible.value = true
+}
+
 const doRateFix = async () => {
   if (!rateFixForm.fixingRate) {
     ElMessage.error('请输入 Fixing 汇率')
@@ -736,9 +851,21 @@ const doRateFix = async () => {
   }
   rateFixing.value = true
   try {
-    const res = await rateFixFxDeal(detail.value.id, rateFixForm)
-    ElMessage.success(`RATE_FIX 完成,差额: ${res.data?.settlementAmount}`)
+    const payload = {
+      fixingRate: rateFixForm.fixingRate,
+      fixDate: rateFixForm.fixDate || null,
+      fixCurrency: rateFixForm.fixCurrency || detail.value.buyCurrency,
+      fixMarketRate: rateFixForm.fixMarketRate || null,
+      operator: rateFixForm.operator || 'admin',
+      fixRemark: rateFixForm.fixRemark || null
+    }
+    const res = await rateFixFxDeal(detail.value.id, payload)
+    const data = res.data || res
     rateFixVisible.value = false
+    const dirLabel = data.direction === 'Inflow' ? '流入' : '流出'
+    ElMessage.success(`RATE_FIX 完成 | 差额: ${Number(data.settlementAmount).toFixed(2)} ${data.currency} (${dirLabel}) | Cashflow: ${data.dealmapNumber}`)
+    // 自动跳到 Cashflow Tab
+    activeTab.value = 'cashflow'
     await loadData(detail.value.dealNumber)
   } catch (e) {
     ElMessage.error(e?.message || 'RATE_FIX 失败')
@@ -817,7 +944,9 @@ const resolveEntityNames = async (d) => {
 const loadCopyData = async (dealNumber) => {
   try {
     const res = await copyFxDeal(dealNumber)
-    fillFormFromObject(res.data || res)
+    const data = res.data || res
+    fillFormFromObject(data)
+    applyPreloadFromCopyData(data)
     form.dealNumber = ''
   } catch (e) {
     ElMessage.error('复制失败: ' + (e?.message || '请重试'))

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.opentms.dealing.dto.FxCalculateRequest;
 import com.opentms.dealing.dto.FxCalculateResponse;
 import com.opentms.dealing.dto.FxDealDTO;
+import com.opentms.dealing.dto.RateFixRequest;
 import com.opentms.dealing.vo.FxDealDetailVO;
 import com.opentms.dealing.vo.FxDealVO;
 
@@ -50,8 +51,16 @@ public interface FxDealService {
 
     /**
      * NDF RATE_FIX（生成 1 DealMap(FX_FIX) + 1 Cashflow(差额) + UPDATE fixing_rate/settlement_amount）
-     * @return 包含 dealNumber / settlementAmount / dealmapNumber
+     * Phase 1: 支持 fixDate / fixCurrency / fixMarketRate / verifierBy / fixRemark
+     * @return 包含 dealNumber / settlementAmount / dealmapNumber / currency / direction
      */
+    Map<String, Object> rateFix(Long id, RateFixRequest req);
+
+    /**
+     * NDF RATE_FIX（旧签名，向后兼容）
+     * @deprecated 使用 {@link #rateFix(Long, RateFixRequest)} 替代
+     */
+    @Deprecated
     Map<String, Object> rateFix(Long id, BigDecimal fixingRate, String operator);
 
     /**

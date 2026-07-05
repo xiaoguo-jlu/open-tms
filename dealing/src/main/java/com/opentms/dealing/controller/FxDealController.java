@@ -5,13 +5,13 @@ import com.opentms.common.model.Result;
 import com.opentms.dealing.dto.FxCalculateRequest;
 import com.opentms.dealing.dto.FxCalculateResponse;
 import com.opentms.dealing.dto.FxDealDTO;
+import com.opentms.dealing.dto.RateFixRequest;
 import com.opentms.dealing.service.FxDealService;
 import com.opentms.dealing.vo.FxDealDetailVO;
 import com.opentms.dealing.vo.FxDealVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -136,27 +136,18 @@ public class FxDealController {
     }
 
     /**
-     * NDF RATE_FIX
+     * NDF RATE_FIX（Phase 1: 支持 fixDate/fixCurrency/fixMarketRate/verifierBy/fixRemark）
      */
     @PostMapping("/{id}/rate-fix")
-    public Result<Map<String, Object>> rateFix(@PathVariable Long id, @RequestBody Map<String, Object> request) {
+    public Result<Map<String, Object>> rateFix(@PathVariable Long id, @RequestBody RateFixRequest req) {
         try {
-            BigDecimal fixingRate = toBigDecimal(request.get("fixingRate"));
-            String operator = request.get("operator") != null ? request.get("operator").toString() : "system";
-            Map<String, Object> data = fxDealService.rateFix(id, fixingRate, operator);
+            Map<String, Object> data = fxDealService.rateFix(id, req);
             return Result.success(data);
         } catch (IllegalArgumentException e) {
             return Result.badRequest(e.getMessage());
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
-    }
-
-    private BigDecimal toBigDecimal(Object o) {
-        if (o == null) return null;
-        if (o instanceof BigDecimal) return (BigDecimal) o;
-        if (o instanceof Number) return new BigDecimal(o.toString());
-        return new BigDecimal(o.toString());
     }
 
     private String deriveProductType(FxDealDTO dto) {

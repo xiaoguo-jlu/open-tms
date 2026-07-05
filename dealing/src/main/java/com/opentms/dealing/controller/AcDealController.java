@@ -36,11 +36,19 @@ public class AcDealController {
     }
 
     /**
-     * 获取详情（按 ID）
+     * 获取详情（按 ID 或 dealNumber 自动识别）
+     * <p>2026-07-05 修复: 历史路径 /ac-deals/{id} 使用 Long,前端偶发传入 dealNumber
+     * (如 AC202607050001) 时被 Spring 抛 400。改为 String 并在控制器内根据是否纯数字
+     * 路由到 getDetail(Long) 或 getDetailByDealNumber(String),保持后端逻辑不变。</p>
      */
     @GetMapping("/{id}")
-    public Result<AcDealDetailVO> getById(@PathVariable Long id) {
-        AcDealDetailVO detail = acDealService.getDetail(id);
+    public Result<AcDealDetailVO> getById(@PathVariable String id) {
+        AcDealDetailVO detail;
+        if (id != null && id.matches("\\d+")) {
+            detail = acDealService.getDetail(Long.valueOf(id));
+        } else {
+            detail = acDealService.getDetailByDealNumber(id);
+        }
         if (detail == null) {
             return Result.notFound("AC Deal not found");
         }

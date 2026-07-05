@@ -103,7 +103,7 @@
           <el-row :gutter="12">
             <el-col :xs="24" :sm="12" :md="6">
               <el-form-item label="管理主体" prop="managementEntity">
-                <BaseDataPicker v-model="form.managementEntity" entity="management-entity" placeholder="管理主体" size="small" />
+                <BaseDataPicker v-model="form.managementEntity" entity="management-entity" placeholder="管理主体" size="small" :preload-row="preloadRows.managementEntity" />
               </el-form-item>
             </el-col>
             <el-col :xs="24" :sm="12" :md="6">
@@ -145,27 +145,27 @@
             </el-col>
             <el-col :xs="24" :sm="12" :md="6">
               <el-form-item label="交易员" prop="traderId">
-                <BaseDataPicker v-model="form.traderId" entity="trader" placeholder="交易员" size="small" />
+                <BaseDataPicker v-model="form.traderId" entity="trader" placeholder="交易员" size="small" :preload-row="preloadRows.trader" />
               </el-form-item>
             </el-col>
             <el-col :xs="24" :sm="12" :md="6">
               <el-form-item label="交易对手">
-                <BaseDataPicker v-model="form.counterpartyId" entity="counterparty" placeholder="交易对手" size="small" @change="onCounterpartyChange" />
+                <BaseDataPicker v-model="form.counterpartyId" entity="counterparty" placeholder="交易对手" size="small" :preload-row="preloadRows.counterparty" @change="onCounterpartyChange" />
               </el-form-item>
             </el-col>
             <el-col :xs="24" :sm="12" :md="6">
               <el-form-item label="金融工具">
-                <BaseDataPicker v-model="form.instrumentId" entity="instrument" placeholder="金融工具" size="small" @change="row => form.instrumentName = row?.instrumentName || ''" />
+                <BaseDataPicker v-model="form.instrumentId" entity="instrument" placeholder="金融工具" size="small" :preload-row="preloadRows.instrument" @change="row => form.instrumentName = row?.instrumentName || ''" />
               </el-form-item>
             </el-col>
             <el-col :xs="24" :sm="12" :md="6">
               <el-form-item label="本方账户" prop="bankAccountId">
-                <BaseDataPicker v-model="form.bankAccountId" entity="bank-account" placeholder="本方账户" size="small" @change="row => form.bankAccountName = row?.accountName || ''" />
+                <BaseDataPicker v-model="form.bankAccountId" entity="bank-account" placeholder="本方账户" size="small" :preload-row="preloadRows.bankAccount" @change="row => form.bankAccountName = row?.accountName || ''" />
               </el-form-item>
             </el-col>
             <el-col :xs="24" :sm="12" :md="6">
               <el-form-item label="对手方账户">
-                <BaseDataPicker v-model="form.counterpartyAccountId" entity="counterparty-account" :auto-filter="{ counterpartyId: form.counterpartyId }" placeholder="对手方账户" size="small" @change="row => form.counterpartyAccountName = row?.accountName || ''" />
+                <BaseDataPicker v-model="form.counterpartyAccountId" entity="counterparty-account" :auto-filter="{ counterpartyId: form.counterpartyId }" placeholder="对手方账户" size="small" :preload-row="preloadRows.counterpartyAccount" @change="row => form.counterpartyAccountName = row?.accountName || ''" />
               </el-form-item>
             </el-col>
             <el-col :xs="24" :sm="12" :md="6">
@@ -389,19 +389,22 @@ const emptyForm = () => ({
   dealNumber: '',
   dealType: 'AC',
   managementEntity: '',
+  managementEntityName: '',
   traderId: null,
+  traderName: '',
   counterpartyId: null,
+  counterpartyName: '',
   instrumentId: null,
+  instrumentName: '',
   direction: 'Outflow',
   amount: 0,
   currency: '',
   dealDate: new Date().toISOString().slice(0, 10),
   valueDate: new Date().toISOString().slice(0, 10),
   bankAccountId: null,
-  counterpartyAccountId: null,
   bankAccountName: '',
+  counterpartyAccountId: null,
   counterpartyAccountName: '',
-  instrumentName: '',
   paymentMethod: 'TRANSFER',
   description: '',
   remark: '',
@@ -427,8 +430,11 @@ const fillFormFromObject = (src) => {
     dealNumber: src.dealNumber || '',
     dealType: 'AC',
     managementEntity: src.managementEntity || '',
+    managementEntityName: src.managementEntityName || '',
     traderId: src.traderId ?? null,
+    traderName: src.traderName || '',
     counterpartyId: src.counterpartyId ?? null,
+    counterpartyName: src.counterpartyName || '',
     instrumentId: src.instrumentId ?? null,
     direction: src.direction || 'Outflow',
     amount: src.amount ?? 0,
@@ -445,6 +451,83 @@ const fillFormFromObject = (src) => {
     remark: src.remark || '',
     operator: src.operator || 'admin'
   })
+}
+
+/**
+ * 2026-07-05 修复 #1: AC 复制后表单字段全部丢失
+ * <p>原因: fillFormFromObject 没有把后端返回的关联实体名称 preload 到 BaseDataPicker,
+ * 导致 Picker 只显示 ID。</p>
+ * <p>修复: 增加 preloadRows (reactive) + applyPreloadFromCopyData() 工具, 通过 :preload-row
+ * 让 Picker 在挂载时就直接展示 "code (name)" 形式, 而非 ID 数字。</p>
+ */
+const preloadRows = reactive({
+  managementEntity: null,
+  trader: null,
+  counterparty: null,
+  instrument: null,
+  bankAccount: null,
+  counterpartyAccount: null
+})
+
+function applyPreloadFromCopyData(src) {
+  // name 字段填入 Picker preloadRow, 让复制后直接展示 "code (name)"
+  // management-entity Picker 用 returnField='code', 所以 preloadRow 不需要 id, 只需 code+name
+  if (src.managementEntity) {
+    preloadRows.managementEntity = {
+      code: src.managementEntity,
+      name: src.managementEntityName && src.managementEntityName.includes('(')
+        ? src.managementEntityName.substring(src.managementEntityName.indexOf('(') + 1, src.managementEntityName.indexOf(')'))
+        : (src.managementEntityName || '')
+    }
+  }
+  if (src.traderId && src.traderName) preloadRows.trader = pickCodeName(src.traderName, src.traderId)
+  if (src.counterpartyId && src.counterpartyName) preloadRows.counterparty = pickCodeName(src.counterpartyName, src.counterpartyId)
+  if (src.instrumentId && src.instrumentName) {
+    const { instrumentCode, instrumentName } = splitInstrument(src.instrumentName, src.instrumentId)
+    preloadRows.instrument = { instrumentCode, instrumentName, id: src.instrumentId }
+  }
+  if (src.bankAccountId && src.bankAccountName) {
+    const { accountNo, accountName } = splitAccount(src.bankAccountName, src.bankAccountId)
+    preloadRows.bankAccount = { accountNo, accountName, id: src.bankAccountId }
+  }
+  if (src.counterpartyAccountId && src.counterpartyAccountName) {
+    const { accountNo, accountName } = splitAccount(src.counterpartyAccountName, src.counterpartyAccountId)
+    preloadRows.counterpartyAccount = { accountNo, accountName, id: src.counterpartyAccountId }
+  }
+}
+
+/** 从 "code (name)" 形式的字符串提取 code/name */
+function pickCodeName(nameStr, id) {
+  if (!nameStr) return null
+  let code = nameStr
+  let name = nameStr
+  if (nameStr.includes('(')) {
+    code = nameStr.substring(0, nameStr.indexOf('(')).trim()
+    name = nameStr.substring(nameStr.indexOf('(') + 1, nameStr.lastIndexOf(')')).trim()
+  }
+  return { id, code, name }
+}
+
+function splitInstrument(nameStr, id) {
+  if (!nameStr) return { instrumentCode: null, instrumentName: null }
+  if (nameStr.includes('(')) {
+    return {
+      instrumentCode: nameStr.substring(0, nameStr.indexOf('(')).trim(),
+      instrumentName: nameStr.substring(nameStr.indexOf('(') + 1, nameStr.lastIndexOf(')')).trim()
+    }
+  }
+  return { instrumentCode: nameStr, instrumentName: '' }
+}
+
+function splitAccount(nameStr, id) {
+  if (!nameStr) return { accountNo: null, accountName: null }
+  if (nameStr.includes('(')) {
+    return {
+      accountNo: nameStr.substring(0, nameStr.indexOf('(')).trim(),
+      accountName: nameStr.substring(nameStr.indexOf('(') + 1, nameStr.lastIndexOf(')')).trim()
+    }
+  }
+  return { accountNo: nameStr, accountName: '' }
 }
 
 const onCounterpartyChange = (row) => {
@@ -470,6 +553,7 @@ const enterCopy = async () => {
     const res = await copyAcDeal(detail.value.dealNumber)
     const data = res.data || res
     fillFormFromObject(data)
+    applyPreloadFromCopyData(data)
     form.dealNumber = ''
     router.replace({ path: '/dealing/ac-deal/detail', query: { copyFrom: detail.value.dealNumber } })
   } catch (e) {
@@ -621,7 +705,9 @@ const loadData = async (dealNumber) => {
 const loadCopyData = async (dealNumber) => {
   try {
     const res = await copyAcDeal(dealNumber)
-    fillFormFromObject(res.data || res)
+    const data = res.data || res
+    fillFormFromObject(data)
+    applyPreloadFromCopyData(data)
     form.dealNumber = ''
   } catch (e) {
     ElMessage.error('复制失败: ' + (e?.message || '请重试'))

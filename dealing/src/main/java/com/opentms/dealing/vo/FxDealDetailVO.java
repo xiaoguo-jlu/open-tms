@@ -68,6 +68,21 @@ public class FxDealDetailVO {
 
     private BigDecimal settlementAmount;
 
+    /** NDF fixing 执行日期 */
+    private LocalDate fixDate;
+
+    /** NDF fixing 结算币种 */
+    private String fixCurrency;
+
+    /** NDF fixing 市场参考汇率 */
+    private BigDecimal fixMarketRate;
+
+    /** NDF fixing 复核人 */
+    private String verifierBy;
+
+    /** NDF RATE_FIX 备注 */
+    private String fixRemark;
+
     // 日期字段（v3.2 移到公共表）
     private LocalDate tradeDate;
 

@@ -89,6 +89,21 @@ public class FxDealDTO {
     /** NDF 结算金额（RATE_FIX 时计算 = notional × (fixingRate - exchangeRate)） */
     private BigDecimal settlementAmount;
 
+    /** NDF fixing 执行日期（可选，默认 valueDate） */
+    private LocalDate fixDate;
+
+    /** NDF fixing 结算币种（单选，默认 buyCurrency） */
+    private String fixCurrency;
+
+    /** NDF fixing 市场参考汇率（可选） */
+    private BigDecimal fixMarketRate;
+
+    /** NDF fixing 复核人（可选） */
+    private String verifierBy;
+
+    /** NDF RATE_FIX 备注（可选） */
+    private String fixRemark;
+
     // ==================== 描述 ====================
 
     private String description;
@@ -100,4 +115,23 @@ public class FxDealDTO {
     /** 操作人（必填） */
     @NotBlank(message = "操作人不能为空")
     private String operator;
+
+    // ============ 复制增强字段 (v3.3 - 2026-07-05) ============
+    // 仅由 /copy 端点填充,不影响 create/update 入参格式
+    // 前端 BaseDataPicker 利用 preloadRow 显示实体名称而非 ID
+
+    /** 管理主体名称（optional, copy 端点填充） */
+    private String managementEntityName;
+
+    /** 交易对手名称 */
+    private String counterpartyName;
+
+    /** 金融工具名称 */
+    private String instrumentName;
+
+    /** 交易员名称 */
+    private String traderName;
+
+    /** 币种对名称 (例: "EURUSD EUR/USD") */
+    private String currencyPairName;
 }

@@ -46,11 +46,19 @@ public class AtDealController {
     }
 
     /**
-     * 按 ID 获取详情
+     * 按 ID 或 dealNumber 自动识别获取详情
+     * <p>2026-07-05 修复: 历史路径 /at-deals/{id} 使用 Long,前端偶发传入 dealNumber
+     * (如 AT202607050003) 时被 Spring 抛 400。改为 String 并在控制器内根据是否纯数字
+     * 路由到 getById(Long) 或 getByDealNumber(String)。</p>
      */
     @GetMapping("/{id}")
-    public Result<AtDealVO> getById(@PathVariable Long id) {
-        AtDealVO vo = atDealService.getById(id);
+    public Result<AtDealVO> getById(@PathVariable String id) {
+        AtDealVO vo;
+        if (id != null && id.matches("\\d+")) {
+            vo = atDealService.getById(Long.valueOf(id));
+        } else {
+            vo = atDealService.getByDealNumber(id);
+        }
         if (vo == null) {
             return Result.notFound("AT Deal not found");
         }

@@ -68,4 +68,26 @@ public class AcDealDTO {
 
     /** 操作人（必填） */
     private String operator;
+
+    // ============ 复制增强字段 (v2.1 - 2026-07-05) ============
+    // 仅由 /copy 端点填充,不影响 create/update 入参格式
+    // 前端 BaseDataPicker 利用 preloadRow 显示实体名称而非 ID
+
+    /** 管理主体名称（optional, copy 端点填充） */
+    private String managementEntityName;
+
+    /** 交易对手名称 */
+    private String counterpartyName;
+
+    /** 金融工具名称 */
+    private String instrumentName;
+
+    /** 交易员名称 */
+    private String traderName;
+
+    /** 银行账户名称 */
+    private String bankAccountName;
+
+    /** 对手方账户名称 */
+    private String counterpartyAccountName;
 }
