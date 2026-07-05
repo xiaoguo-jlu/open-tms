@@ -358,7 +358,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowLeft, Check, CopyDocument, Delete, DocumentCopy, Edit, Plus } from '@element-plus/icons-vue'
 import request from '@/utils/request'
 import {
-  getAtDeal, listAtDealMaps, listAtCashflows, listAtActions, listAtImages,
+  getAtDeal, getAtDealByNumber, listAtDealMaps, listAtCashflows, listAtActions, listAtImages,
   saveAtDeal, updateAtDeal, copyAtDeal
 } from '@/api/dealing/atDeal'
 import BaseDataPicker from '@/components/picker/BaseDataPicker.vue'
@@ -573,7 +573,7 @@ const handleBack = () => router.push('/dealing/at-deal')
 
 const enterEdit = () => {
   fillFormFromObject(detail.value)
-  router.replace({ path: '/dealing/at-deal/detail', query: { id: detail.value.id, edit: 1 } })
+  router.replace({ path: '/dealing/at-deal/detail', query: { dealNumber: detail.value.dealNumber, edit: 1 } })
 }
 
 const enterCopy = async () => {
@@ -597,8 +597,8 @@ const handleCancel = async () => {
     }
   }
   if (mode.value === 'copy' || mode.value === 'edit') {
-    if (detail.value.id) {
-      router.replace({ path: '/dealing/at-deal/detail', query: { id: detail.value.id } })
+    if (detail.value.dealNumber) {
+      router.replace({ path: '/dealing/at-deal/detail', query: { dealNumber: detail.value.dealNumber } })
     } else {
       handleBack()
     }
@@ -635,16 +635,16 @@ const handleSave = async () => {
       await updateAtDeal(submitForm)
       ElMessage.success('保存成功')
       await loadData(form.id)
-      router.replace({ path: '/dealing/at-deal/detail', query: { id: form.id } })
+      router.replace({ path: '/dealing/at-deal/detail', query: { dealNumber: detail.value.dealNumber } })
     } else {
       const createData = { ...submitForm }
       delete createData.id
       delete createData.dealNumber
       const res = await saveAtDeal(createData)
-      const newId = res.data?.id
+      const newNumber = res.data?.dealNumber
       ElMessage.success('创建成功')
-      if (newId) {
-        router.replace({ path: '/dealing/at-deal/detail', query: { id: newId } })
+      if (newNumber) {
+        router.replace({ path: '/dealing/at-deal/detail', query: { dealNumber: newNumber } })
       } else {
         handleBack()
       }
@@ -739,7 +739,27 @@ const loadData = async (id) => {
     }
     fillFormFromObject(detail.value)
   } catch (e) {
-    console.error(e)
+    ElMessage.error(e?.message || '加载失败:请重试')
+  } finally {
+    loadingDetail.value = false
+  }
+}
+
+const loadDataByNumber = async (dealNumber) => {
+  if (!dealNumber) return
+  loadingDetail.value = true
+  try {
+    const res = await getAtDealByNumber(dealNumber)
+    detail.value = res.data
+    if (detail.value.dealNumber) {
+      dealMapList.value = (await listAtDealMaps(detail.value.dealNumber)).data || []
+      cashflowList.value = (await listAtCashflows(detail.value.dealNumber)).data || []
+      actionList.value = (await listAtActions(detail.value.dealNumber)).data || []
+      imageList.value = (await listAtImages(detail.value.dealNumber)).data || []
+    }
+    fillFormFromObject(detail.value)
+  } catch (e) {
+    ElMessage.error(e?.message || '加载失败:请重试')
   } finally {
     loadingDetail.value = false
   }
@@ -790,7 +810,7 @@ const loadCopyData = async (dealNumber) => {
       selectedMgmtEntity.value = sourceAccount.value.managementEntityId
     }
   } catch (e) {
-    console.error(e)
+    ElMessage.error('复制失败: ' + (e?.message || '请重试'))
   }
 }
 
@@ -804,9 +824,16 @@ const init = async () => {
     if (copyFrom) await loadCopyData(copyFrom)
     return
   }
-  const id = route.query.id
-  if (!id) return
-  await loadData(id)
+  // 兼容 ?dealNumber=xxx (优先) 与 ?id=xxx (兜底)
+  const num = route.query.dealNumber
+  const idFallback = route.query.id
+  if (num) {
+    await loadDataByNumber(num)
+  } else if (idFallback) {
+    await loadData(idFallback)
+  } else {
+    return
+  }
   if (mode.value === 'edit') {
     fillFormFromObject(detail.value)
   }

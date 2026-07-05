@@ -116,7 +116,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { listFxDeal, rateFixFxDeal, copyFxDeal } from '@/api/dealing/fxDeal'
+import { listFxDeal, rateFixFxDeal } from '@/api/dealing/fxDeal'
 
 const router = useRouter()
 const loading = ref(false)
@@ -178,15 +178,8 @@ const handleView = (row) => {
   router.push(`/dealing/fx-deal/detail?dealNumber=${row.dealNumber}`)
 }
 
-const handleCopy = async (row) => {
-  try {
-    const res = await copyFxDeal(row.dealNumber)
-    // copy API returns editable DTO without dealNumber; pre-fill via copyFrom query
-    // We route to detail with copyFrom → detail page will load copy DTO itself
-    router.push(`/dealing/fx-deal/detail?copyFrom=${row.dealNumber}`)
-  } catch (e) {
-    ElMessage.error(e?.message || '复制失败')
-  }
+const handleCopy = (row) => {
+  router.push(`/dealing/fx-deal/detail?copyFrom=${row.dealNumber}`)
 }
 
 const handleRateFix = (row) => {

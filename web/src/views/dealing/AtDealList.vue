@@ -91,8 +91,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { pageAtDeals, copyAtDeal } from '@/api/dealing/atDeal'
+import { pageAtDeals } from '@/api/dealing/atDeal'
 
 const router = useRouter()
 const loading = ref(false)
@@ -160,17 +159,11 @@ const handleReset = () => {
 const handleAdd = () => {
   router.push('/dealing/at-deal/detail?new=1')
 }
-const handleCopy = async (row) => {
-  try {
-    await copyAtDeal(row.dealNumber)
-    router.push(`/dealing/at-deal/detail?copyFrom=${row.dealNumber}`)
-  } catch (e) {
-    ElMessage.error('获取复制数据失败')
-    console.error(e)
-  }
+const handleCopy = (row) => {
+  router.push(`/dealing/at-deal/detail?copyFrom=${row.dealNumber}`)
 }
 const handleView = (row) => {
-  router.push(`/dealing/at-deal/detail?id=${row.id}`)
+  router.push(`/dealing/at-deal/detail?dealNumber=${row.dealNumber}`)
 }
 
 onMounted(() => { fetchData() })

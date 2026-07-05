@@ -612,7 +612,7 @@ const loadData = async (dealNumber) => {
     cashflowList.value = d.cashflowList || []
     actionList.value = d.actionList || []
   } catch (e) {
-    console.error(e)
+    ElMessage.error(e?.message || '加载失败:请重试')
   } finally {
     loadingDetail.value = false
   }
@@ -624,7 +624,7 @@ const loadCopyData = async (dealNumber) => {
     fillFormFromObject(res.data || res)
     form.dealNumber = ''
   } catch (e) {
-    console.error(e)
+    ElMessage.error('复制失败: ' + (e?.message || '请重试'))
   }
 }
 
@@ -633,13 +633,17 @@ const init = async () => {
     Object.assign(form, emptyForm())
     return
   }
+  // copy 模式: 直接通过 copyFrom 拉取可复制字段
+  if (mode.value === 'copy') {
+    const copyFrom = route.query.copyFrom
+    if (copyFrom) await loadCopyData(copyFrom)
+    return
+  }
   const num = route.query.dealNumber
   if (!num) return
   await loadData(num)
   if (mode.value === 'edit') {
     fillFormFromObject(detail.value)
-  } else if (mode.value === 'copy') {
-    await loadCopyData(num)
   }
 }
 
