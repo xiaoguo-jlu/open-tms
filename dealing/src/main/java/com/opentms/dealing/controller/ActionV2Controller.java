@@ -42,21 +42,51 @@ public class ActionV2Controller {
 
     /**
      * 查询待审批 Action 列表
+     *
+     * @param dealType 可选 — 按交易类型过滤 (AC / AT / FX)
      */
     @GetMapping("/pending")
     public Result<Page<ActionVO>> pending(
             @RequestParam(defaultValue = "1") int pageNum,
-            @RequestParam(defaultValue = "20") int pageSize) {
+            @RequestParam(defaultValue = "20") int pageSize,
+            @RequestParam(required = false) String dealType) {
         com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Action> wrapper =
                 new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<>();
-        wrapper.eq(Action::getApprovalStatus1, "Pending")
-               .orderByAsc(Action::getCreatedAt);
+        wrapper.eq(Action::getApprovalStatus1, "Pending");
+        if (dealType != null && !dealType.isEmpty()) {
+            wrapper.eq(Action::getDealType, dealType);
+        }
+        wrapper.orderByAsc(Action::getCreatedAt);
         com.baomidou.mybatisplus.extension.plugins.pagination.Page<Action> page =
                 actionMapper.selectPage(new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNum, pageSize), wrapper);
         com.baomidou.mybatisplus.extension.plugins.pagination.Page<ActionVO> voPage =
                 new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(page.getCurrent(), page.getSize(), page.getTotal());
         voPage.setRecords(page.getRecords().stream().map(this::toVO).collect(Collectors.toList()));
         return Result.success(voPage);
+    }
+
+    /**
+     * Action 统计信息 — Action 代办菜单首页统计卡片使用
+     *
+     * @return pending/approved/rejected 各状态总数
+     */
+    @GetMapping("/stats")
+    public Result<java.util.Map<String, Long>> stats(@RequestParam(required = false) String dealType) {
+        com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Action> base =
+                new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<>();
+        if (dealType != null && !dealType.isEmpty()) {
+            base.eq(Action::getDealType, dealType);
+        }
+        long pending = actionMapper.selectCount(base.clone().eq(Action::getApprovalStatus1, "Pending"));
+        long approved = actionMapper.selectCount(base.clone().eq(Action::getApprovalStatus1, "Approved"));
+        long rejected = actionMapper.selectCount(base.clone().eq(Action::getApprovalStatus1, "Rejected"));
+        long total = pending + approved + rejected;
+        java.util.Map<String, Long> map = new java.util.LinkedHashMap<>();
+        map.put("total", total);
+        map.put("pending", pending);
+        map.put("approved", approved);
+        map.put("rejected", rejected);
+        return Result.success(map);
     }
 
     /**

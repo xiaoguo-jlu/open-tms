@@ -66,12 +66,10 @@
             <el-tag :type="getStatusType(row.status)">{{ getStatusLabel(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="260" fixed="right">
+        <el-table-column label="操作" width="220" fixed="right">
           <template #default="{ row }">
             <el-button type="success" link @click="handleCopy(row)">复制</el-button>
             <el-button type="primary" link @click="handleView(row)">查看</el-button>
-            <el-button type="primary" link @click="handleEdit(row)" v-if="canEdit(row.status)">编辑</el-button>
-            <el-button type="danger" link @click="handleDelete(row)" v-if="canDelete(row.status)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -93,8 +91,8 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { pageAtDeals, deleteAtDeal } from '@/api/dealing'
+import { ElMessage } from 'element-plus'
+import { pageAtDeals, copyAtDeal } from '@/api/dealing/atDeal'
 
 const router = useRouter()
 const loading = ref(false)
@@ -111,12 +109,10 @@ const getTransferTypeLabel = (type) => {
   const map = { SAME_COMPANY: '同公司', CROSS_COMPANY: '跨公司', CROSS_BORDER: '跨境' }
   return map[type] || type
 }
-
 const getPaymentMethodLabel = (method) => {
   const map = { INTERNAL: '内部转账', SWIFT: 'SWIFT 电汇', RTGS: 'RTGS 实时结算' }
   return map[method] || method
 }
-
 const getStatusLabel = (status) => {
   const map = {
     New: '新建', Approved: '已审批', Rejected: '已驳回',
@@ -124,7 +120,6 @@ const getStatusLabel = (status) => {
   }
   return map[status] || status
 }
-
 const getStatusType = (status) => {
   const map = {
     New: 'info', Approved: 'success', Rejected: 'danger',
@@ -132,14 +127,10 @@ const getStatusType = (status) => {
   }
   return map[status] || 'info'
 }
-
 const formatAmount = (amount, currency) => {
   if (amount == null) return '-'
   return new Intl.NumberFormat('zh-CN', { minimumFractionDigits: 2 }).format(amount) + ' ' + (currency || '')
 }
-
-const canEdit = (status) => status === 'New' || status === 'Rejected'
-const canDelete = (status) => status === 'New' || status === 'Rejected'
 
 const fetchData = async () => {
   loading.value = true
@@ -161,29 +152,25 @@ const fetchData = async () => {
 }
 
 const handleQuery = () => { pagination.pageNum = 1; fetchData() }
-
 const handleReset = () => {
   Object.assign(queryForm, { keyword: '', transferType: '', status: '' })
   handleQuery()
 }
 
-const handleAdd = () => { router.push('/dealing/at-deal/form') }
-
-const handleCopy = (row) => { router.push(`/dealing/at-deal/form?copyFrom=${row.dealNumber}`) }
-
-const handleView = (row) => { router.push(`/dealing/at-deal/detail?id=${row.id}`) }
-
-const handleEdit = (row) => { router.push(`/dealing/at-deal/form?id=${row.id}`) }
-
-const handleDelete = async (row) => {
+const handleAdd = () => {
+  router.push('/dealing/at-deal/detail?new=1')
+}
+const handleCopy = async (row) => {
   try {
-    await ElMessageBox.confirm(`确认删除交易 ${row.dealNumber}?`, '提示', { type: 'warning' })
-    await deleteAtDeal(row.id)
-    ElMessage.success('删除成功')
-    fetchData()
+    await copyAtDeal(row.dealNumber)
+    router.push(`/dealing/at-deal/detail?copyFrom=${row.dealNumber}`)
   } catch (e) {
-    if (e !== 'cancel') console.error(e)
+    ElMessage.error('获取复制数据失败')
+    console.error(e)
   }
+}
+const handleView = (row) => {
+  router.push(`/dealing/at-deal/detail?id=${row.id}`)
 }
 
 onMounted(() => { fetchData() })

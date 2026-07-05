@@ -21,9 +21,8 @@ const routes = [
   {
     path: '/dealing', name: 'Dealing', children: [
       { path: 'ac-deal', name: 'AcDealList', component: () => import('@/views/dealing/AcDealList.vue') },
-      { path: 'ac-deal/detail/:dealNumber', name: 'AcDealDetail', component: () => import('@/views/dealing/AcDealDetail.vue') },
+      { path: 'ac-deal/detail', name: 'AcDealDetail', component: () => import('@/views/dealing/AcDealDetail.vue') },
       { path: 'at-deal', name: 'AtDealList', component: () => import('@/views/dealing/AtDealList.vue') },
-      { path: 'at-deal/form', name: 'AtDealForm', component: () => import('@/views/dealing/AtDealForm.vue') },
       { path: 'at-deal/detail', name: 'AtDealDetail', component: () => import('@/views/dealing/AtDealDetail.vue') },
       { path: 'action', name: 'ActionList', component: () => import('@/views/dealing/ActionList.vue') },
       { path: 'fx-deal', name: 'FxDealList', component: () => import('@/views/dealing/FxDealList.vue') },

@@ -36,7 +36,7 @@
     <el-card class="table-card">
       <el-alert type="info" :closable="false" style="margin-bottom: 12px;">
         <template #title>
-          <span>v3.2: DX 创建即生成 3 DealMap + 0/2 Cashflow(NDF 等 RATE_FIX)；后端 calculate 联动计算</span>
+          <span>v3.2: DX 创建即生成 3 DealMap + 0/2 Cashflow(NDF 等 RATE_FIX);后端 calculate 联动计算</span>
         </template>
       </el-alert>
       <el-table :data="tableData" v-loading="loading" stripe>
@@ -73,14 +73,11 @@
             <el-tag :type="getStatusType(row.status)">{{ getStatusLabel(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="240" fixed="right">
+        <el-table-column label="操作" width="260" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleView(row)">详情</el-button>
-            <el-button type="primary" link @click="handleEdit(row)" v-if="row.status !== 'Canceled'">编辑</el-button>
             <el-button type="success" link @click="handleCopy(row)">复制</el-button>
-            <el-button type="warning" link @click="handleApprove(row)" v-if="row.status === 'New'">审批</el-button>
             <el-button type="warning" link @click="handleRateFix(row)" v-if="row.productType === 'NDF' && row.status === 'New'">RATE_FIX</el-button>
-            <el-button type="danger" link @click="handleDelete(row)" v-if="row.status !== 'Canceled'">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -96,11 +93,6 @@
         style="margin-top: 16px; justify-content: flex-end;"
       />
     </el-card>
-
-    <!-- 编辑抽屉 -->
-    <el-drawer v-model="drawerVisible" :title="drawerTitle" direction="rtl" size="700px" destroy-on-close>
-      <FxDealForm v-if="drawerVisible" :deal-data="editingDeal" @saved="onSaved" @cancel="drawerVisible = false" />
-    </el-drawer>
 
     <!-- RATE_FIX 对话框 -->
     <el-dialog v-model="rateFixVisible" title="NDF RATE_FIX" width="420px" destroy-on-close>
@@ -118,66 +110,23 @@
       </template>
     </el-dialog>
   </div>
-
-  <!-- 审批弹窗 -->
-  <el-dialog v-model="approvalVisible" title="FX 交易审批" width="780px" destroy-on-close>
-    <el-alert :title="`交易编号: ${approvingDeal?.dealNumber || ''}`" type="info" :closable="false" style="margin-bottom: 12px;" />
-    <el-table :data="pendingActions" v-loading="approvalLoading" stripe max-height="300">
-      <el-table-column prop="actionNumber" label="Action 编号" width="170" />
-      <el-table-column prop="actionType" label="类型" width="100" align="center">
-        <template #default="{ row }">
-          <el-tag size="small">{{ row.actionType }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column prop="operator" label="操作人" width="100" />
-      <el-table-column prop="actionStatus" label="状态" width="100" align="center">
-        <template #default="{ row }">
-          <el-tag :type="row.actionStatus === 'Approved' ? 'success' : row.actionStatus === 'Rejected' ? 'danger' : 'warning'" size="small">
-            {{ row.actionStatus }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column prop="remark" label="备注" min-width="180" show-overflow-tooltip />
-      <el-table-column label="操作" width="140" align="center">
-        <template #default="{ row }">
-          <el-button v-if="row.actionStatus === 'Approved' || row.approvalStatus1 === 'Pending' || !row.approvalStatus1" type="success" link size="small" @click="doApprove(row)">通过</el-button>
-          <el-button type="danger" link size="small" @click="doReject(row)">驳回</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <el-empty v-if="!approvalLoading && pendingActions.length === 0" description="该交易没有可审批的 Action" />
-    <template #footer>
-      <el-button @click="approvalVisible = false">关闭</el-button>
-    </template>
-  </el-dialog>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { listFxDeal, deleteFxDeal, rateFixFxDeal, copyFxDeal, approveFxAction, rejectFxAction } from '@/api/dealing/fxDeal'
-import { listActionsByDeal } from '@/api/dealing/acDeal'
-import FxDealForm from './FxDealForm.vue'
+import { ElMessage } from 'element-plus'
+import { listFxDeal, rateFixFxDeal, copyFxDeal } from '@/api/dealing/fxDeal'
 
 const router = useRouter()
 const loading = ref(false)
 const tableData = ref([])
-const drawerVisible = ref(false)
-const drawerTitle = ref('新建 FX 交易')
-const editingDeal = ref(null)
 
-// RATE_FIX
+// RATE_FIX (列表中可直接触发)
 const rateFixVisible = ref(false)
 const rateFixing = ref(false)
 const fixingDeal = ref(null)
 const rateFixForm = reactive({ fixingRate: null, operator: 'admin' })
-
-// 审批
-const approvalVisible = ref(false)
-const approvalLoading = ref(false)
-const approvingDeal = ref(null)
-const pendingActions = ref([])
 
 const queryForm = reactive({
   managementEntityId: null,
@@ -220,80 +169,23 @@ const handleReset = () => {
   dateRange.value = []
   handleQuery()
 }
+
 const handleAdd = () => {
-  editingDeal.value = null
-  drawerTitle.value = '新建 FX 交易'
-  drawerVisible.value = true
+  router.push('/dealing/fx-deal/detail?new=1')
 }
+
 const handleView = (row) => {
   router.push(`/dealing/fx-deal/detail?dealNumber=${row.dealNumber}`)
 }
-const handleEdit = (row) => {
-  editingDeal.value = row
-  drawerTitle.value = `编辑 FX 交易 - ${row.dealNumber}`
-  drawerVisible.value = true
-}
+
 const handleCopy = async (row) => {
   try {
     const res = await copyFxDeal(row.dealNumber)
-    editingDeal.value = res.data || res
-    drawerTitle.value = '复制 FX 交易'
-    drawerVisible.value = true
+    // copy API returns editable DTO without dealNumber; pre-fill via copyFrom query
+    // We route to detail with copyFrom → detail page will load copy DTO itself
+    router.push(`/dealing/fx-deal/detail?copyFrom=${row.dealNumber}`)
   } catch (e) {
     ElMessage.error(e?.message || '复制失败')
-  }
-}
-const handleDelete = async (row) => {
-  try {
-    await ElMessageBox.confirm(
-      `确认删除 FX 交易 ${row.dealNumber}？将级联软删 Deal/DealMap/Cashflow。`,
-      '删除确认',
-      { type: 'warning', confirmButtonText: '确认删除', cancelButtonText: '取消' }
-    )
-    await deleteFxDeal(row.id)
-    ElMessage.success('删除成功')
-    fetchData()
-  } catch (e) {
-    if (e !== 'cancel') console.error(e)
-  }
-}
-const handleApprove = async (row) => {
-  approvingDeal.value = row
-  approvalVisible.value = true
-  pendingActions.value = []
-  approvalLoading.value = true
-  try {
-    const res = await listActionsByDeal(row.dealNumber)
-    const records = res?.data?.records || res?.data || res || []
-    pendingActions.value = (Array.isArray(records) ? records : []).filter(a => a.actionStatus === 'Pending' || a.actionStatus === 'Approved')
-  } catch (e) {
-    console.error(e)
-    ElMessage.error('加载 Action 失败')
-  } finally {
-    approvalLoading.value = false
-  }
-}
-
-const doApprove = async (action) => {
-  try {
-    await approveFxAction(action.actionNumber, { approver: 'admin', remark: 'FX 审批通过' })
-    ElMessage.success(`Action ${action.actionNumber} 审批通过`)
-    await handleApprove(approvingDeal.value)
-    fetchData()
-  } catch (e) {
-    ElMessage.error(e?.message || '审批失败')
-  }
-}
-
-const doReject = async (action) => {
-  try {
-    await ElMessageBox.confirm(`确认驳回 Action ${action.actionNumber}？`, '驳回确认', { type: 'warning' })
-    await rejectFxAction(action.actionNumber, { approver: 'admin', remark: 'FX 审批驳回' })
-    ElMessage.success('已驳回')
-    await handleApprove(approvingDeal.value)
-    fetchData()
-  } catch (e) {
-    if (e !== 'cancel') ElMessage.error(e?.message || '驳回失败')
   }
 }
 
@@ -311,7 +203,7 @@ const doRateFix = async () => {
   rateFixing.value = true
   try {
     const res = await rateFixFxDeal(fixingDeal.value.id, rateFixForm)
-    ElMessage.success(`RATE_FIX 完成，差额: ${res.data?.settlementAmount}`)
+    ElMessage.success(`RATE_FIX 完成,差额: ${res.data?.settlementAmount}`)
     rateFixVisible.value = false
     fetchData()
   } catch (e) {
@@ -319,11 +211,6 @@ const doRateFix = async () => {
   } finally {
     rateFixing.value = false
   }
-}
-const onSaved = () => {
-  drawerVisible.value = false
-  ElMessage.success('保存成功')
-  fetchData()
 }
 
 onMounted(() => { fetchData() })

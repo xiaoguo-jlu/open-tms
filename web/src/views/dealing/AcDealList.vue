@@ -64,13 +64,10 @@
             <el-tag :type="getStatusType(row.status)">{{ getStatusLabel(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="280" fixed="right">
+        <el-table-column label="操作" width="220" fixed="right">
           <template #default="{ row }">
             <el-button type="success" link @click="handleCopy(row)">复制</el-button>
             <el-button type="primary" link @click="handleView(row)">详情</el-button>
-            <el-button type="primary" link @click="handleEdit(row)" v-if="row.status === 'New'">编辑</el-button>
-            <el-button type="warning" link @click="handleApprove(row)" v-if="row.status === 'New'">审批</el-button>
-            <el-button type="danger" link @click="handleDelete(row)" v-if="row.status === 'New'">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -86,33 +83,18 @@
         style="margin-top: 16px; justify-content: flex-end;"
       />
     </el-card>
-
-    <!-- 编辑抽屉 -->
-    <el-drawer v-model="drawerVisible" :title="drawerTitle" direction="rtl" size="640px" destroy-on-close>
-      <AcDealForm v-if="drawerVisible" :deal-data="editingDeal" @saved="onSaved" @cancel="drawerVisible = false" />
-    </el-drawer>
-
-    <!-- 审批弹窗 -->
-    <ActionApprovalDialog v-model="approvalVisible" :deal="approvingDeal" @approved="onApproved" />
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { listAcDeal, deleteAcDeal, copyAcDeal } from '@/api/dealing/acDeal'
-import AcDealForm from './AcDealForm.vue'
-import ActionApprovalDialog from './ActionApprovalDialog.vue'
+import { ElMessage } from 'element-plus'
+import { listAcDeal, copyAcDeal } from '@/api/dealing/acDeal'
 
 const router = useRouter()
 const loading = ref(false)
 const tableData = ref([])
-const drawerVisible = ref(false)
-const drawerTitle = ref('新建 AC 交易')
-const editingDeal = ref(null)
-const approvalVisible = ref(false)
-const approvingDeal = ref(null)
 
 const queryForm = reactive({
   keyword: '',
@@ -155,56 +137,19 @@ const handleReset = () => {
   handleQuery()
 }
 const handleAdd = () => {
-  editingDeal.value = null
-  drawerTitle.value = '新建 AC 交易'
-  drawerVisible.value = true
+  router.push('/dealing/ac-deal/detail?new=1')
 }
 const handleCopy = async (row) => {
   try {
-    const res = await copyAcDeal(row.dealNumber)
-    editingDeal.value = res.data // copy API 返回的 DTO 不含 dealNumber/id，保存时会走 create 逻辑
-    drawerTitle.value = `复制 AC 交易 - 基于 ${row.dealNumber}`
-    drawerVisible.value = true
+    await copyAcDeal(row.dealNumber)
+    router.push(`/dealing/ac-deal/detail?copyFrom=${row.dealNumber}`)
   } catch (e) {
     ElMessage.error('获取复制数据失败')
     console.error(e)
   }
 }
 const handleView = (row) => {
-  router.push(`/dealing/ac-deal/detail/${row.dealNumber}`)
-}
-const handleEdit = (row) => {
-  editingDeal.value = row
-  drawerTitle.value = `编辑 AC 交易 - ${row.dealNumber}`
-  drawerVisible.value = true
-}
-const handleDelete = async (row) => {
-  try {
-    await ElMessageBox.confirm(
-      `确认删除 AC 交易 ${row.dealNumber}？\n将级联软删 Deal/DealMap/Cashflow，并记录 DealImage。`,
-      '删除确认',
-      { type: 'warning', confirmButtonText: '确认删除', cancelButtonText: '取消' }
-    )
-    await deleteAcDeal(row.id)
-    ElMessage.success('删除成功')
-    fetchData()
-  } catch (e) {
-    if (e !== 'cancel') console.error(e)
-  }
-}
-const handleApprove = (row) => {
-  approvingDeal.value = row
-  approvalVisible.value = true
-}
-const onSaved = () => {
-  drawerVisible.value = false
-  ElMessage.success('保存成功')
-  fetchData()
-}
-const onApproved = () => {
-  approvalVisible.value = false
-  ElMessage.success('审批成功')
-  fetchData()
+  router.push(`/dealing/ac-deal/detail?dealNumber=${row.dealNumber}`)
 }
 
 onMounted(() => { fetchData() })
