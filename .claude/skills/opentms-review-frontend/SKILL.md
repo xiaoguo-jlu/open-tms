@@ -361,6 +361,18 @@ frontend_review_items:
       2. 验证列定义 / 搜索区 / 工具栏结构一致。
     pass_criteria: 与既有页面差异点 ≤3 处
     failure_action: 对齐既有页面
+
+  - id: FE-031
+    name: BaseDataPicker @change/preloadRow 使用完整性
+    severity: P1
+    standard: 使用 BaseDataPicker 时必须正确处理 @change 事件做联动,preloadRow 用于编辑回填,autoFilter 用于筛选联动。缺任何一项即不完整
+    check_method: |
+      1. Grep `BaseDataPicker` 在所有 *.vue 中
+      2. 验证每个实例: @change 处理联动 / preloadRow 用于编辑回填
+      3. 验证 autoFilter 用于筛选联动场景
+      4. 验证无 BaseDataPicker 实例缺失事件处理
+    pass_criteria: 100% BaseDataPicker 实例有 @change 处理;编辑场景 100% 有 preloadRow
+    failure_action: 补充缺失的事件处理
 ```
 
 ---
@@ -453,3 +465,4 @@ opentms-ux-design (UX 设计)
 | 版本 | 日期 | 变更内容 |
 |------|------|---------|
 | v1.0 | 2026-07-05 | 初始版本 — 30 项前端审核项 (11 P0 / 13 P1 / 6 P2) |
+| v1.1 | 2026-07-05 | 新增 FE-031: BaseDataPicker @change/preloadRow 完整性检查 |

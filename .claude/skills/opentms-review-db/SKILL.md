@@ -317,6 +317,18 @@ db_review_items:
       3. 验证其他表未滥用 (其他金额用 DECIMAL(18,2))。
     pass_criteria: DECIMAL(38,18) 仅在必要处使用
     failure_action: 修改精度
+
+  - id: DB-021
+    name: management_entity 字段类型一致性
+    severity: P0
+    standard: 跨表引用管理主体(management_entity)时,字段类型必须统一 — management_entity_id BIGINT NOT NULL,严禁出现 management_entity_id 与 legal_entity_id 混用
+    check_method: |
+      1. Grep management_entity_id / legal_entity_id 在所有 DDL 中
+      2. 验证所有引用处类型为 BIGINT NOT NULL
+      3. 验证无 management_entity_code VARCHAR 替代(用 id 关联)
+      4. 验证命名统一(严禁混用 management_entity_id / legal_entity_id)
+    pass_criteria: 100% management_entity 引用统一使用 management_entity_id BIGINT
+    failure_action: 统一字段类型与命名
 ```
 
 ---
@@ -406,3 +418,4 @@ opentms-db-design (DB 设计)
 | 版本 | 日期 | 变更内容 |
 |------|------|---------|
 | v1.0 | 2026-07-05 | 初始版本 — 20 项 DB 审核项 (8 P0 / 7 P1 / 5 P2) |
+| v1.1 | 2026-07-05 | 新增 DB-021: management_entity 字段类型一致性 |

@@ -393,6 +393,18 @@ backend_review_items:
       4. 校验覆盖率 ≥70%。
     pass_criteria: Service 单测覆盖率 ≥70%
     failure_action: 补充单测
+
+  - id: BE-031
+    name: 3+ 处重复代码需抽取 BaseService
+    severity: P0
+    standard: 同一模块或跨模块出现 3+ 处相同模式的 CRUD/校验/转换逻辑,必须抽取到 BaseService/BaseController 或 common 工具类,严禁复制粘贴
+    check_method: |
+      1. 识别 Service 中重复的 save/update/delete CRUD 模式
+      2. 识别 Controller 中重复的参数校验/分页查询模式
+      3. 识别重复的 BeanUtil.copyProperties 转换逻辑
+      4. 检查 common/ 模块是否已有 BaseService/BaseController 基类
+    pass_criteria: 0 处 3+ 重复代码;重复逻辑 100% 抽象
+    failure_action: 抽取为 BaseService/工具方法
 ```
 
 ---
@@ -499,3 +511,4 @@ opentms-api-design (API 文档)
 | 版本 | 日期 | 变更内容 |
 |------|------|----------|
 | v1.0 | 2026-07-05 | 初始版本 — 30 项后端审核项 (9 P0 / 16 P1 / 5 P2) |
+| v1.1 | 2026-07-05 | 新增 BE-031: 3+ 处重复代码抽取检查 |

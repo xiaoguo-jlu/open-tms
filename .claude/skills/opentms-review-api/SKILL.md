@@ -373,6 +373,18 @@ api_review_items:
       3. 验证无直接暴露 deleted 字段给所有用户。
     pass_criteria: 软删除字段隐藏
     failure_action: 隐藏 deleted 字段
+
+  - id: API-022
+    name: Controller try-catch 返回 Result.badRequest() 规范
+    severity: P0
+    standard: Controller 层禁止 try-catch 后手动返回 Result.badRequest(),应由 GlobalExceptionHandler 统一拦截。Service 抛 BusinessException,Controller 零异常处理代码
+    check_method: |
+      1. Grep `try\s*\{` 在所有 Controller 中
+      2. Grep `Result.badRequest|Result.error|Result.fail` 在 Controller catch 块中(禁止)
+      3. 验证 Service 层使用 throw new BusinessException(...)
+      4. 验证 GlobalExceptionHandler 存在 @ExceptionHandler(BusinessException.class)
+    pass_criteria: 0 个 Controller try-catch 返回 Result.badRequest();100% 异常由 GlobalExceptionHandler 处理
+    failure_action: 移除 Controller try-catch,统一由 GlobalExceptionHandler 处理
 ```
 
 ---
@@ -469,3 +481,4 @@ opentms-api-design (API 设计)
 | 版本 | 日期 | 变更内容 |
 |------|------|---------|
 | v1.0 | 2026-07-05 | 初始版本 — 21 项 API 审核项 (10 P0 / 8 P1 / 3 P2) |
+| v1.1 | 2026-07-05 | 新增 API-022: Controller try-catch 规范检查 |

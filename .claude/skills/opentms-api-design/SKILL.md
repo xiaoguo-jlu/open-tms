@@ -13,18 +13,9 @@ description: Use when designing Open-TMS backend API contracts and documentation
 
 ## 一、触发条件
 
-**当需要进行以下工作时，触发本skill：**
+当需要进行以下工作时触发：PRD已确认需要设计接口方案、已有功能需要新增/修改接口、跨模块调用需要定义接口契约、评审已有接口设计。
 
-- PRD已确认，需要设计接口方案
-- 已有功能需要新增/修改接口
-- 跨模块调用需要定义接口契约
-- 需要评审已有接口设计
-
-**触发信号：**
-- PM完成PRD评审，分配接口设计任务
-- TA要求设计接口契约
-- Dev需要明确接口规范
-- QA需要接口文档进行测试
+触发信号：PM完成PRD评审分配接口设计任务、TA要求设计接口契约、Dev需要明确接口规范、QA需要接口文档进行测试。
 
 ---
 
@@ -32,21 +23,17 @@ description: Use when designing Open-TMS backend API contracts and documentation
 
 ### 2.1 必须输入
 
-| 输入项 | 来源 | 说明 |
-|--------|------|------|
-| PRD文档 | PM提供 | 功能需求文档，明确接口需求 |
-| 总体设计规范 | `docs/规范/Open-TMS开发规范文档.md` | 接口设计规范 |
-| 通用接口模式 | `docs/api/README.md` | 模块接口列表和通用模式 |
-| 模块历史摘要 | `docs/api/{模块}/SUMMARY.md` | 本模块历史接口设计记录（若存在） |
-| 已有相关接口 | `docs/api/` | 同模块或相关模块的已有接口文档 |
+- **PRD文档**: PM提供 — 功能需求，明确接口需求
+- **总体设计规范**: `docs/规范/Open-TMS开发规范文档.md`
+- **通用接口模式**: `docs/api/README.md` — 模块接口列表和通用模式
+- **模块历史摘要**: `docs/api/{模块}/SUMMARY.md` — 本模块历史接口设计记录（若存在）
+- **已有相关接口**: `docs/api/`
 
 ### 2.2 可选输入
 
-| 输入项 | 来源 | 说明 |
-|--------|------|------|
-| 竞品接口调研 | Dev自行收集 | FIS Quantum/SAP接口参考 |
-| 技术约束 | TA提供 | 技术可行性约束 |
-| 前端接口需求 | UX提供 | 界面交互所需的接口 |
+- **竞品接口调研**: FIS Quantum/SAP接口参考
+- **技术约束**: TA提供
+- **前端接口需求**: UX提供
 
 ---
 
@@ -54,154 +41,38 @@ description: Use when designing Open-TMS backend API contracts and documentation
 
 ### 3.1 交付件输出标准
 
-#### 3.1.1 接口文档标准
+每个接口文档必须包含: 请求（Method + URL + 参数）、请求体、响应、响应码定义、错误码。
 
-每个接口文档必须包含以下章节：
+完整模板见 `references/api-doc-template.md`。响应结构模板见 `references/response-template.md`。
 
-```
-# {模块名称}接口
-
-**模块**: {module}  
-**版本**: v1.0  
-**路径**: `/api/v1/{resource}`
-
----
-
-## 1. 接口名称
-
-### 请求
-```
-{METHOD} /api/v1/{resource}
-```
-
-### 参数
-| 参数 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-
-### 请求体（若适用）
-```json
-{
-  "field": "value"
-}
-```
-
-### 响应
-```json
-{
-  "code": 200,
-  "data": {}
-}
-```
-
-### 响应码定义
-| 响应码 | 值 | 说明 |
-|--------|-----|------|
-| SUCCESS | 200 | 成功 |
-| BAD_REQUEST | 400 | 参数错误 |
-| NOT_FOUND | 404 | 资源不存在 |
-| SYSTEM_ERROR | 500 | 系统异常 |
-
-### 错误码（用于业务异常细分，可扩展）
-| 错误码 | 说明 |
-|--------|------|
-| BUSINESS_ERROR | 业务异常 |
-| VALIDATION_ERROR | 参数校验失败 |
-```
-
-#### 3.1.2 接口分类
+### 3.2 接口分类
 
 | 分类 | 说明 | 示例 |
 |------|------|------|
-| CRUD接口 | 基础的增删改查 | 列表、新增、更新、删除、详情 |
+| CRUD接口 | 基础增删改查 | 列表、新增、更新、删除、详情 |
 | 业务接口 | 业务操作 | 提交、审批、执行、撤销 |
 | 导出接口 | 数据导出 | Excel导出、PDF导出 |
 | 导入接口 | 数据导入 | Excel批量导入 |
 | 统计接口 | 聚合查询 | 汇总、统计、报表 |
 
-### 3.2 存放路径规范
+### 3.3 存放路径规范
 
 ```
-docs/
-├── api/                              # API文档根目录
-│   ├── README.md                    # 全模块接口索引
-│   ├── common/                       # 公共接口
-│   │   └── docs/
-│   │       ├── SUMMARY.md           # 公共模块接口历史摘要
-│   │       └── ...
-│   ├── basedata/                    # M0基础数据模块
-│   │   ├── 01-business-unit.md
-│   │   ├── 02-trader.md
-│   │   └── docs/
-│   │       └── SUMMARY.md
-│   ├── dealing/                     # M1交易管理模块
-│   │   ├── 01-deal.md
-│   │   └── docs/
-│   ├── bankaccount/                # M1银行账户模块
-│   │   ├── 01-bank-account.md
-│   │   └── docs/
-│   ├── cashpool/                   # M2现金池模块
-│   │   └── docs/
-│   ├── fx/                         # M3外汇模块
-│   │   └── docs/
-│   ├── valuation/                  # M3估值模块
-│   │   └── docs/
-│   ├── exposure/                   # M4敞口模块
-│   │   └── docs/
-│   ├── var/                        # M4 VaR模块
-│   │   └── docs/
-│   ├── cockpit/                    # M5驾驶舱模块
-│   │   └── docs/
-│   └── report/                     # M5报表模块
-│       └── docs/
+docs/api/
+├── README.md                  # 全模块接口索引
+├── common/docs/               # 公共接口
+├── basedata/                  # M0基础数据
+├── dealing/                   # M1交易管理
+├── bankaccount/              # M1银行账户
+├── cashpool/                 # M2现金池
+├── fx/ valuation/            # M3金融工具
+├── exposure/ var/            # M4风险管理
+└── cockpit/ report/          # M5分析报表
 ```
 
-**路径选择规则：**
+### 3.4 设计摘要标准
 
-| 模块归属 | 存放路径 |
-|----------|----------|
-| M0基础数据 | `docs/api/` |
-| M1交易管理 | `docs/api/dealing/` |
-| M1银行账户 | `docs/api/bankaccount/` |
-| M2资金管理 | `docs/api/{子模块}/` |
-| M3金融工具 | `docs/api/{子模块}/` |
-| M4风险管理 | `docs/api/{子模块}/` |
-| M5分析报表 | `docs/api/{子模块}/` |
-| 跨模块公共 | `docs/api/common/` |
-
-### 3.3 设计摘要标准
-
-每次完成一组接口设计后，生成设计摘要，存放在模块的`docs/SUMMARY.md`：
-
-```
-# {模块名} 接口设计摘要
-
-## 最近更新
-- **日期**: YYYY-MM-DD
-- **设计师**: Dev/TA
-- **本次完成**: {接口列表}
-
-## 设计过程记录
-
-### YYYY-MM-DD - {本次主题}
-**完成内容**:
-- {已完成的接口1}
-- {已完成的接口2}
-
-**遇到的问题**:
-- {问题1} → {解决方案}
-- {问题2} → {解决方案}
-
-**接口契约**:
-- {跨模块调用1}: 提供方{模块A}，消费方{模块B}
-- {跨模块调用2}: 提供方{模块B}，消费方{模块C}
-
-**待确认事项**:
-- {待确认事项1}
-- {待确认事项2}
-
-### 历史记录
-- YYYY-MM-DD: {设计主题} - 完成{接口列表}
-```
+每次完成后更新 `docs/api/{模块}/SUMMARY.md`，记录: 完成的接口、遇到的问题、跨模块接口契约、待确认事项。
 
 ---
 
@@ -209,289 +80,101 @@ docs/
 
 ### 步骤1：业界洞察
 
-**目的**：了解业界专业资金系统的接口设计实践，吸收优秀设计。
-
-**操作**：
-
-1. 读取 `docs/api/README.md` 了解现有接口模式
-2. 研究业界产品（FIS Quantum、SAP、Murex）的接口设计
-3. 分析竞品的：
-   - 接口设计模式
-   - RESTful URL规范
-   - 响应结构设计
-   - 错误处理机制
-4. 记录关键设计亮点作为参考
-
-**输出**：
-- 在接口文档中记录对标参考
+读取 `docs/api/README.md` 了解现有接口模式，研究FIS Quantum、SAP、Murex的接口设计。对标参考见 `references/api-patterns.md`。
 
 ### 步骤2：读取历史摘要
 
-**目的**：了解本模块已有接口设计，避免重复和冲突。
-
-**操作**：
-
-1. 检查是否存在历史摘要：`docs/api/{模块}/SUMMARY.md`
-2. 若存在，读取摘要内容
-3. 了解：
-   - 已完成哪些接口设计
-   - 设计过程中遇到的问题及解决方案
-   - 已有的接口契约
-   - 需要优化的接口
-
-**若为新模块**：
-- 创建新的摘要文件
-- 在接口文档开头注明"本模块为新建模块"
+检查 `docs/api/{模块}/SUMMARY.md`，了解已完成接口、设计决策、待优化接口。若为新模块则创建新摘要文件。
 
 ### 步骤3：读取PRD理解需求
 
-**目的**：深入理解功能需求，确保接口设计满足业务场景。
-
-**操作**：
-
-1. 详细阅读PM提供的PRD文档
-2. 识别需要设计的接口清单
-3. 理解数据流转和跨模块调用
-4. 标注需要与PM/TA确认的问题
-
-**输出**：
-- 确认需要设计的接口范围
-- 识别跨模块接口契约
-- 列出需要与PM确认的问题
+详细阅读PRD，识别需要设计的接口清单、数据流转和跨模块调用。
 
 ### 步骤4：接口设计
 
-**目的**：输出符合项目标准的接口文档。
+1. **URL设计**: 资源命名用复数名词，版本 `/api/v1/`，路径参数 `/{id}`，业务操作 `/{id}/action`。
 
-**操作**：
-
-1. **URL设计**
-   - 资源命名使用复数名词
-   - 版本控制：`/api/v1/`
-   - 路径参数：`/resources/{id}`
-   - 业务操作：`/resources/{id}/action`
-
-2. **⚠️ HTTP方法规范（重要）**
+2. **HTTP方法规范（重要）**: > 详见 `CLAUDE.md` REST API Patterns 章节。
    ```
-   GET     /api/v1/resources           # 列表查询
-   GET     /api/v1/resources/page      # 分页查询
-   GET     /api/v1/resources/{id}      # 详情查询
-   POST    /api/v1/resources          # 新增
-   POST    /api/v1/resources/update    # 更新（使用POST方法）
-   POST    /api/v1/resources/delete/{id}  # 删除（使用POST方法）
-   POST    /api/v1/resources/{id}/action  # 业务操作
+   GET    /api/v1/resources              # 列表查询
+   GET    /api/v1/resources/page         # 分页查询
+   GET    /api/v1/resources/{id}         # 详情查询
+   POST   /api/v1/resources              # 新增
+   POST   /api/v1/resources/update       # 更新
+   POST   /api/v1/resources/delete/{id}  # 删除
+   POST   /api/v1/resources/{id}/action  # 业务操作
    ```
+   红线: update/delete 一律 POST，勿用 PUT/DELETE。
 
-   **说明**：
-   - 所有查询使用 `GET`
-   - 所有新增使用 `POST`
-   - 所有修改使用 `POST` + `/update` 路径区分
-   - 所有删除使用 `POST` + `/delete/{id}` 路径区分
-   - 业务操作使用 `POST` + `/action` 路径
+3. **请求参数**: 查询参数（分页/排序/筛选）、路径参数（资源ID）、请求体 JSON（Content-Type: application/json）。
 
-3. **请求参数设计**
-   - 查询参数：分页、排序、筛选
-   - 路径参数：资源ID
-   - 请求体：JSON格式，所有JSON请求必须设置 `Content-Type: application/json`
+4. **响应结构**: 统一包装 `{code, message, data, timestamp}`。分页 `{records, total, size, current}`。详见 `CLAUDE.md` API Response Format。
 
-4. **响应结构设计**
-   - 统一响应包装：`{code, message, data, timestamp}`
-   - 分页响应：`{list, total, pageNo, pageSize}`
-   - 错误响应：`{code, message, data}`
+5. **幂等性**: 写操作接口支持幂等，使用 `X-Idempotency-Key` 请求头。
 
-5. **幂等性设计**
-   - 业务操作接口支持幂等
-   - 使用idempotencyKey
+#### 4.1 Controller try-catch 规范 (BadRequest 统一处理)
 
-6. **遵循** `docs/规范/Open-TMS开发规范文档.md` 中的接口规范
+所有 Controller 方法必须遵循统一的异常处理模式:
 
-**注意事项**：
-- 接口设计需考虑前端调用便利性
-- 响应结构需考虑脱敏需求
-- 金额/汇率等字段需明确精度
-- 日期时间需明确时区
+```java
+// 正确做法: Controller 不写 try-catch，由 GlobalExceptionHandler 统一处理
+@PostMapping
+public Result<Void> create(@Valid @RequestBody XxxDTO dto) {
+    xxxService.create(dto);
+    return Result.success();
+}
 
-**输出**：
-- 接口文档保存到对应路径
-- 文件命名格式：`{序号}-{资源名}.md`
+// Service 层抛 BusinessException
+public void create(XxxDTO dto) {
+    if (exists(dto.getCode())) {
+        throw new BusinessException(ResultCode.BAD_REQUEST, "编码已存在");
+    }
+    // ...
+}
+```
+
+**禁止做法**:
+- Controller 中 try-catch 后手动返回 `Result.badRequest()` → 应由 GlobalExceptionHandler 统一拦截
+- Service 中 catch 后吞异常不抛出 → 必须向上传播给 GlobalExceptionHandler
+- Controller 中直接 `return Result.badRequest("xxx")` → 改用 `throw new BusinessException(...)`
+
+**设计原则**: Controller 层零异常处理代码，所有异常由 GlobalExceptionHandler 统一转换为 Result 响应。
 
 ### 步骤5：检查设计一致性
 
-**目的**：确保接口符合项目总体设计规范。
-
-**操作**：
-
-1. 读取 `docs/规范/Open-TMS开发规范文档.md` 中的接口设计规范
-2. 对照检查接口设计中的：
-   - [ ] URL是否符合RESTful规范
-   - [ ] HTTP方法是否正确使用
-   - [ ] 响应结构是否统一
-   - [ ] 错误码是否明确定义
-   - [ ] 是否包含分页参数
-   - [ ] 是否考虑幂等设计
-   - [ ] 参数命名是否一致
-
-**检查结果处理**：
-
-| 检查结果 | 处理方式 |
-|----------|----------|
-| 符合规范 | 进入下一步 |
-| 不符合规范，且设计不合理 | 修改设计至符合规范 |
-| 不符合规范，但设计合理 | 弹出询问用户 |
+对照规范检查: URL RESTful、HTTP方法、响应结构、错误码、分页参数、幂等设计。
 
 ### 步骤6：定义接口契约
 
-**目的**：明确跨模块接口调用约定。
-
-**操作**：
-
-1. 识别跨模块调用场景
-2. 与相关模块开发确认接口契约
-3. 在接口文档中明确：
-   - 接口提供方
-   - 接口消费方
-   - 数据格式约定
-   - 错误处理约定
-
-**输出**：
-- 接口契约文档
+识别跨模块调用场景，明确接口提供方/消费方、数据格式约定、错误处理约定。
 
 ### 步骤7：创建GitHub Project工作项
 
-**目的**：按照团队协作规范，创建对应的Task工作项。
-
-**操作**：
-
-根据接口设计内容，在GitHub Projects创建工作项：
-
-1. **Task**：后端开发任务
-   ```bash
-   gh issue create --title "[{模块}-Dev] {接口名称}接口开发" --body "## 接口清单\n{接口列表}\n\n## 接口文档\n{文档链接}\n\n## 验收标准\n- [ ] 接口返回正确\n- [ ] 参数校验通过\n- [ ] 错误处理正确" --label "Dev,Task"
-   ```
-
-2. **US**：用户故事（若涉及用户体验）
-   ```bash
-   gh issue create --title "[US] {用户角色}可通过{功能}" --body "## 接口需求\n{接口需求描述}" --label "Dev,US"
-   ```
+创建后端开发Task。具体命令 > 详见 `opentms-pm-lead` 第九节。
 
 ### 步骤8：生成设计摘要
 
-**目的**：记录接口设计过程，便于后续追溯和团队共享。
-
-**操作**：
-
-1. 更新模块的 `SUMMARY.md`
-2. 若模块无SUMMARY.md，则创建
-3. 记录内容：
-   - 本次完成的接口
-   - 遇到的问题及解决方案
-   - 跨模块接口契约
-   - 待确认事项
+更新 `docs/api/{模块}/SUMMARY.md`。
 
 ---
 
 ## 五、业界优秀实践
 
-### 5.1 RESTful API设计原则
+RESTful API设计原则: 资源导向（URL代表资源）、统一接口（标准HTTP方法）、错误处理（适当状态码+错误详情）、分页过滤（默认分页避免全量返回）。
 
-**1. 资源导向**
-- URL代表资源，不是动作
-- 使用复数名词：`/transactions` 而不是 `/getTransaction`
-- 嵌套资源表达关系：`/accounts/{id}/transactions`
+金融系统特殊要求: 金额 DECIMAL(18,2)，汇率 DECIMAL(18,8)，利率 DECIMAL(10,4)；ISO 8601日期、UTC时区；状态机流转+审计日志；幂等性保证（所有写操作）。
 
-**2. 统一接口**
-- 使用标准HTTP方法
-- 无状态交互
-- 统一响应结构
-
-**3. 错误处理**
-- 使用适当的HTTP状态码
-- 响应体包含错误详情
-- 错误码需业务语义化
-
-**4. 分页与过滤**
-- 默认分页，避免全量返回
-- 支持排序字段指定
-- 支持多条件筛选
-
-### 5.2 金融系统接口特殊要求
-
-**1. 精度处理**
-- 金额：`DECIMAL(18,2)`，响应时千分位格式化
-- 汇率：`DECIMAL(18,8)`
-- 利率：`DECIMAL(10,4)`
-
-**2. 日期时间处理**
-- 统一使用ISO 8601格式
-- 明确时区（推荐UTC）
-- 交割日、起息日等业务日期使用DATE类型
-
-**3. 状态机设计**
-- 状态流转需明确
-- 状态变更需审计日志
-- 非法状态转换需返回明确错误
-
-**4. 幂等性保证**
-- 所有写操作接口需支持幂等
-- 使用idempotencyKey防重复提交
-- 交易类接口需防重复执行
-
-### 5.3 对标系统接口参考
-
-| 系统 | 特色 | Open-TMS借鉴 |
-|------|------|--------------|
-| FIS Quantum | 高性能批量接口 | 批量操作接口设计 |
-| Murex | 实时数据推送 | WebSocket/SSE支持 |
-| Bloomberg | 快捷键丰富 | API版本兼容性 |
+> 详细设计模式和对标分析见 `references/api-patterns.md`。
 
 ---
 
 ## 六、与其他Skill的衔接
 
-### 6.1 前置依赖
+### 6.1 前置依赖: 产品设计(PM) 提供 PRD + 数据库设计(DB) 提供表结构
 
-| 前置Skill | 依赖内容 | 说明 |
-|-----------|----------|------|
-| 产品设计(PM) | PRD文档 | 明确接口需求 |
-| 数据库设计 | 数据表结构 | 明确字段映射 |
+### 6.2 后续触发: 后端代码开发、前端代码开发、测试用例设计
 
-### 6.2 后续触发
-
-| 后续Skill | 触发条件 | 输出 |
-|-----------|----------|------|
-| 后端代码开发 | 接口文档已确认 | 代码实现 |
-| 前端代码开发 | 接口文档已确认 | 前端调用 |
-| 测试用例设计 | 接口可用 | 测试用例 |
-
-### 6.3 协作流程
-
-```
-PRD (PM)
-    │
-    ▼
-┌─────────────────┐
-│  数据库设计     │ ◄── 数据表结构
-│  (DB Design)   │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  后端接口设计   │ ◄── PRD、业务逻辑
-│  (本skill)     │
-└────────┬────────┘
-         │
-         ├──────────────────┐
-         ▼                  ▼
-┌─────────────────┐  ┌────────────┐
-│  后端代码开发   │  │ 前端代码开发 │
-└────────┬────────┘  └──────┬─────┘
-         │                  │
-         └────────┬─────────┘
-                  ▼
-           ┌───────────┐
-           │ 测试用例设计 │
-           └───────────┘
-```
+### 6.3 协作流程: PRD → 数据库设计 → 后端接口设计 → 后端/前端开发 → 测试用例设计
 
 ---
 
@@ -520,8 +203,7 @@ PRD (PM)
 ### 7.3 评审通过标准
 
 - [ ] 所有PRD中的接口需求已设计
-- [ ] URL符合RESTful规范
-- [ ] 响应结构统一
+- [ ] URL符合RESTful规范、响应结构统一
 - [ ] 错误码定义完整
 - [ ] 跨模块接口契约已确认
 - [ ] 已创建后端开发任务
@@ -530,228 +212,32 @@ PRD (PM)
 
 ## 八、交付物检查清单
 
-### 8.1 接口文档检查
+### 8.1 接口文档
 
-- [ ] 文件命名符合规范：`{序号}-{资源名}.md`
-- [ ] 存放路径正确
-- [ ] 包含所有必要章节
-- [ ] 请求参数完整（类型、必填、说明）
-- [ ] 响应结构明确
-- [ ] 错误码定义完整
+- [ ] 文件命名符合规范、存放路径正确、包含所有必要章节
+- [ ] 请求参数完整、响应结构明确、错误码定义完整
 
-### 8.2 设计摘要检查
+### 8.2 设计摘要
 
-- [ ] 已更新SUMMARY.md
-- [ ] 包含本次完成内容
-- [ ] 包含遇到的问题
-- [ ] 包含跨模块接口契约
-- [ ] 包含待确认事项
+- [ ] 已更新SUMMARY.md（含完成内容、问题、跨模块契约、待确认事项）
 
-### 8.3 GitHub工作项检查
+### 8.3 GitHub工作项
 
-- [ ] Task已创建（按接口拆分）
-- [ ] Label正确分配（Dev,Task）
-- [ ] 验收标准明确
+- [ ] Task已创建，Label正确分配（Dev,Task），验收标准明确
 
-### 8.4 规范一致性检查
+### 8.4 规范一致性
 
-- [ ] URL符合项目规范
-- [ ] HTTP方法正确（查询GET，新增POST，修改POST/update，删除POST/delete）
-- [ ] 响应结构统一
-- [ ] 错误码定义完整
-- [ ] 分页参数符合规范
-- [ ] 幂等设计考虑
+- [ ] URL符合项目规范、HTTP方法正确、响应结构统一、分页参数符合规范、幂等设计考虑
 
 ---
 
 ## 九、附录
 
-### 附录A：接口文档模板
-
-```markdown
-# {模块名称}接口
-
-**模块**: {module}  
-**版本**: v1.0  
-**日期**: YYYY-MM-DD  
-**路径**: `/api/v1/{resource}`
-
----
-
-## 1. {接口名称}
-
-### 请求
-```
-{METHOD} /api/v1/{resource}
-```
-
-### 参数
-| 参数 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| {param1} | string | Y | 参数说明 |
-| {param2} | int | N | 参数说明 |
-
-### 请求体（若适用）
-```json
-{
-  "field1": "value1",
-  "field2": "value2"
-}
-```
-
-### 响应
-```json
-{
-  "code": 0,
-  "message": "success",
-  "data": {
-    "id": 1,
-    "name": "示例"
-  },
-  "timestamp": 1704067200000
-}
-```
-
-### 错误码
-| 错误码 | 说明 |
-|--------|------|
-| BUSINESS_ERROR | 业务异常 |
-| VALIDATION_ERROR | 参数校验失败 |
-| NOT_FOUND | 资源不存在 |
-
----
-
-## 2. {接口名称2}
-
-...
-
----
-
-## 接口清单
-
-| 序号 | 接口 | 方法 | 说明 |
-|------|------|------|------|
-| 1 | /{resource} | GET | 列表查询 |
-| 2 | /{resource}/{id} | GET | 详情查询 |
-| 3 | /{resource} | POST | 新增 |
-| 4 | /{resource}/update | POST | 更新 |
-| 5 | /{resource}/delete/{id} | POST | 删除 |
-| 6 | /{resource}/{id}/action | POST | 业务操作 |
-
----
-
-*API产出 - v{版本号}*
-```
-
-### 附录B：SUMMARY.md模板
-
-```markdown
-# {模块名} 接口设计摘要
-
-## 最近更新
-- **日期**: YYYY-MM-DD
-- **设计师**: Dev/TA
-- **本次完成**: {接口列表}
-
----
-
-## 设计过程记录
-
-### YYYY-MM-DD - {本次主题}
-**完成内容**:
-- {已完成的接口1}
-- {已完成的接口2}
-
-**遇到的问题**:
-- {问题1} → {解决方案}
-- {问题2} → {解决方案}
-
-**接口契约**:
-- {跨模块调用1}: 提供方{模块A}，消费方{模块B}
-
-**待确认事项**:
-- {待确认事项1}
-- {待确认事项2}
-
----
-
-## 历史记录
-
-| 日期 | 主题 | 完成内容 | 备注 |
-|------|------|----------|------|
-| YYYY-MM-DD | {主题} | {完成内容} | {备注} |
-```
-
-### 附录C：通用接口模式
-
-**⚠️ HTTP方法规范（重要）**
-```
-# 查询操作 - 使用GET
-GET    /api/v1/{module}              # 列表查询
-GET    /api/v1/{module}/page         # 分页查询
-GET    /api/v1/{module}/{id}         # 详情查询
-GET    /api/v1/{module}/code/{code}  # 按代码查询
-
-# 新增操作 - 使用POST
-POST   /api/v1/{module}              # 新增
-
-# 修改操作 - 使用POST + /update 路径
-POST   /api/v1/{module}/update       # 更新
-
-# 删除操作 - 使用POST + /delete/{id} 路径
-POST   /api/v1/{module}/delete/{id}  # 删除
-
-# 批量操作
-POST   /api/v1/{module}/batch-delete # 批量删除
-
-# 导入导出
-POST   /api/v1/{module}/import      # 批量导入
-GET    /api/v1/{module}/export       # 导出
-
-# 业务操作
-POST   /api/v1/{module}/{id}/submit  # 提交
-POST   /api/v1/{module}/{id}/approve # 审批通过
-POST   /api/v1/{module}/{id}/reject  # 审批驳回
-POST   /api/v1/{module}/{id}/cancel  # 撤销
-```
-
-**说明**：
-- 所有修改操作统一使用 `POST` 方法，通过 `/update` 路径区分
-- 所有删除操作统一使用 `POST` 方法，通过 `/delete/{id}` 路径区分
-- 所有JSON请求必须设置 `Content-Type: application/json`
-
-### 附录D：响应结构模板
-
-```json
-// 成功响应
-{
-  "code": 0,
-  "message": "success",
-  "data": {},
-  "timestamp": 1704067200000
-}
-
-// 分页响应
-{
-  "code": 0,
-  "message": "success",
-  "data": {
-    "list": [],
-    "total": 100,
-    "pageNo": 1,
-    "pageSize": 20
-  },
-  "timestamp": 1704067200000
-}
-
-// 错误响应
-{
-  "code": "BUSINESS_ERROR",
-  "message": "错误描述",
-  "data": null,
-  "timestamp": 1704067200000
-}
-```
+- **附录A - 接口文档模板**: 见 `references/api-doc-template.md`
+- **附录B - SUMMARY 模板**: 见原附录B
+- **附录C - 通用接口模式**: > 详见 `CLAUDE.md` REST API Patterns 章节
+- **附录D - 响应结构模板**: 见 `references/response-template.md`
+- **业界实践**: 见 `references/api-patterns.md`
 
 ---
 

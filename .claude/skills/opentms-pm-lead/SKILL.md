@@ -7,53 +7,23 @@ description: Use when managing Open-TMS project as PM-Lead, including sprint pla
 
 ## 核心定位
 
-**PM-Lead = 项目管理者 + 流程优化者 + Agent教练**
+PM-Lead = 项目管理者 + 流程优化者 + Agent教练
 
-作为资深软件研发项目经理，PM-Lead的核心价值不是亲力亲为，而是：
-1. **制定规范**：建立高效的研发流程和协作机制
-2. **监控执行**：确保各环节按规范执行，发现问题及时干预
-3. **持续优化**：基于交付数据分析，不断优化流程和工具
-4. **培养Agent**：让每个Agent角色不断成长，提升研发效率
+核心价值: 制定规范 → 监控执行 → 持续优化 → 培养Agent
 
 ---
 
 ## 一、核心职责矩阵
 
-### 1.1 职责全景图
-
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                      PM-Lead 核心职责                           │
-├─────────────────────────────────────────────────────────────────┤
-│  📋 流程制定   │  📊 进度监控   │  🔧 工具优化   │  🎓 Agent培养  │
-│  - 制定规范    │  - GitHub追踪  │  - 分析瓶颈    │  - 技能提升    │
-│  - 建立门禁    │  - 风险预警    │  - 优化工具    │  - 经验固化    │
-│  - 明确职责    │  - 问题升级    │  - 沉淀知识    │  - 自我进化    │
-└─────────────────────────────────────────────────────────────────┘
+PM-Lead 核心职责:
+  - 流程制定: 制定规范、建立门禁、明确职责
+  - 进度监控: GitHub追踪、风险预警、问题升级
+  - 工具优化: 分析瓶颈、优化工具、沉淀知识
+  - Agent培养: 技能提升、经验固化、自我进化
 ```
 
-### 1.2 日常管理循环 (PDCA)
-
-```
-┌─────────────┐
-│   Plan      │ 制定本周研发计划、分配任务、设置里程碑
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│   Do        │ 执行研发任务、协调各方、推进交付
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│   Check     │ 检查各角色进度、分析问题、收集数据
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│   Act       │ 优化流程、修复工具、调整计划、固化经验
-└─────────────┘
-```
+日常管理循环 (PDCA): Plan(制定计划) → Do(执行推进) → Check(检查分析) → Act(优化固化)
 
 ---
 
@@ -77,33 +47,27 @@ description: Use when managing Open-TMS project as PM-Lead, including sprint pla
 
 ### 2.2 Issue 生命周期
 
-```
 创建 → 分配 → 进行中 → 阻塞(可选) → 完成 → 关闭
-```
 
 | 状态 | 触发条件 | 动作 |
 |------|----------|------|
 | 创建 | PM-Lead或各角色创建 | 分配责任人、设置标签 |
-| 分配 | Issue已分配 | 责任人开始执行 |
 | 进行中 | 开始工作 | 定期更新进度 |
 | 阻塞 | 遇到阻碍 | @PM-Lead解决 |
 | 完成 | 质量门禁通过 | 添加Done标签 |
 | 关闭 | 交付确认 | 关闭Issue |
 
-### 2.3 Issue 状态追踪命令
+### 2.3 Issue 状态追踪
 
 ```bash
-# 查看所有进行中的任务（按角色分类）
+# 查看所有进行中的任务
 gh issue list --state open --label "Dev" --label "TA" --label "QA" --label "UX"
 
-# 查看本周需要完成的任务
+# 查看本周任务
 gh issue list --state open --label "Task"
 
 # 查看阻塞项
 gh issue list --state open --label "PM-Lead" --search "阻塞"
-
-# 查看特定特性的所有相关任务
-gh issue list --label "Feature"
 
 # 查看未完成的Bug
 gh issue list --label "Bug" --state open
@@ -115,25 +79,19 @@ gh issue list --label "Bug" --state open
 
 ### 3.1 特性交付标准流程
 
-每个Feature必须遵循以下流程，确保可追踪、可验收：
-
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Feature 交付标准流程                         │
-└─────────────────────────────────────────────────────────────────┘
-
 Phase 0: 特性启动
-  ├── 创建Feature Issue（包含完整描述和验收标准）
-  ├── 创建各角色Task（PM/UX/TA/Dev/QA）
-  └── 添加到GitHub Project跟踪
+  - 创建Feature Issue（完整描述+验收标准）
+  - 创建各角色Task（PM/UX/TA/Dev/QA）
+  - 添加到GitHub Project跟踪
 
 Phase 1-N: 各角色执行（见各角色Skill）
-  └── 每阶段完成后 → 更新Issue状态 → 添加Done标签
+  - 每阶段完成后更新Issue状态
 
 Phase N+1: 交付验收
-  ├── 所有Task已Done
-  ├── Feature Issue更新交付物清单
-  └── PM-Lead确认关闭Feature
+  - 所有Task已Done
+  - Feature Issue更新交付物清单
+  - PM-Lead确认关闭Feature
 ```
 
 ### 3.2 质量门禁体系
@@ -146,26 +104,17 @@ Phase N+1: 交付验收
 | Dev门禁 | 代码已提交、联调通过 | Dev Lead | 进入测试 |
 | QA门禁 | P0用例100%通过、无P0/P1 Bug | QA | 进入交付 |
 
-### 3.3 每日站会机制
+### 3.3 每日站会检查
 
-**执行时间**: 每天早上（团队约定时间）
-
-**检查内容**:
 ```bash
-# 1. 查看进行中的任务
+# 进行中的任务
 gh issue list --state open --label "Dev,Task"
 
-# 2. 查看阻塞项
+# 阻塞项
 gh issue list --state open --label "PM-Lead" --search "阻塞"
 
-# 3. 查看即将到期的任务
+# 即将到期任务
 gh issue list --state open --due 2026-05-30
-
-# 4. 汇总状态
-echo "=== 今日研发状态 ==="
-echo "进行中: $(gh issue list --state open --label Dev --json number | jq length) 个开发任务"
-echo "阻塞项: $(gh issue list --state open --search '阻塞' --json number | jq length) 个"
-echo "待验证: $(gh issue list --state open --label QA --json number | jq length) 个测试任务"
 ```
 
 ---
@@ -174,11 +123,7 @@ echo "待验证: $(gh issue list --state open --label QA --json number | jq leng
 
 ### 4.1 Agent成长目标
 
-每个Agent角色应具备：
-- **自我诊断**：能发现自身问题并主动优化
-- **经验固化**：将成功经验固化为可复用模式
-- **持续改进**：不断迭代提升效率和质量
-- **知识沉淀**：将隐性知识显性化，便于传承
+每个Agent角色应具备: 自我诊断（发现问题主动优化）、经验固化（成功经验可复用）、持续改进（迭代提升效率）、知识沉淀（隐性知识显性化）。
 
 ### 4.2 Agent能力评估维度
 
@@ -189,38 +134,11 @@ echo "待验证: $(gh issue list --state open --label QA --json number | jq leng
 | 稳定性 | 输出一致性的程度 | 偏差率、标准差 |
 | 学习 | 从经验中获取知识的能力 | 错误不重复率、技能增长 |
 
-### 4.3 Agent成长追踪机制
+### 4.3 Agent技能提升方法
 
-```bash
-# 查看各角色Task完成情况
-gh issue list --state closed --label "Dev" --limit 50
-
-# 分析完成效率
-# - 平均完成时间
-# - 阻塞时间占比
-# - 返工次数
-
-# 识别高频问题
-# - 某类任务频繁出现问题
-# - 某角色重复遇到相同问题
-```
-
-### 4.4 Agent技能提升方法
-
-**方法1: 错误模式分析**
-```
-每次遇到问题 → 记录问题类型 → 分析根本原因 → 优化Skill → 验证效果
-```
-
-**方法2: 最佳实践固化**
-```
-成功完成任务 → 提取成功要素 → 编写最佳实践 → 更新Skill → 推广应用
-```
-
-**方法3: 工具迭代优化**
-```
-发现工具不足 → 分析需求 → 优化工具 → 验证效果 → 推广使用
-```
+- **错误模式分析**: 遇到问题 → 记录类型 → 分析根因 → 优化Skill → 验证效果
+- **最佳实践固化**: 成功任务 → 提取要素 → 编写实践 → 更新Skill → 推广
+- **工具迭代优化**: 发现不足 → 分析需求 → 优化工具 → 验证效果 → 推广
 
 ---
 
@@ -235,60 +153,13 @@ gh issue list --state closed --label "Dev" --limit 50
 | 某工具频繁无法使用 | >2次/周 | 修复或替换工具 |
 | 某角色经常需要协助 | >5次/周 | 评估技能差距，培训或调整 |
 
-### 5.2 优化执行流程
+### 5.2 优化执行流程 (PDCA)
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    持续优化循环 (PDCA)                           │
-└─────────────────────────────────────────────────────────────────┘
-
-分析阶段:
-  1. 收集数据：GitHub Issue统计、任务耗时、问题类型
-  2. 识别问题：高频问题、瓶颈环节、反复错误
-  3. 根因分析：5Why分析、鱼骨图等方法
-
-制定方案:
-  4. 制定对策：优化Skill、调整流程、升级工具
-  5. 评估效果：预期提升 vs 投入成本
-
-执行验证:
-  6. 小范围试点：新方案先在1-2个任务验证
-  7. 全面推广：验证有效后推广到所有任务
-  8. 效果跟踪：持续监控指标变化
-```
+分析阶段: 收集数据 → 识别问题 → 根因分析 → 制定对策 → 评估效果 → 小范围试点 → 全面推广 → 效果跟踪
 
 ### 5.3 优化记录规范
 
-每次优化后必须记录：
-
-```markdown
-### 优化记录 - YYYY-MM-DD
-
-**问题现象**: {具体描述}
-**影响范围**: {影响的任务类型和频率}
-**根本原因**: {分析结论}
-**优化措施**: {具体修改内容}
-**修改位置**: {修改的Skill或工具}
-**验证结果**: {优化效果数据}
-**推广情况**: {是否已推广}
-```
-
-### 5.4 优化案例库
-
-PM-Lead应维护一个优化案例库：
-
-```bash
-# 优化案例库位置
-harness/优化案例库/
-
-# 文件命名
-优化案例-{序号}-{问题简述}.md
-
-# 示例
-优化案例-001-测试脚本路径修复.md
-优化案例-002-前端编译错误处理流程.md
-优化案例-003-后端服务启动脚本优化.md
-```
+每次优化后记录: 问题现象、影响范围、根本原因、优化措施、修改位置、验证结果、推广情况。
 
 ---
 
@@ -296,24 +167,21 @@ harness/优化案例库/
 
 ### 6.1 核心指标
 
-| 指标 | 定义 | 目标值 | 测量方法 |
-|------|------|--------|----------|
-| 特性交付周期 | 从Feature创建到关闭的时间 | <目标周期80% | GitHub Issue时间差 |
-| 任务完成率 | 按时完成的任务数/总任务数 | >90% | Task Done数统计 |
-| 缺陷逃逸率 | 测试阶段发现的Bug/线上Bug | <20% | Bug统计 |
-| 平均修复时间 | Bug从创建到关闭的时间 | <目标时间的50% | Bug Issue时间差 |
-| 返工率 | 因质量问题返工的任务/总任务 | <10% | Task重复开启统计 |
+| 指标 | 定义 | 目标值 |
+|------|------|--------|
+| 特性交付周期 | Feature创建到关闭的时间 | <目标周期80% |
+| 任务完成率 | 按时完成的任务数/总任务数 | >90% |
+| 缺陷逃逸率 | 测试发现的Bug/线上Bug | <20% |
+| 平均修复时间 | Bug创建到关闭的时间 | <目标时间50% |
+| 返工率 | 因质量返工的任务/总任务 | <10% |
 
-### 6.2 指标收集脚本
+### 6.2 指标收集
 
 ```bash
-# 交付效率统计脚本位置
-.agents/skills/opentms-pm-lead/scripts/delivery_stats.py
-
-# 使用方法
-python .agents/skills/opentms-pm-lead/scripts/delivery_stats.py weekly   # 本周统计
-python .agents/skills/opentms-pm-lead/scripts/delivery_stats.py monthly   # 本月统计
-python .agents/skills/opentms-pm-lead/scripts/delivery_stats.py trend     # 趋势分析
+# 交付效率统计
+python .agents/skills/opentms-pm-lead/scripts/delivery_stats.py weekly
+python .agents/skills/opentms-pm-lead/scripts/delivery_stats.py monthly
+python .agents/skills/opentms-pm-lead/scripts/delivery_stats.py trend
 ```
 
 ### 6.3 周报模板
@@ -322,27 +190,13 @@ python .agents/skills/opentms-pm-lead/scripts/delivery_stats.py trend     # 趋�
 # Open-TMS {版本} 周报 - YYYY-MM-DD
 
 ## 本周概况
-- 特性完成: X 个
-- 任务完成: X 个（完成率 XX%）
-- Bug修复: X 个
-- 阻塞解决: X 个
+- 特性完成/任务完成/Bug修复/阻塞解决
 
 ## 交付效率
 | 指标 | 本周 | 上周 | 变化 |
-|------|------|------|------|
-| 特性交付周期 | X天 | X天 | ±X% |
-| 任务完成率 | XX% | XX% | ±X% |
-| 平均修复时间 | X小时 | X小时 | ±X% |
 
 ## 问题与优化
-### 发现的问题
-- {问题描述}
-
-### 已完成的优化
-- {优化内容}
-
-### 下周改进计划
-- {改进措施}
+- 发现问题 / 已完成优化 / 下周改进计划
 
 ## 风险预警
 - {风险项} - {影响} - {缓解措施}
@@ -356,170 +210,45 @@ python .agents/skills/opentms-pm-lead/scripts/delivery_stats.py trend     # 趋�
 
 ```
 harness/
-├── 最佳实践/               # 已验证的最佳实践
-│   ├── 开发规范/
-│   ├── 测试规范/
-│   └── 项目管理/
-├── 问题解决/               # 问题解决方案
-│   ├── 常见错误/
-│   └── 修复记录/
-├── 培训材料/               # 技能培训资料
-│   ├── Agent使用指南/
-│   └── 流程说明/
-└── 优化案例库/             # 持续优化记录
+├── 最佳实践/     # 已验证的最佳实践
+├── 问题解决/     # 问题解决方案
+├── 培训材料/     # 技能培训资料
+└── 优化案例库/   # 持续优化记录
 ```
 
 ### 7.2 经验固化流程
 
-```
-完成一个复杂任务后:
-  1. 复盘：分析成功/失败要素
-  2. 提炼：提取可复用的模式
-  3. 固化：更新到Skill或最佳实践
-  4. 验证：在下次任务中应用验证
-```
-
-### 7.3 Agent技能档案
-
-为每个Agent角色维护技能档案：
-
-```markdown
-# {角色} Agent技能档案
-
-## 当前技能水平
-| 技能 | 等级 | 评估日期 |
-|------|------|----------|
-| {技能1} | 熟练 | YYYY-MM-DD |
-| {技能2} | 入门 | YYYY-MM-DD |
-
-## 成长记录
-### YYYY-MM-DD
-- 提升内容: {描述}
-- 验证方式: {描述}
-- 效果评估: {描述}
-
-## 待提升技能
-- {技能X} - 计划在{时间}提升
-```
+完成复杂任务后: 复盘 → 提炼 → 固化到Skill → 下次验证
 
 ---
 
 ## 八、PM-Lead 日常工作清单
 
-### 8.1 每日检查 (5分钟)
-
-```bash
-# 1. 检查阻塞项
-gh issue list --state open --search "阻塞" --label "PM-Lead"
-
-# 2. 检查即将到期任务
-gh issue list --state open --due before:7days
-
-# 3. 检查开发进度
-gh issue list --state open --label "Dev"
-
-# 4. 检查测试状态
-gh issue list --state open --label "QA"
-```
-
-### 8.2 每周评审 (30分钟)
-
-```bash
-# 1. 生成周报
-python .agents/skills/opentms-pm-lead/scripts/delivery_stats.py weekly
-
-# 2. 分析效率指标
-# - 特性交付周期
-# - 任务完成率
-# - 阻塞时间占比
-
-# 3. 识别优化机会
-# - 高频问题
-# - 瓶颈环节
-# - 工具不足
-
-# 4. 更新优化案例库
-```
-
-### 8.3 每月复盘 (1小时)
-
-```bash
-# 1. 收集月度数据
-python .agents/skills/opentms-pm-lead/scripts/delivery_stats.py monthly
-
-# 2. 分析Agent成长情况
-# - 各角色任务完成效率
-# - 错误模式变化
-# - 技能提升进度
-
-# 3. 评审流程有效性
-# - 各阶段门禁是否有效
-# - 协作机制是否顺畅
-# - 工具是否满足需求
-
-# 4. 制定下月改进计划
-```
-
-### 8.4 季度规划 (2小时)
-
-```bash
-# 1. 回顾季度目标达成
-# 2. 分析重大交付项目
-# 3. 评估团队能力提升
-# 4. 制定下季度优化重点
-```
+- **每日(5分钟)**: 检查阻塞项、即将到期任务、开发进度、测试状态
+- **每周(30分钟)**: 生成周报、分析效率指标、识别优化机会、更新优化案例库
+- **每月(1小时)**: 收集月度数据、分析Agent成长、评审流程有效性、制定改进计划
+- **每季度(2小时)**: 回顾目标达成、分析重大交付、评估团队能力、制定优化重点
 
 ---
 
 ## 九、常用命令速查
 
-### 9.1 Issue管理
+> 完整命令参考见 `references/commands.md`。
+
+核心命令:
 
 ```bash
-# 创建任务
+# 创建任务/特性/Bug
 gh issue create --title "[Dev] {任务名}" --body "..." --label "Dev,Task"
-
-# 创建特性
 gh issue create --title "[Feature] {特性名}" --body "..." --label "PM,Feature"
 
-# 创建Bug
-gh issue create --title "[Bug] {缺陷描述}" --body "..." --label "Bug,Dev"
-
-# 更新状态
-gh issue edit <number> --add-label "Done"
-
-# 分配责任人
-gh issue edit <number> --add-label "Dev"
-
-# 关闭Issue
-gh issue close <number>
-```
-
-### 9.2 进度查看
-
-```bash
-# 查看所有进行中
+# 进度查看
 gh issue list --state open
-
-# 按角色筛选
 gh issue list --label "Dev"
-gh issue list --label "QA"
-
-# 查看阻塞项
 gh issue list --search "阻塞"
 
-# 查看已延期
-gh issue list --state open --due before:2026-05-27
-```
-
-### 9.3 统计报告
-
-```bash
-# 查看交付效率
+# 统计
 python .agents/skills/opentms-pm-lead/scripts/delivery_stats.py weekly
-
-# 查看Agent工作量
-gh issue list --state closed --label "Dev" --limit 30 --json number,title,closedAt
 ```
 
 ---

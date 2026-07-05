@@ -244,6 +244,17 @@ ux_review_items:
     check_method: 对比 Murex MX.3 / FIS Quantum 录屏,识别差异。
     pass_criteria: 关键场景至少 70% 一致
     failure_action: 长期规划
+
+  - id: UX-023
+    name: 4 模式统一布局 (new/copy/edit/readonly)
+    severity: P1
+    standard: 详情页必须实现 4 种模式的统一布局 — 新建(new)/复制(copy)/编辑(edit)/只读(readonly),通过 ModeBadge + disabled 状态区分,不创建 4 个独立页面
+    check_method: |
+      1. Read *.vue 详情页,识别是否有独立的 create/edit/copy/detail 页面
+      2. Grep `mode` 变量,验证通过 computed 控制 disabled/readonly
+      3. 校验 ModeBadge 对 4 种模式均正确显示
+    pass_criteria: 1 个详情页组件覆盖 4 种模式;不创建 4 个独立页面
+    failure_action: 合并为单组件多模式
 ```
 
 ---
@@ -326,4 +337,4 @@ opentms-ux-design (UX 设计)
 
 | 版本 | 日期 | 变更内容 |
 |------|------|----------|
-| v1.0 | 2026-07-05 | 初始版本 — 22 项 UX 审核项 (4 P0 / 13 P1 / 5 P2) |
+| v1.1 | 2026-07-05 | 新增 UX-023: 4 模式统一布局检查 |

@@ -192,6 +192,17 @@ checklist:
       3. 验证无别名/同义词混用
     pass_criteria: 0 术语不一致
     failure_action: 退回 PM 统一术语
+
+  - id: REQ-015
+    name: 对 5 份已有 PRD 的交叉引用
+    severity: P0
+    standard: 新 PRD 必须检查与 5 份存量 PRD(银行账户/金融工具/AC交易/AT交易/交易对手方)的字段引用一致性
+    check_method: |
+      1. 列出新 PRD 中引用的所有已有实体(银行账户/金融工具/交易对手方等)
+      2. 对照 5 份存量 PRD 验证字段定义、业务编码、状态值不冲突
+      3. 验证管理主体(management_entity)引用方式一致
+    pass_criteria: 引用的存量实体字段与已有 PRD 100% 一致;无冲突定义
+    failure_action: 退回 PM 对齐存量 PRD
 ```
 
 ## 评级体系
@@ -214,3 +225,12 @@ checklist:
 - `opentms-product-design` — PRD 编写规范
 - `opentms-business-architect` — 业务架构与对标
 - `opentms-pm-lead` — 需求管理与立项
+
+---
+
+## 版本历史
+
+| 版本 | 日期 | 变更内容 |
+|------|------|---------|
+| v1.0 | 2026-07-05 | 初始版本 — 14 项需求审核项 (8 P0 / 6 P1 / 0 P2) |
+| v1.1 | 2026-07-05 | 新增 REQ-015: 5 份已有 PRD 交叉引用检查 |
