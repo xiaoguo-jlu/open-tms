@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open-TMS — M1-主体默认银行账户规则 UX 原型 v1.1</title>
+<style>
+/* ===== Open-TMS 设计系统 ===== */
+:root {
+  --color-primary: #1E40AF;
+  --color-primary-light: #3B82F6;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-info: #6B7280;
+  --color-bg: #F9FAFB;
+  --color-card: #FFFFFF;
+  --color-border: #E5E7EB;
+  --color-text: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-placeholder: #9CA3AF;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,.08), 0 2px 4px -1px rgba(0,0,0,.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ===== 顶部导航 ===== */
+.app-header {
+  background: var(--color-primary);
+  color: white;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-md);
+}
+.app-logo { font-weight: 700; font-size: 16px; letter-spacing: 1px; }
+.app-nav { display: flex; gap: 4px; flex: 1; }
+.app-nav a {
+  color: rgba(255,255,255,.85);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  transition: all .15s;
+}
+.app-nav a:hover { background: rgba(255,255,255,.1); color: white; }
+.app-nav a.active { background: rgba(255,255,255,.18); color: white; font-weight: 600; }
+.app-user { font-size: 13px; opacity: .9; }
+
+/* ===== 主布局 ===== */
+.app-layout {
+  display: flex;
+  min-height: calc(100vh - 52px);
+}
+.sidebar {
+  width: 220px;
+  background: var(--color-card);
+  border-right: 1px solid var(--color-border);
+  padding: 16px 0;
+  flex-shrink: 0;
+}
+.sidebar-section { padding: 8px 16px; }
+.sidebar-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  letter-spacing: 1px;
+  padding: 8px 16px;
+}
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: 13px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all .15s;
+}
+.sidebar-item:hover { background: var(--color-bg); color: var(--color-text); }
+.sidebar-item.active { background: rgba(30,64,175,.06); border-left-color: var(--color-primary); color: var(--color-primary); font-weight: 600; }
+
+.main-content { flex: 1; padding: 24px; overflow-x: auto; }
+
+/* ===== 页面 header ===== */
+.page-header {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.page-subtitle {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+}
+
+/* ===== Tabs ===== */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 16px;
+  gap: 4px;
+  background: var(--color-card);
+  padding: 0 16px;
+}
+.tab {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all .15s;
+  font-weight: 500;
+}
+.tab:hover { color: var(--color-text); }
+.tab.active { color: var(--color-primary); border-bottom-color: var(--color-primary); }
+
+/* ===== Card ===== */
+.card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 16px;
+}
+.card-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.card-body { padding: 16px; }
+
+/* ===== Form ===== */
+.form-row {
+  display: grid;
+  grid-template-columns: 140px 1fr 140px 1fr;
+  gap: 12px 16px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.form-row-3 {
+  display: grid;
+  grid-template-columns: 140px 1fr 140px 1fr 140px 1fr;
+  gap: 12px 16px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.form-label {
+  font-size: 13px;
+  color: var(--color-text);
+  text-align: right;
+  font-weight: 500;
+}
+.form-label.required::before {
+  content: "*";
+  color: var(--color-error);
+  margin-right: 4px;
+}
+.form-control {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-family: inherit;
+  background: white;
+  transition: all .15s;
+}
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-primary-light);
+  box-shadow: 0 0 0 3px rgba(30,64,175,.12);
+}
+.form-control:disabled { background: #F3F4F6; color: var(--color-text-secondary); cursor: not-allowed; }
+.form-control.error { border-color: var(--color-error); }
+.form-help { font-size: 12px; color: var(--color-text-secondary); margin-top: 4px; }
+.form-error { font-size: 12px; color: var(--color-error); margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+
+select.form-control { cursor: pointer; }
+textarea.form-control { min-height: 60px; resize: vertical; font-family: inherit; }
+
+/* ===== Button ===== */
+.btn {
+  padding: 7px 16px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all .15s;
+}
+.btn-primary { background: var(--color-primary); color: white; }
+.btn-primary:hover { background: #1E3A8A; }
+.btn-default { background: white; color: var(--color-text); border-color: var(--color-border); }
+.btn-default:hover { border-color: var(--color-primary-light); color: var(--color-primary); }
+.btn-danger { background: var(--color-error); color: white; }
+.btn-danger:hover { background: #DC2626; }
+.btn-text { background: transparent; color: var(--color-primary); padding: 4px 8px; }
+.btn-text:hover { background: rgba(30,64,175,.06); }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+.btn-group { display: flex; gap: 8px; }
+
+/* ===== Table ===== */
+.table-wrap { background: white; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--color-border); }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table th {
+  background: #F9FAFB;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+.table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+.table tbody tr:hover { background: #F9FAFB; }
+.table tbody tr.selected { background: rgba(30,64,175,.04); }
+.table .col-action { white-space: nowrap; width: 1%; }
+.table .col-num { text-align: right; font-variant-numeric: tabular-nums; }
+.table-empty {
+  padding: 60px 16px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+.table-empty .icon { font-size: 48px; opacity: .3; margin-bottom: 12px; }
+
+/* ===== Tag ===== */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+}
+.tag-success { background: rgba(16,185,129,.1); color: var(--color-success); }
+.tag-warning { background: rgba(245,158,11,.1); color: var(--color-warning); }
+.tag-error { background: rgba(239,68,68,.1); color: var(--color-error); }
+.tag-info { background: rgba(107,114,128,.1); color: var(--color-info); }
+.tag-primary { background: rgba(30,64,175,.1); color: var(--color-primary); }
+
+/* ===== Switch ===== */
+.switch {
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  background: #D1D5DB;
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+  transition: background .2s;
+}
+.switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  transition: all .2s;
+}
+.switch.on { background: var(--color-primary); }
+.switch.on::after { left: 18px; }
+
+/* ===== InputNumber ===== */
+.input-number {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  width: 100px;
+}
+.input-number .form-control {
+  border: none;
+  text-align: center;
+  padding: 5px 4px;
+  width: 60px;
+}
+.input-number-btn {
+  padding: 0 8px;
+  background: #F9FAFB;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+.input-number-btn:hover { background: #F3F4F6; color: var(--color-text); }
+
+/* ===== Pagination ===== */
+.pagination {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  border-top: 1px solid var(--color-border);
+  font-size: 13px;
+}
+.pagination-controls { display: flex; gap: 4px; align-items: center; }
+.pagination-btn {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--color-border);
+  background: white;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+}
+.pagination-btn:hover { border-color: var(--color-primary-light); color: var(--color-primary); }
+.pagination-btn.active { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+
+/* ===== Tooltip ===== */
+[data-tooltip] { position: relative; }
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1F2937;
+  color: white;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+/* ===== Modal/Dialog ===== */
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal {
+  background: white;
+  border-radius: var(--radius-lg);
+  min-width: 420px;
+  max-width: 600px;
+  box-shadow: var(--shadow-lg);
+}
+.modal-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+}
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  line-height: 1;
+}
+.modal-body { padding: 20px; }
+.modal-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ===== Drawer ===== */
+.drawer-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.4);
+  z-index: 999;
+}
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 720px;
+  background: white;
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+.drawer-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.drawer-title { font-weight: 600; font-size: 16px; }
+.drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
+.drawer-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ===== Description list (详情页) ===== */
+.descriptions {
+  display: grid;
+  grid-template-columns: 140px 1fr 140px 1fr;
+  gap: 12px 16px;
+  align-items: center;
+}
+.descriptions .label {
+  text-align: right;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+.descriptions .value { font-size: 13px; }
+
+/* ===== Alert ===== */
+.alert {
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.alert-info { background: rgba(59,130,246,.08); color: #1E40AF; border-left: 3px solid var(--color-primary-light); }
+.alert-warning { background: rgba(245,158,11,.08); color: #92400E; border-left: 3px solid var(--color-warning); }
+.alert-error { background: rgba(239,68,68,.08); color: #991B1B; border-left: 3px solid var(--color-error); }
+.alert-success { background: rgba(16,185,129,.08); color: #065F46; border-left: 3px solid var(--color-success); }
+
+/* ===== Timeline (审计) ===== */
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background: var(--color-border);
+}
+.timeline-item { position: relative; padding-bottom: 18px; }
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -24px;
+  top: 6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid var(--color-primary);
+}
+.timeline-item.disabled::before { border-color: var(--color-text-placeholder); }
+.timeline-time { font-size: 12px; color: var(--color-text-secondary); }
+.timeline-title { font-weight: 600; margin: 2px 0; }
+.timeline-content { font-size: 13px; color: var(--color-text-secondary); margin-top: 4px; }
+
+/* ===== Code/Diff ===== */
+.code-block {
+  background: #1F2937;
+  color: #E5E7EB;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  overflow-x: auto;
+  margin: 8px 0;
+}
+.diff-old { color: #FCA5A5; text-decoration: line-through; opacity: .8; }
+.diff-new { color: #6EE7B7; }
+
+/* ===== Loading ===== */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.skeleton {
+  background: linear-gradient(90deg, #F3F4F6 25%, #E5E7EB 50%, #F3F4F6 75%);
+  background-size: 200% 100%;
+  animation: skeleton 1.5s infinite;
+  border-radius: var(--radius-sm);
+  height: 14px;
+}
+@keyframes skeleton { to { background-position: -200% 0; } }
+
+/* ===== Page navigation (Section anchors) ===== */
+.section-nav {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 8px;
+  box-shadow: var(--shadow-md);
+  z-index: 50;
+  max-width: 220px;
+}
+.section-nav-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  padding: 4px 8px;
+  letter-spacing: 1px;
+}
+.section-nav a {
+  display: block;
+  padding: 6px 8px;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: 12px;
+  border-radius: var(--radius-sm);
+  transition: all .15s;
+}
+.section-nav a:hover { background: var(--color-bg); color: var(--color-text); }
+.section-nav a.active { background: rgba(30,64,175,.08); color: var(--color-primary); font-weight: 600; }
+
+/* ===== Page section ===== */
+.page-section {
+  scroll-margin-top: 70px;
+  margin-bottom: 32px;
+  padding-top: 16px;
+  border-top: 2px dashed var(--color-border);
+}
+.page-section:first-child { border-top: none; padding-top: 0; }
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.section-num {
+  width: 28px;
+  height: 28px;
+  background: var(--color-primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+.section-title { font-size: 18px; font-weight: 600; }
+.section-desc { color: var(--color-text-secondary); font-size: 13px; margin-bottom: 16px; margin-left: 40px; }
+
+/* ===== FX Demo specific ===== */
+.fx-currency-pair {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(30,64,175,.06);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  color: var(--color-primary);
+}
+.account-field {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  background: white;
+}
+.account-field.filled { border-color: var(--color-success); background: rgba(16,185,129,.04); }
+.account-field-hint {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.account-field-hint.matched { color: var(--color-success); }
+.account-field-hint.empty { color: var(--color-warning); }
+
+.debounce-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  background: rgba(245,158,11,.1);
+  color: var(--color-warning);
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.cache-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  background: rgba(16,185,129,.1);
+  color: var(--color-success);
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.lock-banner {
+  background: rgba(245,158,11,.06);
+  border: 1px solid rgba(245,158,11,.3);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* ===== Statistic cards ===== */
+.stat-card {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  flex: 1;
+}
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(30,64,175,.1);
+  color: var(--color-primary);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.stat-value { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.stat-label { font-size: 12px; color: var(--color-text-secondary); }
+.stat-row { display: flex; gap: 16px; margin-bottom: 16px; }
+
+/* Utilities */
+.text-muted { color: var(--color-text-secondary); }
+.text-error { color: var(--color-error); }
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+.text-primary { color: var(--color-primary); }
+.text-mono { font-family: 'JetBrains Mono', monospace; }
+.mb-8 { margin-bottom: 8px; } .mb-12 { margin-bottom: 12px; } .mb-16 { margin-bottom: 16px; }
+.flex { display: flex; } .flex-1 { flex: 1; } .gap-8 { gap: 8px; } .gap-12 { gap: 12px; } .gap-16 { gap: 16px; }
+.center { display: flex; align-items: center; }
+.between { display: flex; align-items: center; justify-content: space-between; }
+</style>
+</head>
+<body>
+
+<!-- ===== 顶部导航 ===== -->
+<div class="app-header">
+  <div class="app-logo">⚡ Open-TMS</div>
+  <nav class="app-nav">
+    <a href="#">仪表盘</a>
+    <a href="#" class="active">基础数据</a>
+    <a href="#">资金运营</a>
+    <a href="#">金融工具</a>
+    <a href="#">风险管理</a>
+    <a href="#">分析报表</a>
+  </nav>
+  <div class="app-user">👤 admin · 资金主管</div>
+</div>
+
+<div class="app-layout">
+  <!-- ===== 侧边栏 ===== -->
+  <aside class="sidebar">
+    <div class="sidebar-title">基础数据</div>
+    <a class="sidebar-item" href="#">📊 仪表盘</a>
+    <a class="sidebar-item" href="#">🏢 资金管理主体</a>
+    <a class="sidebar-item" href="#">👥 交易对手</a>
+    <a class="sidebar-item" href="#">💼 金融工具</a>
+    <a class="sidebar-item" href="#">💱 币种</a>
+    <a class="sidebar-item" href="#">🌐 国家/地区</a>
+    <a class="sidebar-item" href="#">🏦 银行账户</a>
+    <a class="sidebar-item active" href="#">📋 默认账户规则 <span class="tag tag-primary" style="margin-left:auto">NEW</span></a>
+    <a class="sidebar-item" href="#">💱 币种对</a>
+    <a class="sidebar-item" href="#">📅 工作日</a>
+    <a class="sidebar-item" href="#">🏛️ 子公司</a>
+    <a class="sidebar-item" href="#">👨‍💼 交易员</a>
+  </aside>
+
+  <!-- ===== 主内容区 ===== -->
+  <main class="main-content">
+
+    <!-- ===== 全局导航 ===== -->
+    <div class="card mb-16">
+      <div class="card-body" style="padding: 12px 16px;">
+        <div class="flex gap-12" style="flex-wrap: wrap; align-items: center; font-size: 13px;">
+          <span class="text-muted">UX 原型 v1.1</span>
+          <span class="text-muted">·</span>
+          <span>5 个核心页面</span>
+          <span class="text-muted">·</span>
+          <span>基于 PRD v1.1 (P0×5 + 关键 P1×4 = 9 项修复)</span>
+          <span class="text-muted">·</span>
+          <span class="tag tag-info">基于 Element Plus + Vue 3</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================== -->
+    <!-- 1. 规则列表页 -->
+    <!-- ============================== -->
+    <section id="page-list" class="page-section">
+      <div class="section-header">
+        <div class="section-num">1</div>
+        <div>
+          <div class="section-title">规则列表页</div>
+          <div class="section-desc">资金主管维护规则的主入口 — 搜索/筛选/批量/行内编辑/状态切换</div>
+        </div>
+      </div>
+
+      <!-- 页面 -->
+      <div class="page-header">
+        <div>
+          <div class="page-title">默认账户规则</div>
+          <div class="page-subtitle">为主体配置默认银行账户的匹配规则 · 共 18 条规则</div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-default">📥 导出</button>
+          <button class="btn btn-default">🛑 批量停用</button>
+          <button class="btn btn-primary">+ 新增规则</button>
+        </div>
+      </div>
+
+      <!-- 搜索区 -->
+      <div class="card">
+        <div class="card-header">
+          <span>🔍 筛选条件</span>
+          <button class="btn btn-text">收起 ▴</button>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <label class="form-label required">管理主体</label>
+            <select class="form-control">
+              <option>集团总部</option>
+              <option>上海子公司</option>
+              <option>深圳子公司</option>
+            </select>
+            <label class="form-label">状态</label>
+            <select class="form-control">
+              <option>全部</option>
+              <option>启用 (Active)</option>
+              <option>停用 (Inactive)</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label class="form-label">对手方</label>
+            <select class="form-control">
+              <option>全部</option>
+              <option>中国银行</option>
+              <option>工商银行</option>
+              <option>渣打银行</option>
+            </select>
+            <label class="form-label">金融产品</label>
+            <select class="form-control">
+              <option>全部</option>
+              <option>FX-SPOT-USD-CNY</option>
+              <option>FX-FWD-EUR-CNY-3M</option>
+              <option>FX-NDF-USD-CNY</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label class="form-label">币种</label>
+            <select class="form-control">
+              <option>全部</option>
+              <option>USD</option>
+              <option>CNY</option>
+              <option>EUR</option>
+            </select>
+            <label class="form-label">关键词</label>
+            <input class="form-control" type="text" placeholder="搜索规则编号/描述">
+          </div>
+          <div class="flex gap-8" style="margin-top: 12px;">
+            <button class="btn btn-primary">🔍 查询</button>
+            <button class="btn btn-default">↻ 重置</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 统计卡片 -->
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-icon">📋</div>
+          <div>
+            <div class="stat-value">18</div>
+            <div class="stat-label">规则总数</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(16,185,129,.1); color: var(--color-success);">✓</div>
+          <div>
+            <div class="stat-value text-success">15</div>
+            <div class="stat-label">Active 启用中</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(245,158,11,.1); color: var(--color-warning);">⏸</div>
+          <div>
+            <div class="stat-value text-warning">3</div>
+            <div class="stat-label">Inactive 已停用</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📈</div>
+          <div>
+            <div class="stat-value">2,847</div>
+            <div class="stat-label">近 30 天匹配次数</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 表格 -->
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th style="width: 32px;"><input type="checkbox"></th>
+              <th>规则编号</th>
+              <th>对手方</th>
+              <th>金融产品</th>
+              <th>方向</th>
+              <th>币种</th>
+              <th>默认账户</th>
+              <th class="col-num">优先级</th>
+              <th>状态</th>
+              <th>生效日</th>
+              <th class="col-action">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td class="text-mono">RULE202607080001</td>
+              <td>中国银行</td>
+              <td>FX-SPOT-USD-CNY</td>
+              <td><span class="tag tag-success">Inflow</span></td>
+              <td>USD</td>
+              <td>中行美元账户 #1001</td>
+              <td class="col-num">
+                <div class="input-number">
+                  <button class="input-number-btn">−</button>
+                  <input class="form-control" value="200">
+                  <button class="input-number-btn">+</button>
+                </div>
+              </td>
+              <td><span class="switch on" data-tooltip="停用"></span></td>
+              <td>2026-07-08</td>
+              <td class="col-action">
+                <button class="btn btn-text">编辑</button>
+                <button class="btn btn-text">复制</button>
+                <button class="btn btn-text" style="color: var(--color-error);">删除</button>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td class="text-mono">RULE202607080002</td>
+              <td>中国银行</td>
+              <td>FX-SPOT-USD-CNY</td>
+              <td><span class="tag tag-warning">Outflow</span></td>
+              <td>CNY</td>
+              <td>中行人民币账户 #1002</td>
+              <td class="col-num">
+                <div class="input-number">
+                  <button class="input-number-btn">−</button>
+                  <input class="form-control" value="180">
+                  <button class="input-number-btn">+</button>
+                </div>
+              </td>
+              <td><span class="switch on"></span></td>
+              <td>2026-07-08</td>
+              <td class="col-action">
+                <button class="btn btn-text">编辑</button>
+                <button class="btn btn-text">复制</button>
+                <button class="btn btn-text" style="color: var(--color-error);">删除</button>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td class="text-mono">RULE202607080005</td>
+              <td>ALL</td>
+              <td>FX-FWD-EUR-CNY-3M</td>
+              <td><span class="tag tag-info">ALL</span></td>
+              <td>EUR</td>
+              <td>工行欧元账户 #2003</td>
+              <td class="col-num">
+                <div class="input-number">
+                  <button class="input-number-btn">−</button>
+                  <input class="form-control" value="150">
+                  <button class="input-number-btn">+</button>
+                </div>
+              </td>
+              <td><span class="switch on"></span></td>
+              <td>2026-07-15</td>
+              <td class="col-action">
+                <button class="btn btn-text">编辑</button>
+                <button class="btn btn-text">复制</button>
+                <button class="btn btn-text" style="color: var(--color-error);">删除</button>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td class="text-mono">RULE202607080008</td>
+              <td>渣打银行</td>
+              <td>FX-NDF-USD-CNY</td>
+              <td><span class="tag tag-success">Inflow</span></td>
+              <td>USD</td>
+              <td>渣打美元账户 #3001</td>
+              <td class="col-num">
+                <div class="input-number">
+                  <button class="input-number-btn">−</button>
+                  <input class="form-control" value="120">
+                  <button class="input-number-btn">+</button>
+                </div>
+              </td>
+              <td><span class="switch on"></span></td>
+              <td>—</td>
+              <td class="col-action">
+                <button class="btn btn-text">编辑</button>
+                <button class="btn btn-text">复制</button>
+                <button class="btn btn-text" style="color: var(--color-error);">删除</button>
+              </td>
+            </tr>
+            <tr style="opacity: 0.6;">
+              <td><input type="checkbox"></td>
+              <td class="text-mono">RULE202607050003</td>
+              <td>工商银行</td>
+              <td>FX-SPOT-EUR-CNY</td>
+              <td><span class="tag tag-success">Inflow</span></td>
+              <td>EUR</td>
+              <td>工行欧元账户 #2003</td>
+              <td class="col-num">
+                <div class="input-number">
+                  <button class="input-number-btn">−</button>
+                  <input class="form-control" value="80">
+                  <button class="input-number-btn">+</button>
+                </div>
+              </td>
+              <td><span class="switch"></span></td>
+              <td>2026-06-01</td>
+              <td class="col-action">
+                <button class="btn btn-text">编辑</button>
+                <button class="btn btn-text">复制</button>
+                <button class="btn btn-text">启用</button>
+                <button class="btn btn-text" style="color: var(--color-error);">删除</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- 分页 -->
+        <div class="pagination">
+          <div class="text-muted">共 18 条 · 第 1-5 条</div>
+          <div class="pagination-controls">
+            <button class="pagination-btn">‹</button>
+            <button class="pagination-btn active">1</button>
+            <button class="pagination-btn">2</button>
+            <button class="pagination-btn">3</button>
+            <button class="pagination-btn">4</button>
+            <button class="pagination-btn">›</button>
+            <select class="form-control" style="width: auto; padding: 4px 8px;">
+              <option>10 条/页</option>
+              <option>20 条/页</option>
+              <option>50 条/页</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 删除确认 Modal 演示 -->
+      <div class="alert alert-warning" style="margin-top: 16px;">
+        <div>💡</div>
+        <div>
+          <strong>删除规则时</strong>,系统会弹出确认对话框,显示"该规则已被 <span class="text-warning">28</span> 笔交易引用(未结算 5 笔 + 近 90 天已结算 23 笔)"。
+          引用数据查询响应 < 50ms,基于 <code>tms_deals_t(bank_account_id, status)</code> 索引。
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== -->
+    <!-- 2. 新增/编辑表单 -->
+    <!-- ============================== -->
+    <section id="page-form" class="page-section">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <div>
+          <div class="section-title">新增/编辑表单</div>
+          <div class="section-desc">5 维选择器 + 默认账户联动 + 校验逻辑</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>✏️ 编辑规则 RULE202607080001</span>
+          <button class="btn btn-text">取消</button>
+        </div>
+        <div class="card-body">
+
+          <!-- 编辑模式特有:Lock banner -->
+          <div class="lock-banner">
+            🔒 此规则已加载 · 数据更新于 2026-07-08 10:30:00 · 编辑提交时若规则被他人修改会提示刷新
+          </div>
+
+          <!-- 基本信息 -->
+          <div class="mb-16">
+            <h4 style="margin-bottom: 12px; font-size: 14px;">基本信息</h4>
+            <div class="form-row">
+              <label class="form-label required">管理主体</label>
+              <select class="form-control" disabled>
+                <option>集团总部</option>
+              </select>
+              <label class="form-label">规则编号</label>
+              <input class="form-control text-mono" value="RULE202607080001" disabled>
+            </div>
+            <div class="form-row">
+              <label class="form-label">对手方</label>
+              <select class="form-control">
+                <option>中国银行</option>
+                <option>工商银行</option>
+                <option>渣打银行</option>
+              </select>
+              <label class="form-label">金融产品</label>
+              <select class="form-control">
+                <option>FX-SPOT-USD-CNY</option>
+                <option>FX-FWD-EUR-CNY-3M</option>
+                <option>FX-NDF-USD-CNY</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label class="form-label required">方向</label>
+              <select class="form-control">
+                <option>Inflow (收)</option>
+                <option>Outflow (付)</option>
+                <option>ALL (通配)</option>
+              </select>
+              <label class="form-label">币种</label>
+              <select class="form-control">
+                <option>USD</option>
+                <option>CNY</option>
+                <option>EUR</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 输出 -->
+          <div class="mb-16">
+            <h4 style="margin-bottom: 12px; font-size: 14px;">默认账户输出</h4>
+            <div class="form-row">
+              <label class="form-label required">默认银行账户</label>
+              <select class="form-control">
+                <option>中行美元账户 #1001 (USD · 集团总部)</option>
+                <option>中行人民币账户 #1002 (CNY · 集团总部)</option>
+                <option>工行欧元账户 #2003 (EUR · 集团总部)</option>
+              </select>
+              <label class="form-label">开始生效日</label>
+              <input class="form-control" type="date" value="2026-07-08">
+            </div>
+            <div class="form-row">
+              <label class="form-label required">优先级</label>
+              <div>
+                <div class="input-number">
+                  <button class="input-number-btn">−</button>
+                  <input class="form-control" value="200">
+                  <button class="input-number-btn">+</button>
+                </div>
+                <div class="form-help">范围 0-9999,数字越大越优先</div>
+              </div>
+              <label class="form-label">状态</label>
+              <div>
+                <span class="switch on" style="vertical-align: middle;"></span>
+                <span style="margin-left: 8px; font-size: 13px;">Active 启用</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 描述 -->
+          <div class="mb-16">
+            <h4 style="margin-bottom: 12px; font-size: 14px;">描述</h4>
+            <div class="form-row" style="grid-template-columns: 140px 1fr;">
+              <label class="form-label">业务说明</label>
+              <input class="form-control" value="USD SPOT 默认收账账户,适用于中行对手方">
+            </div>
+            <div class="form-row" style="grid-template-columns: 140px 1fr;">
+              <label class="form-label">备注</label>
+              <textarea class="form-control" placeholder="内部备注">适用于中行对手方;2026-07-08 由 admin 调整优先级 100→200</textarea>
+            </div>
+          </div>
+
+          <!-- 校验提示 -->
+          <div class="alert alert-info">
+            <div>ℹ️</div>
+            <div>
+              <strong>校验规则</strong>:
+              <ul style="margin-top: 4px; padding-left: 20px;">
+                <li>Active 唯一约束:同维度组合 + Active 状态不能重复(已校验通过 ✓)</li>
+                <li>priority 范围 0-9999(当前 200 ✓)</li>
+                <li>账户归属主体:中行美元账户 #1001 属于集团总部 ✓</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 操作按钮 -->
+          <div class="flex gap-8" style="justify-content: flex-end; margin-top: 16px;">
+            <button class="btn btn-default">取消</button>
+            <button class="btn btn-primary">保存修改</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 校验错误态演示 -->
+      <div class="card" style="border-color: var(--color-error);">
+        <div class="card-header" style="background: rgba(239,68,68,.04);">
+          <span>❌ 校验错误态演示</span>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <label class="form-label required">优先级</label>
+            <div>
+              <div class="input-number" style="width: 100px; border-color: var(--color-error);">
+                <button class="input-number-btn">−</button>
+                <input class="form-control" value="15000">
+                <button class="input-number-btn">+</button>
+              </div>
+              <div class="form-error">⚠️ 优先级超出范围 0-9999</div>
+            </div>
+            <label class="form-label">默认账户</label>
+            <div>
+              <select class="form-control error">
+                <option>请选择账户...</option>
+              </select>
+              <div class="form-error">⚠️ 所选账户 #9999 不属于当前主体"集团总部"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== -->
+    <!-- 3. 详情页 + 审计 -->
+    <!-- ============================== -->
+    <section id="page-detail" class="page-section">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <div>
+          <div class="section-title">详情页(只读 + 审计历史)</div>
+          <div class="section-desc">完整字段查看 + 变更审计(基于 tms_rule_audit_log_t)</div>
+        </div>
+      </div>
+
+      <div class="page-header">
+        <div>
+          <div class="page-title">规则详情 · RULE202607080001</div>
+          <div class="page-subtitle">USD SPOT 默认收账账户 · 创建于 2026-07-08</div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-default">📋 复制</button>
+          <button class="btn btn-primary">✏️ 编辑</button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab active">基本信息</div>
+        <div class="tab">审计历史 (15)</div>
+        <div class="tab">使用统计</div>
+      </div>
+
+      <!-- 详情内容 -->
+      <div class="card">
+        <div class="card-body">
+          <div class="descriptions">
+            <div class="label">规则编号</div><div class="value text-mono">RULE202607080001</div>
+            <div class="label">状态</div><div class="value"><span class="tag tag-success">Active</span></div>
+
+            <div class="label">管理主体</div><div class="value">集团总部</div>
+            <div class="label">对手方</div><div class="value">中国银行</div>
+
+            <div class="label">金融产品</div><div class="value">FX-SPOT-USD-CNY</div>
+            <div class="label">方向</div><div class="value"><span class="tag tag-success">Inflow</span></div>
+
+            <div class="label">币种</div><div class="value">USD</div>
+            <div class="label">优先级</div><div class="value text-mono">200</div>
+
+            <div class="label">默认账户</div><div class="value">中行美元账户 #1001 (USD)</div>
+            <div class="label">开始生效日</div><div class="value">2026-07-08</div>
+
+            <div class="label">业务说明</div><div class="value" style="grid-column: span 3;">USD SPOT 默认收账账户,适用于中行对手方</div>
+
+            <div class="label">备注</div><div class="value" style="grid-column: span 3;">适用于中行对手方;2026-07-08 由 admin 调整优先级 100→200</div>
+
+            <div class="label">创建人</div><div class="value">admin</div>
+            <div class="label">创建时间</div><div class="value text-mono">2026-07-08 09:00:00</div>
+
+            <div class="label">最后修改</div><div class="value">admin · 2026-07-08 10:30:00</div>
+            <div class="label">版本号</div><div class="value text-mono">v3</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 审计历史 Tab 内容 -->
+      <div class="card">
+        <div class="card-header">
+          <span>📜 审计历史</span>
+          <span class="text-muted" style="font-size: 12px;">共 15 条变更记录</span>
+        </div>
+        <div class="card-body">
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-time">2026-07-08 10:30:00 · admin</div>
+              <div class="timeline-title">UPDATE · 调整优先级</div>
+              <div class="timeline-content">
+                <div class="code-block">
+                  <span class="diff-old">priority: 100</span> → <span class="diff-new">priority: 200</span>
+                </div>
+                备注:中行对手方业务量增加,提升优先级
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-time">2026-07-08 09:00:00 · admin</div>
+              <div class="timeline-title">CREATE · 创建规则</div>
+              <div class="timeline-content">
+                首次创建规则,初始优先级 100
+              </div>
+            </div>
+            <div class="timeline-item disabled">
+              <div class="timeline-time">2026-07-05 16:20:00 · admin</div>
+              <div class="timeline-title">DISABLE · 停用上一版本规则 RULE202607050001</div>
+              <div class="timeline-content">被新规则 RULE202607080001 替代</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== -->
+    <!-- 4. FX 录入联动演示 -->
+    <!-- ============================== -->
+    <section id="page-fx-demo" class="page-section">
+      <div class="section-header">
+        <div class="section-num">4</div>
+        <div>
+          <div class="section-title">FX 录入联动演示(★ v1.1 双方向)</div>
+          <div class="section-desc">FX SPOT 录入时,match 接口自动带出 Inflow + Outflow 两个账户</div>
+        </div>
+      </div>
+
+      <div class="alert alert-info">
+        <div>🎯</div>
+        <div>
+          <strong>v1.1 关键升级</strong>:match 接口支持 <code>?dualDirection=true</code>,同时返回收账 + 付账两个账户。
+          前端 300ms 防抖避免重复请求,后端 Redis 缓存 5 分钟。
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>📝 新增 FX SPOT 交易 (USD/CNY)</span>
+          <div class="flex gap-8">
+            <span class="debounce-indicator">⏱ 防抖 300ms</span>
+            <span class="cache-indicator">💾 Redis 5min TTL</span>
+          </div>
+        </div>
+        <div class="card-body">
+
+          <!-- 5 维选择 -->
+          <div class="form-row-3">
+            <label class="form-label required">管理主体</label>
+            <select class="form-control">
+              <option>集团总部</option>
+            </select>
+            <label class="form-label required">金融产品</label>
+            <select class="form-control">
+              <option>FX-SPOT-USD-CNY</option>
+            </select>
+            <label class="form-label required">币种对</label>
+            <div class="fx-currency-pair">
+              <span>USD</span>
+              <span>⇄</span>
+              <span>CNY</span>
+            </div>
+          </div>
+
+          <div class="form-row-3">
+            <label class="form-label">对手方</label>
+            <select class="form-control">
+              <option>中国银行</option>
+            </select>
+            <label class="form-label">买入金额</label>
+            <input class="form-control text-mono" value="1,000,000.00 USD">
+            <label class="form-label">汇率</label>
+            <input class="form-control text-mono" value="7.2500">
+          </div>
+
+          <!-- ★ 双方向账户自动填充 -->
+          <h4 style="margin: 16px 0 8px; font-size: 14px;">★ 自动匹配账户 (dualDirection=true)</h4>
+
+          <div class="form-row-3">
+            <label class="form-label required">收账账户 (Inflow)</label>
+            <div>
+              <div class="account-field filled">
+                <div class="between">
+                  <div>
+                    <strong>中行美元账户 #1001</strong>
+                    <div class="account-field-hint matched">✓ 命中规则 RULE202607080001 (优先级 200)</div>
+                  </div>
+                  <button class="btn btn-text">更换 ▼</button>
+                </div>
+              </div>
+              <div class="account-field-hint matched">📡 来自 match 接口 · cache hit (5min TTL)</div>
+            </div>
+            <label class="form-label required">付账账户 (Outflow)</label>
+            <div>
+              <div class="account-field filled">
+                <div class="between">
+                  <div>
+                    <strong>中行人民币账户 #1002</strong>
+                    <div class="account-field-hint matched">✓ 命中规则 RULE202607080002 (优先级 180)</div>
+                  </div>
+                  <button class="btn btn-text">更换 ▼</button>
+                </div>
+              </div>
+              <div class="account-field-hint matched">📡 来自 match 接口 · cache hit (5min TTL)</div>
+            </div>
+            <label class="form-label">交易日期</label>
+            <input class="form-control" type="date" value="2026-07-08">
+          </div>
+
+          <!-- 防抖可视化 -->
+          <div class="alert alert-info">
+            <div>⏱</div>
+            <div>
+              <strong>防抖可视化</strong>:用户快速切换"金融产品"下拉时,前端 300ms 内只触发最后一次 match 调用。
+              <div class="code-block" style="margin-top: 6px;">
+// 前端代码<br>
+import { debounce } from 'lodash'<br>
+<br>
+const debouncedMatch = debounce(async (params) => {<br>
+&nbsp;&nbsp;const result = await matchDefaultBankAccount({ ...params, dualDirection: true })<br>
+&nbsp;&nbsp;fillAccounts(result.data.inflow, result.data.outflow)<br>
+}, 300)<br>
+<br>
+// 维度变化时<br>
+watch([mgmtId, instrumentId, currency], () => {<br>
+&nbsp;&nbsp;if (isSameAsLastParams(...)) return // 维度完全相同不调<br>
+&nbsp;&nbsp;debouncedMatch({ ... })<br>
+})
+              </div>
+            </div>
+          </div>
+
+          <!-- 操作按钮 -->
+          <div class="flex gap-8" style="justify-content: flex-end; margin-top: 16px;">
+            <button class="btn btn-default">取消</button>
+            <button class="btn btn-default">保存草稿</button>
+            <button class="btn btn-primary">提交审批</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 无匹配兜底态 -->
+      <div class="card" style="border-color: var(--color-warning); margin-top: 16px;">
+        <div class="card-header" style="background: rgba(245,158,11,.04);">
+          <span>⚠️ 无匹配兜底态演示</span>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-warning">
+            <div>⚠️</div>
+            <div>
+              <strong>当前选择的组合</strong>(主体=上海子公司 + 金融产品=FX-FWD-JPY-CNY-3M) <strong>未匹配到任何规则</strong>。
+              请手动选择账户,或<a href="#" style="color: var(--color-primary);">创建新规则</a>。
+            </div>
+          </div>
+          <div class="form-row-3">
+            <label class="form-label required">收账账户</label>
+            <select class="form-control">
+              <option>-- 请手动选择账户 --</option>
+            </select>
+            <label class="form-label required">付账账户</label>
+            <select class="form-control">
+              <option>-- 请手动选择账户 --</option>
+            </select>
+            <label class="form-label">建议</label>
+            <div class="text-muted" style="padding-top: 6px; font-size: 12px;">
+              基于历史交易统计:您经常使用「招行日元账户 #4001」
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== -->
+    <!-- 5. match 调试工具 -->
+    <!-- ============================== -->
+    <section id="page-test-tool" class="page-section">
+      <div class="section-header">
+        <div class="section-num">5</div>
+        <div>
+          <div class="section-title">match 调试工具(运营端点 /test-match)</div>
+          <div class="section-desc">资金主管预览"为什么 FX 录入会自动填这个账户" — 返回所有命中规则</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>🧪 测试匹配</span>
+          <span class="tag tag-info">P1 工具 · 运营调试用</span>
+        </div>
+        <div class="card-body">
+
+          <!-- 输入区 -->
+          <div class="form-row-3">
+            <label class="form-label required">管理主体</label>
+            <select class="form-control">
+              <option>集团总部</option>
+            </select>
+            <label class="form-label">对手方</label>
+            <select class="form-control">
+              <option>中国银行</option>
+            </select>
+            <label class="form-label">金融产品</label>
+            <select class="form-control">
+              <option>FX-SPOT-USD-CNY</option>
+            </select>
+          </div>
+          <div class="form-row-3">
+            <label class="form-label">币种</label>
+            <select class="form-control">
+              <option>USD</option>
+            </select>
+            <label class="form-label">方向模式</label>
+            <select class="form-control">
+              <option>dualDirection 双方向</option>
+              <option>single 单方向</option>
+            </select>
+            <div></div>
+          </div>
+          <div class="flex gap-8" style="margin-top: 12px;">
+            <button class="btn btn-primary">▶ 执行测试</button>
+            <button class="btn btn-default">↻ 重置</button>
+          </div>
+
+          <!-- 结果区 -->
+          <h4 style="margin: 24px 0 12px; font-size: 14px;">📊 匹配结果 (共命中 3 条规则)</h4>
+
+          <div class="alert alert-info">
+            <div>ℹ️</div>
+            <div>
+              接口 <code>GET /api/v1/default-bank-account-rules/test-match?managementEntityId=1&counterpartyId=5001&instrumentId=401&currency=USD&dualDirection=true</code> · 响应时间 <strong class="text-success">18ms</strong>
+            </div>
+          </div>
+
+          <!-- 命中规则列表 -->
+          <div class="table-wrap" style="margin-bottom: 16px;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>选中</th>
+                  <th>规则编号</th>
+                  <th>方向</th>
+                  <th class="col-num">优先级</th>
+                  <th>默认账户</th>
+                  <th>状态</th>
+                  <th>描述</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background: rgba(16,185,129,.04);">
+                  <td><span class="tag tag-success">★ Inflow 选中</span></td>
+                  <td class="text-mono">RULE202607080001</td>
+                  <td><span class="tag tag-success">Inflow</span></td>
+                  <td class="col-num"><strong>200</strong></td>
+                  <td>中行美元账户 #1001</td>
+                  <td><span class="tag tag-success">Active</span></td>
+                  <td>USD SPOT 默认收账账户</td>
+                </tr>
+                <tr style="background: rgba(245,158,11,.04);">
+                  <td><span class="tag tag-warning">★ Outflow 选中</span></td>
+                  <td class="text-mono">RULE202607080002</td>
+                  <td><span class="tag tag-warning">Outflow</span></td>
+                  <td class="col-num"><strong>180</strong></td>
+                  <td>中行人民币账户 #1002</td>
+                  <td><span class="tag tag-success">Active</span></td>
+                  <td>CNY SPOT 默认付账账户</td>
+                </tr>
+                <tr>
+                  <td><span class="text-muted">— 备选</span></td>
+                  <td class="text-mono">RULE202607050010</td>
+                  <td><span class="tag tag-info">ALL</span></td>
+                  <td class="col-num">50</td>
+                  <td>通用美元账户 #1003</td>
+                  <td><span class="tag tag-success">Active</span></td>
+                  <td>USD 通配兜底账户</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 选中结果 -->
+          <h4 style="margin: 16px 0 12px; font-size: 14px;">🎯 最终选中(自动填入 FX 录入页)</h4>
+          <div class="form-row">
+            <label class="form-label">收账账户 (Inflow)</label>
+            <div>
+              <strong>中行美元账户 #1001</strong>
+              <div class="text-muted" style="font-size: 12px;">命中规则 RULE202607080001 · 优先级 200</div>
+            </div>
+            <label class="form-label">付账账户 (Outflow)</label>
+            <div>
+              <strong>中行人民币账户 #1002</strong>
+              <div class="text-muted" style="font-size: 12px;">命中规则 RULE202607080002 · 优先级 180</div>
+            </div>
+          </div>
+
+          <!-- 算法可视化 -->
+          <details style="margin-top: 16px;">
+            <summary style="cursor: pointer; font-size: 13px; color: var(--color-primary);">▼ 查看匹配算法步骤</summary>
+            <div class="code-block" style="margin-top: 8px;">
+1. 基础过滤: status='Active' AND start_date IS NULL OR start_date &lt;= today AND deleted='0' → 18 条候选<br>
+2. 主体过滤: management_entity_id = 1 → 12 条<br>
+3. 对手方过滤: counterparty_id IS NULL OR counterparty_id = 5001 → 8 条<br>
+4. 金融产品过滤: instrument_id IS NULL OR instrument_id = 401 → 5 条<br>
+5. 币种过滤: currency IS NULL OR currency = 'USD' → 3 条<br>
+6. 双方向排序: priority DESC, created_at ASC<br>
+&nbsp;&nbsp;&nbsp;- Inflow 方向命中: RULE202607080001 (priority 200) → 中行美元 #1001<br>
+&nbsp;&nbsp;&nbsp;- Outflow 方向命中: RULE202607080002 (priority 180) → 中行人民币 #1002<br>
+<br>
+缓存命中: redis key=dbar:match:1:5001:401:USD, TTL=5min
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== -->
+    <!-- 状态覆盖 -->
+    <!-- ============================== -->
+    <section id="states" class="page-section">
+      <div class="section-header">
+        <div class="section-num">📦</div>
+        <div>
+          <div class="section-title">状态覆盖演示</div>
+          <div class="section-desc">所有页面需覆盖的状态:加载中 / 数据为空 / 错误</div>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="card flex-1">
+          <div class="card-header"><span>⏳ 加载中</span></div>
+          <div class="card-body">
+            <div class="flex gap-12" style="padding: 12px 0;">
+              <span class="spinner"></span>
+              <span class="text-muted">正在加载规则列表...</span>
+            </div>
+            <div style="margin-top: 8px;">
+              <div class="skeleton" style="width: 60%; margin-bottom: 8px;"></div>
+              <div class="skeleton" style="width: 80%; margin-bottom: 8px;"></div>
+              <div class="skeleton" style="width: 40%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card flex-1">
+          <div class="card-header"><span>📭 数据为空</span></div>
+          <div class="card-body" style="text-align: center; padding: 32px 16px;">
+            <div style="font-size: 48px; opacity: .3; margin-bottom: 8px;">📋</div>
+            <div style="font-weight: 500;">暂无规则</div>
+            <div class="text-muted" style="font-size: 12px; margin: 4px 0 12px;">当前主体下还没有配置任何默认账户规则</div>
+            <button class="btn btn-primary btn-sm">+ 新增规则</button>
+          </div>
+        </div>
+
+        <div class="card flex-1">
+          <div class="card-header"><span>❌ 错误态</span></div>
+          <div class="card-body">
+            <div class="alert alert-error">
+              <div>❌</div>
+              <div>
+                <strong>加载失败</strong>
+                <div style="font-size: 12px; margin-top: 4px;">HTTP 500 · Internal Server Error · 接口 /api/v1/default-bank-account-rules/page</div>
+                <button class="btn btn-text btn-sm" style="margin-top: 4px;">↻ 重试</button>
+              </div>
+            </div>
+            <div class="alert alert-error">
+              <div>⚠️</div>
+              <div>
+                <strong>规则已被他人修改</strong>
+                <div style="font-size: 12px; margin-top: 4px;">updated_at 变化:2026-07-08 10:30:00 · 请刷新后重试</div>
+                <button class="btn btn-primary btn-sm" style="margin-top: 4px;">🔄 刷新</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== -->
+    <!-- 总结 -->
+    <!-- ============================== -->
+    <section id="summary" class="page-section">
+      <div class="section-header">
+        <div class="section-num">📝</div>
+        <div>
+          <div class="section-title">v1.1 设计要点总结</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <div class="stat-row">
+            <div class="stat-card">
+              <div class="stat-icon">1</div>
+              <div>
+                <div class="stat-value">5 维匹配</div>
+                <div class="stat-label">主体 + 4 通配维度</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon" style="background: rgba(16,185,129,.1); color: var(--color-success);">2</div>
+              <div>
+                <div class="stat-value text-success">双方向</div>
+                <div class="stat-label">inflow + outflow</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon" style="background: rgba(245,158,11,.1); color: var(--color-warning);">3</div>
+              <div>
+                <div class="stat-value text-warning">并发控制</div>
+                <div class="stat-label">lock_token + 409</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon" style="background: rgba(239,68,68,.1); color: var(--color-error);">4</div>
+              <div>
+                <div class="stat-value text-error">审计日志</div>
+                <div class="stat-label">JSONB 快照</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">5</div>
+              <div>
+                <div class="stat-value">Redis 缓存</div>
+                <div class="stat-label">300ms 防抖 + 5min TTL</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-success">
+            <div>✅</div>
+            <div>
+              <strong>UX 原型完成</strong>:5 个核心页面 + 状态覆盖(加载/空/错误) + v1.1 关键升级(双方向/并发/审计/缓存/防抖)。
+              可进入 Phase 3 表结构设计 + Phase 4 接口设计 + Phase 5 后端开发 + Phase 6 前端开发。
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===== 浮动导航 ===== -->
+<nav class="section-nav">
+  <div class="section-nav-title">📑 页面导航</div>
+  <a href="#page-list">1. 规则列表</a>
+  <a href="#page-form">2. 新增/编辑表单</a>
+  <a href="#page-detail">3. 详情页 + 审计</a>
+  <a href="#page-fx-demo">4. FX 录入联动</a>
+  <a href="#page-test-tool">5. match 调试工具</a>
+  <a href="#states">📦 状态覆盖</a>
+  <a href="#summary">📝 总结</a>
+</nav>
+
+<script>
+// 简单的导航高亮
+document.addEventListener('scroll', () => {
+  const sections = document.querySelectorAll('.page-section');
+  const navLinks = document.querySelectorAll('.section-nav a');
+  let current = '';
+  sections.forEach(s => {
+    const rect = s.getBoundingClientRect();
+    if (rect.top <= 100 && rect.bottom > 100) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.remove('active');
+    if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+  });
+});
+
+// Switch 切换演示
+document.querySelectorAll('.switch').forEach(sw => {
+  sw.addEventListener('click', () => sw.classList.toggle('on'));
+});
+
+// 数字调整
+document.querySelectorAll('.input-number').forEach(group => {
+  const input = group.querySelector('input');
+  const [minus, plus] = group.querySelectorAll('.input-number-btn');
+  minus.addEventListener('click', () => { input.value = Math.max(0, parseInt(input.value || 0) - 10); });
+  plus.addEventListener('click', () => { input.value = Math.min(9999, parseInt(input.value || 0) + 10); });
+});
+
+// Console 标记
+console.log('%c🎨 Open-TMS 默认银行账户规则 UX 原型 v1.1', 'background: #1E40AF; color: white; padding: 4px 8px; border-radius: 4px;');
+console.log('5 页面 · 9 项修复 · 基于 PRD v1.1');
+</script>
+
+</body>
+</html>

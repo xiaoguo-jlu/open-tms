@@ -725,7 +725,7 @@ const init = async () => {
     if (copyFrom) await loadCopyData(copyFrom)
     return
   }
-  const num = route.query.dealNumber
+  const num = route.query.dealNumber || route.params.dealNumber
   if (!num) return
   await loadData(num)
   if (mode.value === 'edit') {
