@@ -23,7 +23,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="管理主体">
-          <el-select v-model="queryForm.managementEntityId" placeholder="请选择" clearable filterable>
+          <el-select v-model="queryForm.businessUnitId" placeholder="请选择" clearable filterable>
             <el-option v-for="item in managementEntityList" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
         </el-form-item>
@@ -58,9 +58,9 @@
             <el-tag>{{ getTypeLabel(row.accountType) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="managementEntityId" label="管理主体" width="100" align="center">
+        <el-table-column prop="businessUnitId" label="管理主体" width="100" align="center">
           <template #default="{ row }">
-            {{ getManagementEntityName(row.managementEntityId) }}
+            {{ getManagementEntityName(row.businessUnitId) }}
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" width="80" align="center">
@@ -116,8 +116,8 @@
             <el-option label="保证金" value="MARGIN" />
           </el-select>
         </el-form-item>
-        <el-form-item label="管理主体" prop="managementEntityId">
-          <el-select v-model="formData.managementEntityId" placeholder="请选择" style="width: 100%;" filterable>
+        <el-form-item label="管理主体" prop="businessUnitId">
+          <el-select v-model="formData.businessUnitId" placeholder="请选择" style="width: 100%;" filterable>
             <el-option v-for="item in managementEntityList" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
         </el-form-item>
@@ -160,7 +160,7 @@ const queryForm = reactive({
   bankId: '',
   currency: '',
   accountType: '',
-  managementEntityId: '',
+  businessUnitId: '',
   status: ''
 })
 const pagination = reactive({ pageNum: 1, pageSize: 10, total: 0 })
@@ -172,7 +172,7 @@ const formData = reactive({
   bankId: '',
   currency: '',
   accountType: '',
-  managementEntityId: '',
+  businessUnitId: '',
   status: '1',
   remark: ''
 })
@@ -200,9 +200,9 @@ const getBankName = (bankId) => {
   return bank ? bank.name : bankId
 }
 
-const getManagementEntityName = (managementEntityId) => {
-  const unit = managementEntityList.value.find(u => u.id === managementEntityId)
-  return unit ? unit.name : managementEntityId
+const getManagementEntityName = (businessUnitId) => {
+  const unit = managementEntityList.value.find(u => u.id === businessUnitId)
+  return unit ? unit.name : businessUnitId
 }
 
 const fetchBankList = async () => {
@@ -240,7 +240,7 @@ const fetchData = async () => {
       bankId: queryForm.bankId,
       currency: queryForm.currency,
       accountType: queryForm.accountType,
-      managementEntityId: queryForm.managementEntityId,
+      businessUnitId: queryForm.businessUnitId,
       status: queryForm.status,
       pageNum: pagination.pageNum,
       pageSize: pagination.pageSize
@@ -265,14 +265,14 @@ const handleReset = () => {
   queryForm.bankId = ''
   queryForm.currency = ''
   queryForm.accountType = ''
-  queryForm.managementEntityId = ''
+  queryForm.businessUnitId = ''
   queryForm.status = ''
   handleQuery()
 }
 
 const handleAdd = () => {
   Object.assign(formData, {
-    id: null, accountNo: '', accountName: '', bankId: '', currency: '', accountType: '', managementEntityId: '', status: '1', remark: ''
+    id: null, accountNo: '', accountName: '', bankId: '', currency: '', accountType: '', businessUnitId: '', status: '1', remark: ''
   })
   formRef.value?.resetFields()
   drawerVisible.value = true

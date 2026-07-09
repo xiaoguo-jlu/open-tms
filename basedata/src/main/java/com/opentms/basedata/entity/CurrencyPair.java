@@ -16,14 +16,19 @@ public class CurrencyPair {
     @TableField("pair_code")
     private String pairCode;
 
-    @TableField("currency1")
-    private String currency1;
+    /**
+     * 基础货币(原 currency1)
+     * 字段对齐:tms_currency_pair_t.base_currency(2026-07-09 修复)
+     */
+    @TableField("base_currency")
+    private String baseCurrency;
 
-    @TableField("currency2")
-    private String currency2;
-
-    @TableField("stronger_currency")
-    private String strongerCurrency;
+    /**
+     * 报价货币(原 currency2)
+     * 字段对齐:tms_currency_pair_t.quote_currency(2026-07-09 修复)
+     */
+    @TableField("quote_currency")
+    private String quoteCurrency;
 
     @TableField("bid_decimal")
     private Integer bidDecimal;

@@ -45,7 +45,7 @@ public class EntityNameLookup {
     public Map<String, Object> findManagementEntity(Long id) {
         if (id == null) return null;
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-                "SELECT id, code, name FROM tms_management_entity_t WHERE id = ? AND deleted = '0'",
+                "SELECT id, code, name FROM tms_business_unit_t WHERE id = ? AND deleted = '0'",
                 id);
         return rows.isEmpty() ? null : rows.get(0);
     }
@@ -59,7 +59,7 @@ public class EntityNameLookup {
     public Map<String, Object> findManagementEntityByCode(String code) {
         if (code == null || code.isEmpty()) return null;
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-                "SELECT id, code, name FROM tms_management_entity_t WHERE code = ? AND deleted = '0'",
+                "SELECT id, code, name FROM tms_business_unit_t WHERE code = ? AND deleted = '0'",
                 code);
         return rows.isEmpty() ? null : rows.get(0);
     }
@@ -109,12 +109,12 @@ public class EntityNameLookup {
 
     /**
      * 币种对 - 复制场景
-     * @return Map{id, pairCode, currency1, currency2} 或 null
+     * @return Map{id, pairCode, baseCurrency, quoteCurrency} 或 null
      */
     public Map<String, Object> findCurrencyPair(Long id) {
         if (id == null) return null;
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-                "SELECT id, pair_code, currency1, currency2 FROM tms_currency_pair_t WHERE id = ? AND deleted = '0'",
+                "SELECT id, pair_code, base_currency, quote_currency FROM tms_currency_pair_t WHERE id = ? AND deleted = '0'",
                 id);
         return rows.isEmpty() ? null : convertCurrencyPairKeys(rows.get(0));
     }
@@ -160,14 +160,14 @@ public class EntityNameLookup {
 
     /**
      * PG 默认返回 snake_case 列名,BaseDataPicker 期望 camelCase 字段
-     * (pairCode/currency1/currency2)。统一转译。
+     * (pairCode/baseCurrency/quoteCurrency)。统一转译。
      */
     private Map<String, Object> convertCurrencyPairKeys(Map<String, Object> src) {
         Map<String, Object> out = new HashMap<>();
         out.put("id", src.get("id"));
         out.put("pairCode", src.get("pair_code"));
-        out.put("currency1", src.get("currency1"));
-        out.put("currency2", src.get("currency2"));
+        out.put("baseCurrency", src.get("base_currency"));
+        out.put("quoteCurrency", src.get("quote_currency"));
         return out;
     }
 }

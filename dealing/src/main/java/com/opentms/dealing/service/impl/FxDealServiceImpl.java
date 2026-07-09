@@ -339,8 +339,8 @@ public class FxDealServiceImpl implements FxDealService {
             Map<String, Object> pair = entityNameLookup.findCurrencyPair(fxDeal != null ? fxDeal.getCurrencyPairId() : null);
             if (pair != null) {
                 Object pc = pair.get("pairCode");
-                Object c1 = pair.get("currency1");
-                Object c2 = pair.get("currency2");
+                Object c1 = pair.get("baseCurrency");
+                Object c2 = pair.get("quoteCurrency");
                 StringBuilder sb = new StringBuilder();
                 if (pc != null) sb.append(pc);
                 if (c1 != null && c2 != null) {
@@ -399,10 +399,10 @@ public class FxDealServiceImpl implements FxDealService {
 
         Map<String, Object> pair = entityNameLookup.findCurrencyPair(fxDeal != null ? fxDeal.getCurrencyPairId() : null);
         if (pair != null) {
-            // pairCode (currency1/currency2) - 与 picker displayFormat 一致
+            // pairCode (baseCurrency/quoteCurrency) - 与 picker displayFormat 一致
             Object pc = pair.get("pairCode");
-            Object c1 = pair.get("currency1");
-            Object c2 = pair.get("currency2");
+            Object c1 = pair.get("baseCurrency");
+            Object c2 = pair.get("quoteCurrency");
             StringBuilder sb = new StringBuilder();
             if (pc != null) sb.append(pc);
             if (c1 != null && c2 != null) {

@@ -748,9 +748,9 @@ public class AtDealServiceImpl implements AtDealService {
             throw new RuntimeException("目标账户不存在或已删除: id=" + dto.getDestAccountId());
         }
         Object sourceCurrency = sourceSnap.get("currency");
-        Object sourceMgmtObj  = sourceSnap.get("management_entity_id");
+        Object sourceMgmtObj  = sourceSnap.get("business_unit_id");
         Object destCurrency   = destSnap.get("currency");
-        Object destMgmtObj    = destSnap.get("management_entity_id");
+        Object destMgmtObj    = destSnap.get("business_unit_id");
 
         // 跨币种直接拒绝 (哪怕填了汇率也不允许, AT 不做汇兑)
         if (sourceCurrency != null && destCurrency != null
