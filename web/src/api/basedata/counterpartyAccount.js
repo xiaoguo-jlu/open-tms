@@ -25,7 +25,7 @@ export function saveCounterpartyAccount(data) {
 
 export function updateCounterpartyAccount(data) {
   return request({
-    url: '/api/v1/counterparty-accounts',
+    url: '/api/v1/counterparty-accounts/update',
     method: 'post',
     data
   })
@@ -33,8 +33,8 @@ export function updateCounterpartyAccount(data) {
 
 export function deleteCounterpartyAccount(id) {
   return request({
-    url: `/api/v1/counterparty-accounts/${id}`,
-    method: 'delete'
+    url: `/api/v1/counterparty-accounts/delete/${id}`,
+    method: 'post'
   })
 }
 

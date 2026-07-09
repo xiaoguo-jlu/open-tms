@@ -35,8 +35,8 @@ export function updateWorkflowTemplate(data) {
 
 export function deleteWorkflowTemplate(id) {
   return request({
-    url: `/approval/templates/${id}`,
-    method: 'delete'
+    url: `/approval/templates/delete/${id}`,
+    method: 'post'
   })
 }
 
@@ -57,8 +57,8 @@ export function saveWorkflowNode(templateId, data) {
 
 export function deleteWorkflowNode(templateId, nodeId) {
   return request({
-    url: `/approval/templates/${templateId}/nodes/${nodeId}`,
-    method: 'delete'
+    url: `/approval/templates/${templateId}/nodes/delete/${nodeId}`,
+    method: 'post'
   })
 }
 

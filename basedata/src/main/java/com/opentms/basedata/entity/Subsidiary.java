@@ -1,5 +1,6 @@
 package com.opentms.basedata.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -7,6 +8,7 @@ import lombok.EqualsAndHashCode;
 /**
  * 子公司表实体
  * 表名: tms_subsidiary_t
+ * 字段对齐:tms_subsidiary_t.business_unit_code(2026-07-09 修复)
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -17,7 +19,8 @@ public class Subsidiary extends BasedataEntity {
 
     private String parentCode;
 
-    private String managementEntityCode;
+    @TableField("business_unit_code")
+    private String businessUnitCode;
 
     private String legalPerson;
 

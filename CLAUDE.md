@@ -15,7 +15,7 @@ Open-TMS (Open Treasury Management System) — 企业级资金管理系统,对�
 ## Active Modules (6)
 | Module | Port | Status | 说明 |
 |--------|------|--------|------|
-| basedata | 8081 | ✅ | CXF;银行账户+金融工具+币种对(2026-06-29 合并自 instrument) |
+| basedata | 8081 | ✅ | CXF;银行账户+金融工具+币种对+**默认银行账户规则 v1.1** |
 | dealing | 8082 | ✅ | Spring MVC;AC/AT/FX 三类交易共用 DealMap |
 | fundplan | 8085 | 📋 | 资金计划 |
 | valuation | 8091 | 🔄 | 估值 |
@@ -187,7 +187,7 @@ dealing 详情/复制接口通过 `JdbcTemplate` 跨模块查询 `*Name`,**禁�
 ## 近期重要变更(最近 30 天)
 | 日期 | 变更 | Commit |
 |------|------|--------|
-| 2026-07-05 | AT image 表新增(端点 500 修复) | `954a4b5` |
+| 2026-07-08 | **默认银行账户规则 v1.1** 完整特性(11 端点 + 双方向 + 并发控制 + 审计 + 缓存) | `3e3604f` |
 | 2026-07-05 | NDF Rate Fix Phase 1 + 5 字段 + Action 直接 Approved | `9ffbd23` |
 | 2026-07-05 | 详情响应补全 *Name(EntityNameLookup) | `2c891bc` |
 | 2026-07-05 | Skill 体系精简(-53% 上下文,+dealmap-patterns) | `9d826a2` |

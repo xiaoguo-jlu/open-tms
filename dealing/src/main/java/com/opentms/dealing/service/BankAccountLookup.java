@@ -25,14 +25,14 @@ public class BankAccountLookup {
 
     /**
      * 查询账户的币种和管理主体ID
-     * @return Map{currency, management_entity_id} 或 null (账户不存在)
+     * @return Map{currency, business_unit_id} 或 null (账户不存在)
      */
     public Map<String, Object> findAccountSnapshot(Long accountId) {
         if (accountId == null) {
             return null;
         }
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-                "SELECT currency, management_entity_id FROM tms_bank_account_t WHERE id = ? AND deleted = '0'",
+                "SELECT currency, business_unit_id FROM tms_bank_account_t WHERE id = ? AND deleted = '0'",
                 accountId);
         return rows.isEmpty() ? null : rows.get(0);
     }
@@ -45,7 +45,7 @@ public class BankAccountLookup {
             return null;
         }
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-                "SELECT id, account_no, account_name, currency, management_entity_id, account_type, bank_id " +
+                "SELECT id, account_no, account_name, currency, business_unit_id, account_type, bank_id " +
                         "FROM tms_bank_account_t WHERE id = ? AND deleted = '0'",
                 accountId);
         return rows.isEmpty() ? null : rows.get(0);

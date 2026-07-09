@@ -33,11 +33,11 @@ public class BankAccountResource {
             @QueryParam("bankId") Long bankId,
             @QueryParam("currency") String currency,
             @QueryParam("accountType") String accountType,
-            @QueryParam("managementEntityId") Long managementEntityId,
+            @QueryParam("businessUnitId") Long businessUnitId,
             @QueryParam("status") String status,
             @QueryParam("pageNum") @DefaultValue("1") int pageNum,
             @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
-        return Result.success(bankAccountService.queryPage(keyword, bankId, currency, accountType, managementEntityId, status, pageNum, pageSize));
+        return Result.success(bankAccountService.queryPage(keyword, bankId, currency, accountType, businessUnitId, status, pageNum, pageSize));
     }
 
     @GET

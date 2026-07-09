@@ -35,16 +35,16 @@ export function saveManagementEntity(data) {
 
 export function updateManagementEntity(data) {
   return request({
-    url: '/api/v1/management-entities',
-    method: 'put',
+    url: '/api/v1/management-entities/update',
+    method: 'post',
     data
   })
 }
 
 export function deleteManagementEntity(id) {
   return request({
-    url: `/api/v1/management-entities/${id}`,
-    method: 'delete'
+    url: `/api/v1/management-entities/delete/${id}`,
+    method: 'post'
   })
 }
 

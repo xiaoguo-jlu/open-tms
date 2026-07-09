@@ -33,8 +33,8 @@ export function updateAcTransaction(data) {
 
 export function deleteAcTransaction(id) {
   return request({
-    url: `/ac/transactions/${id}`,
-    method: 'delete'
+    url: `/ac/transactions/delete/${id}`,
+    method: 'post'
   })
 }
 

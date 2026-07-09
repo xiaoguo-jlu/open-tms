@@ -17,6 +17,7 @@
           <el-menu-item index="/basedata/currency-pair">币种对管理</el-menu-item>
           <el-menu-item index="/basedata/instrument">金融工具管理</el-menu-item>
           <el-menu-item index="/basedata/bank-account">银行账户管理</el-menu-item>
+          <el-menu-item index="/basedata/default-bank-account-rule">默认银行账户规则</el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="dealing">
           <template #title><el-icon><Wallet /></el-icon><span>交易管理</span></template>

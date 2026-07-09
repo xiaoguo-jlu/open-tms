@@ -14,7 +14,7 @@ public class SubsidiaryDTO extends BasedataDTO {
 
     private String parentCode;
 
-    private String managementEntityCode;
+    private String businessUnitCode;
 
     private String legalPerson;
 

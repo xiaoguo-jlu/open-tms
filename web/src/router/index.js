@@ -10,6 +10,7 @@ const routes = [
       { path: 'country', name: 'Country', component: () => import('@/views/basedata/CountryList.vue') },
       { path: 'holiday', name: 'Holiday', component: () => import('@/views/basedata/HolidayList.vue') },
       { path: 'bank-account', name: 'BankAccount', component: () => import('@/views/basedata/BankAccountList.vue') },
+      { path: 'default-bank-account-rule', name: 'DefaultBankAccountRule', component: () => import('@/views/basedata/DefaultBankAccountRuleList.vue') },
       { path: 'counterparty', name: 'Counterparty', component: () => import('@/views/basedata/CounterpartyList.vue') },
       { path: 'counterparty-account', name: 'CounterpartyAccount', component: () => import('@/views/basedata/CounterpartyAccountList.vue') },
       { path: 'currency-pair', name: 'CurrencyPair', component: () => import('@/views/basedata/CurrencyPairList.vue') },
@@ -22,6 +23,7 @@ const routes = [
     path: '/dealing', name: 'Dealing', children: [
       { path: 'ac-deal', name: 'AcDealList', component: () => import('@/views/dealing/AcDealList.vue') },
       { path: 'ac-deal/detail', name: 'AcDealDetail', component: () => import('@/views/dealing/AcDealDetail.vue') },
+      { path: 'ac-deal/detail/:dealNumber', name: 'AcDealDetailByNumber', component: () => import('@/views/dealing/AcDealDetail.vue') },
       { path: 'at-deal', name: 'AtDealList', component: () => import('@/views/dealing/AtDealList.vue') },
       { path: 'at-deal/detail', name: 'AtDealDetail', component: () => import('@/views/dealing/AtDealDetail.vue') },
       { path: 'action', name: 'ActionList', component: () => import('@/views/dealing/ActionList.vue') },
@@ -31,6 +33,7 @@ const routes = [
   },
   {
     path: '/approval', name: 'Approval', children: [
+      { path: 'rule', name: 'ApprovalRule', component: () => import('@/views/approval/ApprovalRuleList.vue') },
       { path: 'template', name: 'WorkflowTemplate', component: () => import('@/views/approval/WorkflowTemplate.vue') },
       { path: 'task', name: 'ApprovalTask', component: () => import('@/views/approval/ApprovalTask.vue') }
     ]

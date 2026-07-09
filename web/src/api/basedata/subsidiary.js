@@ -25,15 +25,15 @@ export function saveSubsidiary(data) {
 
 export function updateSubsidiary(data) {
   return request({
-    url: '/api/v1/subsidiaries',
-    method: 'put',
+    url: '/api/v1/subsidiaries/update',
+    method: 'post',
     data
   })
 }
 
 export function deleteSubsidiary(id) {
   return request({
-    url: `/api/v1/subsidiaries/${id}`,
-    method: 'delete'
+    url: `/api/v1/subsidiaries/delete/${id}`,
+    method: 'post'
   })
 }
