@@ -33,8 +33,8 @@ export function updateTransferTransaction(data) {
 
 export function deleteTransferTransaction(id) {
   return request({
-    url: `/transfer/transactions/${id}`,
-    method: 'delete'
+    url: `/transfer/transactions/delete/${id}`,
+    method: 'post'
   })
 }
 

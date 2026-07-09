@@ -25,16 +25,16 @@ export function saveTrader(data) {
 
 export function updateTrader(data) {
   return request({
-    url: '/api/v1/traders',
-    method: 'put',
+    url: '/api/v1/traders/update',
+    method: 'post',
     data
   })
 }
 
 export function deleteTrader(id) {
   return request({
-    url: `/api/v1/traders/${id}`,
-    method: 'delete'
+    url: `/api/v1/traders/delete/${id}`,
+    method: 'post'
   })
 }
 

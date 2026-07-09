@@ -25,16 +25,16 @@ export function saveCounterparty(data) {
 
 export function updateCounterparty(data) {
   return request({
-    url: '/api/v1/counterparties',
-    method: 'put',
+    url: '/api/v1/counterparties/update',
+    method: 'post',
     data
   })
 }
 
 export function deleteCounterparty(id) {
   return request({
-    url: `/api/v1/counterparties/${id}`,
-    method: 'delete'
+    url: `/api/v1/counterparties/delete/${id}`,
+    method: 'post'
   })
 }
 

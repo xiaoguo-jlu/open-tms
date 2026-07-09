@@ -25,16 +25,16 @@ export function saveCountry(data) {
 
 export function updateCountry(data) {
   return request({
-    url: '/api/v1/countries',
-    method: 'put',
+    url: '/api/v1/countries/update',
+    method: 'post',
     data
   })
 }
 
 export function deleteCountry(id) {
   return request({
-    url: `/api/v1/countries/${id}`,
-    method: 'delete'
+    url: `/api/v1/countries/delete/${id}`,
+    method: 'post'
   })
 }
 

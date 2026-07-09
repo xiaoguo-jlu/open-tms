@@ -33,7 +33,7 @@ export function updateApprovalRule(data) {
 
 export function deleteApprovalRule(id) {
   return request({
-    url: `/api/v1/approval-rules/${id}`,
-    method: 'delete'
+    url: `/api/v1/approval-rules/delete/${id}`,
+    method: 'post'
   })
 }

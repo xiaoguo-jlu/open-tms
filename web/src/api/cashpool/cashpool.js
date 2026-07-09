@@ -35,8 +35,8 @@ export function updateCashPool(data) {
 
 export function deleteCashPool(id) {
   return request({
-    url: `/api/v1/cash-pools/${id}`,
-    method: 'delete'
+    url: `/api/v1/cash-pools/delete/${id}`,
+    method: 'post'
   })
 }
 
@@ -57,8 +57,8 @@ export function addCashPoolMember(id, data) {
 
 export function removeCashPoolMember(poolId, memberId) {
   return request({
-    url: `/api/v1/cash-pools/${poolId}/members/${memberId}`,
-    method: 'delete'
+    url: `/api/v1/cash-pools/${poolId}/members/remove/${memberId}`,
+    method: 'post'
   })
 }
 
@@ -119,8 +119,8 @@ export function updateCashPoolRule(data) {
 
 export function deleteCashPoolRule(id) {
   return request({
-    url: `/api/v1/cash-pools/rules/${id}`,
-    method: 'delete'
+    url: `/api/v1/cash-pools/rules/delete/${id}`,
+    method: 'post'
   })
 }
 

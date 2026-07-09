@@ -17,7 +17,7 @@ export function updateDeposit(data) {
 }
 
 export function deleteDeposit(id) {
-  return request({ url: `/deposit/deals/${id}`, method: 'delete' })
+  return request({ url: `/deposit/deals/delete/${id}`, method: 'post' })
 }
 
 export function submitDeposit(id) {
@@ -57,5 +57,5 @@ export function updateDepositProduct(data) {
 }
 
 export function deleteDepositProduct(id) {
-  return request({ url: `/deposit/products/${id}`, method: 'delete' })
+  return request({ url: `/deposit/products/delete/${id}`, method: 'post' })
 }

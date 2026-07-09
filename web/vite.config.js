@@ -64,6 +64,10 @@ export default defineConfig({
         target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
+      '/api/v1/default-bank-account-rules': {
+        target: 'http://localhost:8081/opentms/basedata',
+        changeOrigin: true
+      },
       '/api/v1/instruments': {
         target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true

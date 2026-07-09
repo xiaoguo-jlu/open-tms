@@ -65,8 +65,8 @@ export function updatePositionLimit(data) {
 
 export function deletePositionLimit(id) {
   return request({
-    url: `/position/limits/${id}`,
-    method: 'delete'
+    url: `/position/limits/delete/${id}`,
+    method: 'post'
   })
 }
 

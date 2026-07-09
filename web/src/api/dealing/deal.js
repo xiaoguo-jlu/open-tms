@@ -120,8 +120,8 @@ export function getImageVersion(dealNumber, version) {
 
 export function deleteDeal(id) {
   return request({
-    url: `/api/v1/dealing/deals/${id}`,
-    method: 'delete'
+    url: `/api/v1/dealing/deals/delete/${id}`,
+    method: 'post'
   })
 }
 
