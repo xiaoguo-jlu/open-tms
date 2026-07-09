@@ -296,7 +296,8 @@ const editRules = {
 // ============= Computed =============
 const filteredBankAccounts = computed(() => {
   if (!editForm.managementEntityId) return bankAccountList.value
-  return bankAccountList.value.filter(a => a.managementEntityId === editForm.managementEntityId)
+  // BankAccount 字段已对齐 DB:businessUnitId(原 managementEntityId)
+  return bankAccountList.value.filter(a => a.businessUnitId === editForm.managementEntityId)
 })
 
 // ============= Methods =============
