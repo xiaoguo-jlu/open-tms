@@ -27,7 +27,7 @@
     </el-card>
 
     <el-card class="table-card">
-      <el-table :data="tableData" v-loading="loading" stripe>
+      <el-table :data="tableData" v-loading="loading" stripe empty-text="暂无审批规则数据,请点击新增按钮创建">
         <el-table-column type="selection" width="50" align="center" />
         <el-table-column type="index" label="序号" width="60" align="center" />
         <el-table-column prop="ruleCode" label="规则编码" width="120" />
@@ -213,7 +213,7 @@ const fetchData = async () => {
       pageSize: pagination.pageSize
     }
     const res = await listApprovalRule(params)
-    tableData.value = res.data.list || []
+    tableData.value = res.data.records || res.data.list || []
     pagination.total = res.data.total || 0
   } catch (error) {
     console.error('Failed to fetch data:', error)

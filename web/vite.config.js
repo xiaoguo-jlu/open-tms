@@ -72,6 +72,10 @@ export default defineConfig({
         target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
+      '/api/v1/approval-rules': {
+        target: 'http://localhost:8081/opentms/basedata',
+        changeOrigin: true
+      },
       '/api/v1/fund-plans': {
         target: 'http://localhost:8085',
         changeOrigin: true

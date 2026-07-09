@@ -33,6 +33,7 @@ const routes = [
   },
   {
     path: '/approval', name: 'Approval', children: [
+      { path: 'rule', name: 'ApprovalRule', component: () => import('@/views/approval/ApprovalRuleList.vue') },
       { path: 'template', name: 'WorkflowTemplate', component: () => import('@/views/approval/WorkflowTemplate.vue') },
       { path: 'task', name: 'ApprovalTask', component: () => import('@/views/approval/ApprovalTask.vue') }
     ]
