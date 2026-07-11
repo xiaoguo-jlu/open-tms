@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open-TMS 真实页面 UX 改进原型 - 10 大问题对比</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-plus/2.5.6/index.css">
+<script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
+<!-- Vue 3.4+ 走 IIFE 闭包不挂 window,Element Plus 依赖 window.Vue,这里手动挂载 -->
+<script>if (typeof Vue !== "undefined") window.Vue = Vue;</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-plus/2.5.6/index.full.min.js"></script>
+<style>
+/* ========== Reset ========== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 14px;
+  color: #303133;
+  background: #f5f7fa;
+  min-height: 100vh;
+}
+
+/* ========== Header (深色) ========== */
+.app-header {
+  height: 56px;
+  background: #1f2d3d;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  box-shadow: 0 1px 4px rgba(0,21,41,.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.app-header .brand {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.app-header .brand-logo {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, #409eff, #67c23a);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+}
+.app-header .version {
+  margin-left: auto;
+  font-size: 12px;
+  color: rgba(255,255,255,.65);
+  padding: 4px 12px;
+  background: rgba(255,255,255,.08);
+  border-radius: 12px;
+}
+.app-header .version b { color: #67c23a; }
+
+/* ========== Page Title ========== */
+.page-title-bar {
+  background: #fff;
+  border-bottom: 1px solid #ebeef5;
+  padding: 16px 24px;
+}
+.page-title-bar h1 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 4px;
+}
+.page-title-bar .subtitle {
+  font-size: 13px;
+  color: #909399;
+}
+
+/* ========== Tabs ========== */
+.tab-bar {
+  background: #fff;
+  border-bottom: 1px solid #ebeef5;
+  padding: 0 24px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.tab-bar::-webkit-scrollbar { height: 4px; }
+.tab-bar::-webkit-scrollbar-thumb { background: #c0c4cc; border-radius: 2px; }
+.tab-item {
+  display: inline-block;
+  padding: 12px 16px;
+  cursor: pointer;
+  color: #606266;
+  border-bottom: 2px solid transparent;
+  transition: all .2s;
+  font-size: 14px;
+}
+.tab-item:hover { color: #409eff; }
+.tab-item.active {
+  color: #409eff;
+  border-bottom-color: #409eff;
+  font-weight: 600;
+}
+.tab-item .badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-size: 11px;
+  margin-left: 4px;
+}
+.tab-item .badge.p0 { background: #fef0f0; color: #f56c6c; }
+.tab-item .badge.p1 { background: #fdf6ec; color: #e6a23c; }
+.tab-item .badge.p2 { background: #f0f9ff; color: #909399; }
+
+/* ========== Content ========== */
+.content {
+  max-width: 1600px;
+  margin: 24px auto;
+  padding: 0 24px;
+}
+
+/* ========== Alert Banner ========== */
+.alert-banner {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.alert-banner.warning { background: #fdf6ec; color: #b88230; border-left: 3px solid #e6a23c; }
+.alert-banner.success { background: #f0f9ff; color: #5daf34; border-left: 3px solid #67c23a; }
+.alert-banner .arrow { font-weight: 700; }
+
+/* ========== Compare Layout ========== */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.compare-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  overflow: hidden;
+}
+.compare-card-header {
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.compare-card-header.before {
+  background: #f5f7fa;
+  color: #606266;
+  border-bottom: 1px solid #ebeef5;
+}
+.compare-card-header.after {
+  background: linear-gradient(90deg, #e1f3d8, #f0f9ff);
+  color: #5daf34;
+  border-bottom: 1px solid #67c23a;
+}
+.compare-card-body {
+  padding: 16px;
+  min-height: 320px;
+}
+.compare-card-body .label {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #f56c6c;
+  color: #fff;
+  font-size: 11px;
+  border-radius: 10px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.compare-card-body .label.green { background: #67c23a; }
+.compare-card-body .label.gray { background: #909399; }
+.compare-card-body .screenshot {
+  width: 100%;
+  border: 1px solid #ebeef5;
+  border-radius: 4px;
+  display: block;
+}
+.compare-card-body .demo-area {
+  border: 1px dashed #c0c4cc;
+  border-radius: 4px;
+  padding: 12px;
+  background: #fafafa;
+}
+
+/* ========== Footer Info ========== */
+.tab-footer {
+  background: #fff;
+  padding: 12px 16px;
+  border-radius: 6px;
+  display: flex;
+  gap: 24px;
+  font-size: 13px;
+  color: #606266;
+  margin-bottom: 16px;
+}
+.tab-footer .item { display: flex; gap: 6px; align-items: center; }
+.tab-footer .item .key { color: #909399; }
+.tab-footer .item .val { font-weight: 600; }
+.tab-footer .item .val.green { color: #67c23a; }
+.tab-footer .item .val.blue { color: #409eff; }
+.tab-footer .item .val.orange { color: #e6a23c; }
+.tab-footer .item .val.red { color: #f56c6c; }
+
+/* ========== Page-switcher ========== */
+.page-switcher {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 100;
+}
+.page-switcher a {
+  display: block;
+  margin-bottom: 8px;
+  padding: 8px 14px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+  font-size: 12px;
+  color: #409eff;
+  text-decoration: none;
+  text-align: center;
+}
+
+/* ========== Specific Components ========== */
+
+/* mock list table */
+.mock-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.mock-table th, .mock-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #ebeef5;
+  text-align: left;
+}
+.mock-table th { background: #f5f7fa; font-weight: 600; color: #606266; }
+.mock-table tbody tr:hover { background: #f5f7fa; }
+.mock-table .op-link { color: #409eff; cursor: pointer; margin-right: 8px; font-size: 12px; }
+.mock-table .op-link.red { color: #f56c6c; }
+.mock-table .op-link.green { color: #67c23a; }
+
+/* mock filter bar */
+.mock-filter {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 12px;
+  background: #fff;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  align-items: center;
+  border: 1px solid #ebeef5;
+}
+.mock-filter .field { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.mock-filter .field label { color: #606266; }
+.mock-filter .input {
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  padding: 4px 8px;
+  min-width: 130px;
+  background: #fff;
+  font-size: 13px;
+}
+.mock-filter .input.placeholder { color: #c0c4cc; }
+.mock-filter .input.short { min-width: 90px; }
+
+/* mock KPI banner */
+.mock-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.mock-kpi {
+  background: #fff;
+  padding: 14px 16px;
+  border-radius: 6px;
+  border: 1px solid #ebeef5;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.mock-kpi .label { font-size: 12px; color: #909399; }
+.mock-kpi .value { font-size: 22px; font-weight: 700; color: #303133; }
+.mock-kpi.green .value { color: #67c23a; }
+.mock-kpi.blue .value { color: #409eff; }
+.mock-kpi.orange .value { color: #e6a23c; }
+.mock-kpi.red .value { color: #f56c6c; }
+
+/* mock status tag */
+.tag {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+.tag.green { background: #f0f9ff; color: #67c23a; border: 1px solid #c2e7b0; }
+.tag.red { background: #fef0f0; color: #f56c6c; border: 1px solid #fbc4c4; }
+.tag.orange { background: #fdf6ec; color: #e6a23c; border: 1px solid #faecd8; }
+.tag.blue { background: #ecf5ff; color: #409eff; border: 1px solid #d9ecff; }
+.tag.gray { background: #f4f4f5; color: #909399; border: 1px solid #e9e9eb; }
+
+/* mock alert */
+.mock-alert {
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  background: #f4f4f5;
+  color: #909399;
+  border-left: 3px solid #909399;
+}
+.mock-alert.warning { background: #fdf6ec; color: #b88230; border-left-color: #e6a23c; }
+.mock-alert.info { background: #ecf5ff; color: #3b73af; border-left-color: #409eff; }
+
+/* batch bar */
+.batch-bar {
+  background: #ecf5ff;
+  border: 1px solid #d9ecff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+/* breadcrumb */
+.breadcrumb {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #909399;
+}
+.breadcrumb a { color: #409eff; text-decoration: none; margin: 0 4px; }
+.breadcrumb a:first-child { margin-left: 0; }
+.breadcrumb .sep { color: #c0c4cc; }
+
+/* key info bar */
+.key-info-bar {
+  display: flex;
+  gap: 24px;
+  padding: 12px 16px;
+  background: #fff;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  border: 1px solid #ebeef5;
+  align-items: center;
+}
+.key-info-bar .key-item .label { font-size: 11px; color: #909399; display: block; }
+.key-info-bar .key-item .value { font-size: 16px; font-weight: 600; color: #303133; }
+.key-info-bar .key-item.highlight .value { color: #409eff; }
+
+/* empty state */
+.empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  color: #909399;
+}
+.empty-state .icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #f5f7fa;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: #c0c4cc;
+}
+.empty-state .text { font-size: 13px; margin-bottom: 12px; }
+
+/* tab default selector */
+.demo-tabs {
+  display: flex;
+  border-bottom: 1px solid #dcdfe6;
+  margin-bottom: 12px;
+}
+.demo-tabs .t {
+  padding: 8px 16px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  font-size: 13px;
+  color: #606266;
+}
+.demo-tabs .t.active { color: #409eff; border-bottom-color: #409eff; font-weight: 600; }
+
+/* mock picker */
+.mock-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  padding: 4px 8px;
+  background: #fff;
+  cursor: pointer;
+  min-width: 140px;
+  font-size: 13px;
+}
+.mock-picker .label { color: #303133; }
+.mock-picker .arrow { color: #c0c4cc; margin-left: auto; }
+.mock-picker.placeholder .label { color: #c0c4cc; }
+
+/* loading shimmer */
+.shimmer {
+  display: inline-block;
+  width: 80px;
+  height: 12px;
+  background: linear-gradient(90deg, #f0f0f0 0%, #e0e0e0 50%, #f0f0f0 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 2px;
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* responsive */
+@media (max-width: 1100px) {
+  .compare-grid { grid-template-columns: 1fr; }
+  .mock-kpi-row { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- Header -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-logo">T</div>
+      <span>Open-TMS 资金管理系统</span>
+    </div>
+    <div class="version">UX 原型 v1.0 · 基于 9 张真实截图 · <b>10 项改进</b></div>
+  </header>
+
+  <!-- Title Bar -->
+  <div class="page-title-bar">
+    <h1>真实页面 UX 改进对比原型</h1>
+    <div class="subtitle">每个 Tab 展示"现状(基于真实截图) → 改进后(Element Plus 交互 demo)" · 单击 Tab 切换</div>
+  </div>
+
+  <!-- Tab Bar -->
+  <nav class="tab-bar">
+    <span v-for="(tab, i) in tabs" :key="i"
+          class="tab-item"
+          :class="{ active: activeTab === i }"
+          @click="activeTab = i">
+      {{ i + 1 }}. {{ tab.title }}
+      <span class="badge" :class="tab.priority.toLowerCase()">{{ tab.priority }}</span>
+    </span>
+  </nav>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Top alert banner for current tab -->
+    <div :class="['alert-banner', tabs[activeTab].bannerType]">
+      <strong>痛点:</strong> {{ tabs[activeTab].pain }}
+      <span class="arrow">→</span>
+      <strong>改法:</strong> {{ tabs[activeTab].fix }}
+    </div>
+
+    <!-- Compare Grid: Before / After -->
+    <div class="compare-grid">
+
+      <!-- BEFORE -->
+      <div class="compare-card">
+        <div class="compare-card-header before">
+          <span style="font-size: 18px;">&#10060;</span>
+          现状(基于真实截图)
+        </div>
+        <div class="compare-card-body">
+          <p style="margin-bottom: 12px;">
+            <span class="label">真实场景</span>
+            <span style="font-size: 13px; color: #606266;">{{ tabs[activeTab].beforeDesc }}</span>
+          </p>
+          <img :src="tabs[activeTab].beforeImg" class="screenshot" :alt="tabs[activeTab].title" />
+          <div style="margin-top: 12px; font-size: 12px; color: #f56c6c;">
+            <strong>问题:</strong>{{ tabs[activeTab].beforeIssues }}
+          </div>
+        </div>
+      </div>
+
+      <!-- AFTER -->
+      <div class="compare-card">
+        <div class="compare-card-header after">
+          <span style="font-size: 18px;">&#9989;</span>
+          改进后(Element Plus 交互)
+        </div>
+        <div class="compare-card-body">
+          <p style="margin-bottom: 12px;">
+            <span class="label green">改进方案</span>
+            <span style="font-size: 13px; color: #606266;">{{ tabs[activeTab].afterDesc }}</span>
+          </p>
+
+          <!-- Demos by tab index -->
+          <component :is="'div'" class="demo-area">
+
+            <!-- Tab 0: DefaultBankAccountRule 预填 -->
+            <div v-if="activeTab === 0">
+              <div class="mock-alert info">
+                ℹ️ 用户登录后自动从 user profile 预填默认主体 "深圳分公司",并直接查询该主体规则
+              </div>
+              <div class="mock-filter">
+                <div class="field">
+                  <label>管理主体</label>
+                  <div class="mock-picker">
+                    <span class="label">BU_SHENZHEN · 深圳分公司</span>
+                    <span class="arrow">▾</span>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>状态</label>
+                  <div style="display: flex; gap: 4px;">
+                    <span class="tag green" style="cursor: pointer;">全部</span>
+                    <span class="tag gray" style="cursor: pointer;">启用</span>
+                    <span class="tag gray" style="cursor: pointer;">停用</span>
+                  </div>
+                </div>
+                <button style="background: #409eff; color: #fff; border: none; padding: 4px 14px; border-radius: 4px; cursor: pointer;">查询</button>
+                <button style="background: #fff; border: 1px solid #dcdfe6; padding: 4px 14px; border-radius: 4px; cursor: pointer;">重置</button>
+              </div>
+              <div class="mock-kpi-row">
+                <div class="mock-kpi"><span class="label">总规则</span><span class="value">28</span></div>
+                <div class="mock-kpi green"><span class="label">启用</span><span class="value">21</span></div>
+                <div class="mock-kpi orange"><span class="label">本月命中</span><span class="value">156</span></div>
+                <div class="mock-kpi blue"><span class="label">本周新建</span><span class="value">3</span></div>
+              </div>
+              <table class="mock-table">
+                <thead><tr><th>规则编号</th><th>对手方</th><th>产品</th><th>方向</th><th>币种</th><th>默认账户</th><th>状态</th><th>操作</th></tr></thead>
+                <tbody>
+                  <tr><td>RULE20260710-0001</td><td>UBS</td><td>FX SPOT</td><td><span class="tag blue">Inflow</span></td><td>USD</td><td>HZ_USD_001</td><td><span class="tag green">Active</span></td><td><span class="op-link">编辑</span><span class="op-link">详情</span></td></tr>
+                  <tr><td>RULE20260710-0002</td><td>ALL</td><td>FX FWD</td><td><span class="tag orange">Outflow</span></td><td>EUR</td><td>SH_EUR_001</td><td><span class="tag green">Active</span></td><td><span class="op-link">编辑</span><span class="op-link">详情</span></td></tr>
+                  <tr><td>RULE20260709-0015</td><td>CITI</td><td>AC</td><td><span class="tag blue">Inflow</span></td><td>CNY</td><td>TEST_CNY_001</td><td><span class="tag green">Active</span></td><td><span class="op-link">编辑</span><span class="op-link">详情</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Tab 1: FX 列表顶部 v3.2 alert 清理 -->
+            <div v-if="activeTab === 1">
+              <div class="breadcrumb">
+                <a>首页</a> <span class="sep">/</span>
+                <a>交易管理</a> <span class="sep">/</span>
+                <span>FX 外汇交易</span>
+              </div>
+              <div class="mock-filter">
+                <div class="field">
+                  <label>管理主体</label>
+                  <div class="mock-picker"><span class="label">BU_SHENZHEN · 深圳分公司</span><span class="arrow">▾</span></div>
+                </div>
+                <div class="field">
+                  <label>对手方</label>
+                  <div class="mock-picker placeholder"><span class="label">选择对手方</span><span class="arrow">▾</span></div>
+                </div>
+                <div class="field">
+                  <label>日期</label>
+                  <div class="input short">2026-07-01 ~ 2026-07-10</div>
+                </div>
+                <button style="background: #409eff; color: #fff; border: none; padding: 4px 14px; border-radius: 4px; cursor: pointer;">查询</button>
+                <button style="background: #67c23a; color: #fff; border: none; padding: 4px 14px; border-radius: 4px; cursor: pointer;">+ 新建 FX 交易</button>
+                <span style="margin-left: auto; cursor: help; color: #909399;" title="业务规则: FX 交易自动生成 DealMap + Cashflow">❓ 帮助</span>
+              </div>
+              <div style="background: #fff; padding: 8px; border: 1px solid #ebeef5; border-radius: 4px; font-size: 12px; color: #909399;">
+                ✅ 已删除开发日志 alert · 帮助移至 tooltip hover · 列表首屏节省 56px 高度
+              </div>
+              <table class="mock-table" style="margin-top: 12px;">
+                <thead><tr><th>交易编号</th><th>产品类型</th><th>卖出</th><th>买入</th><th>汇率</th><th>交易日</th><th>操作</th></tr></thead>
+                <tbody>
+                  <tr><td>FX202607100001</td><td><span class="tag orange">NDF</span></td><td>200,000.00 EUR</td><td>218,000.00 USD</td><td>1.0900</td><td>2026-07-04</td><td><span class="op-link">详情</span><span class="op-link green">复制</span></td></tr>
+                  <tr><td>FX202607050003</td><td><span class="tag orange">NDF</span></td><td>200,000.00 EUR</td><td>218,000.00 USD</td><td>1.0900</td><td>2026-07-04</td><td><span class="op-link">详情</span><span class="op-link green">复制</span></td></tr>
+                  <tr><td>FX202607050002</td><td><span class="tag green">SPOT</span></td><td>500.00 EUR</td><td>545.00 USD</td><td>1.0900</td><td>2026-07-05</td><td><span class="op-link">详情</span><span class="op-link green">复制</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Tab 2: 筛选折叠 -->
+            <div v-if="activeTab === 2">
+              <div class="mock-filter">
+                <div class="field">
+                  <label>关键字</label>
+                  <div class="input">账户号/名称</div>
+                </div>
+                <div class="field">
+                  <label>状态</label>
+                  <div style="display: flex; gap: 4px;">
+                    <span class="tag green">全部</span>
+                    <span class="tag gray">启用</span>
+                    <span class="tag gray">停用</span>
+                  </div>
+                </div>
+                <span style="position: relative; display: inline-block;">
+                  <button style="background: #fff; border: 1px solid #dcdfe6; padding: 4px 12px; border-radius: 4px; cursor: pointer;">⚙ 高级筛选 ▾</button>
+                  <span style="position: absolute; top: -8px; right: -8px; background: #f56c6c; color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 8px;">2</span>
+                </span>
+                <span class="tag blue">币种 = USD ×</span>
+                <span class="tag blue">主体 = 深圳 ×</span>
+                <button style="background: #409eff; color: #fff; border: none; padding: 4px 14px; border-radius: 4px; cursor: pointer;">查询</button>
+                <button style="background: #fff; border: 1px solid #dcdfe6; padding: 4px 14px; border-radius: 4px; cursor: pointer;">重置</button>
+                <button style="background: #67c23a; color: #fff; border: none; padding: 4px 14px; border-radius: 4px; cursor: pointer;">+ 新增</button>
+              </div>
+              <div class="mock-alert success">
+                ✅ 高频筛选(关键字 + 状态)保留常显 · 低频筛选(币种/类型/主体)折叠 · 已选条件显示为蓝色徽标
+              </div>
+              <table class="mock-table">
+                <thead><tr><th>账户编号</th><th>账户名称</th><th>开户银行</th><th>币种</th><th>状态</th><th>操作</th></tr></thead>
+                <tbody>
+                  <tr><td>SH_USD_001</td><td>上海分公司USD基本户</td><td>银行#5</td><td>USD</td><td><span class="tag green">启用</span></td><td><span class="op-link">编辑</span><span class="op-link red">删除</span></td></tr>
+                  <tr><td>HZ_USD_001</td><td>杭州分公司USD基本户</td><td>银行#7</td><td>USD</td><td><span class="tag green">启用</span></td><td><span class="op-link">编辑</span><span class="op-link red">删除</span></td></tr>
+                  <tr><td>TEST_USD_001</td><td>集团总部中行USD账户</td><td>银行#7</td><td>USD</td><td><span class="tag green">启用</span></td><td><span class="op-link">编辑</span><span class="op-link red">删除</span></td></tr>
+                </tbody>
+              </table>
+              <p style="margin-top: 10px; font-size: 12px; color: #67c23a;">💡 Filter Card 高度从 140px 降到 50px,首屏表格全可见</p>
+            </div>
+
+            <!-- Tab 3: BankAccount 余额列 -->
+            <div v-if="activeTab === 3">
+              <div class="mock-kpi-row">
+                <div class="mock-kpi"><span class="label">账户总数</span><span class="value">7</span></div>
+                <div class="mock-kpi green"><span class="label">启用</span><span class="value">7</span></div>
+                <div class="mock-kpi blue"><span class="label">USD 总余额</span><span class="value">$ 1.26M</span></div>
+                <div class="mock-kpi orange"><span class="label">未对账笔数</span><span class="value">3</span></div>
+              </div>
+              <table class="mock-table">
+                <thead><tr><th>账户编号</th><th>账户名称</th><th>币种</th><th style="text-align: right;">余额</th><th>IBAN / SWIFT</th><th>对账时间</th><th>操作</th></tr></thead>
+                <tbody>
+                  <tr><td>SH_CNY_001</td><td>上海分公司CNY基本户</td><td>CNY</td><td style="text-align: right; font-family: monospace; font-weight: 600;">¥ 8,520,300.50</td><td style="font-size: 11px; color: #606266;">CN21 BOCSH ... / BKCHCNBJ45A</td><td>2026-07-09</td><td><span class="op-link">编辑</span><span class="op-link red">删除</span></td></tr>
+                  <tr><td>HZ_USD_001</td><td>杭州分公司USD基本户</td><td>USD</td><td style="text-align: right; font-family: monospace; font-weight: 600;">$ 1,256,789.32</td><td style="font-size: 11px; color: #606266;">US64 BOFA ... / BOFAUS3N</td><td>2026-07-09</td><td><span class="op-link">编辑</span><span class="op-link red">删除</span></td></tr>
+                  <tr><td>TEST_USD_002</td><td>集团总部建行USD账户</td><td>USD</td><td style="text-align: right; font-family: monospace; font-weight: 600;">$ 3,450.00</td><td style="font-size: 11px; color: #606266;">CN45 CCB ... / PCBCCNBJ</td><td>2026-07-08</td><td><span class="op-link">编辑</span><span class="op-link red">删除</span></td></tr>
+                </tbody>
+              </table>
+              <p style="margin-top: 10px; font-size: 12px; color: #67c23a;">💡 新增 余额 / IBAN / 对账时间 4 列 + KPI Banner · 财务对账可在此页直接完成</p>
+            </div>
+
+            <!-- Tab 4: FX 列表 BaseDataPicker -->
+            <div v-if="activeTab === 4">
+              <div class="mock-filter">
+                <div class="field">
+                  <label>管理主体</label>
+                  <div class="mock-picker"><span class="label">BU_SHENZHEN · 深圳分公司</span><span class="arrow">▾</span></div>
+                </div>
+                <div class="field">
+                  <label>对手方</label>
+                  <div class="mock-picker"><span class="label">UBS · 瑞士银行</span><span class="arrow">▾</span></div>
+                </div>
+                <div class="field">
+                  <label>产品类型</label>
+                  <div class="mock-picker placeholder"><span class="label">全部</span><span class="arrow">▾</span></div>
+                </div>
+                <div class="field">
+                  <label>状态</label>
+                  <div class="mock-picker placeholder"><span class="label">全部</span><span class="arrow">▾</span></div>
+                </div>
+                <button style="background: #409eff; color: #fff; border: none; padding: 4px 14px; border-radius: 4px; cursor: pointer;">查询</button>
+              </div>
+              <div class="mock-alert success">
+                ✅ 改用 BaseDataPicker 下拉搜索(已选主体 + 名称 preload) · 不再让用户输入纯数字 ID
+              </div>
+              <table class="mock-table">
+                <thead><tr><th>交易编号</th><th>对手方</th><th>卖出</th><th>买入</th><th>汇率</th><th>操作</th></tr></thead>
+                <tbody>
+                  <tr><td>FX202607100001</td><td>UBS · 瑞士银行</td><td>200,000 EUR</td><td>218,000 USD</td><td>1.0900</td><td><span class="op-link">详情</span><span class="op-link green">复制</span></td></tr>
+                  <tr><td>FX202607090008</td><td>UBS · 瑞士银行</td><td>50,000 EUR</td><td>54,500 USD</td><td>1.0900</td><td><span class="op-link">详情</span><span class="op-link green">复制</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Tab 5: 批量操作栏 -->
+            <div v-if="activeTab === 5">
+              <div class="mock-filter">
+                <div class="field"><label>关键字</label><div class="input">编码/名称</div></div>
+                <button style="background: #409eff; color: #fff; border: none; padding: 4px 14px; border-radius: 4px; cursor: pointer;">查询</button>
+                <button style="background: #67c23a; color: #fff; border: none; padding: 4px 14px; border-radius: 4px; cursor: pointer;">+ 新增</button>
+              </div>
+              <div class="batch-bar">
+                ✅ 已选 <b style="color: #409eff;">3</b> 项
+                <button style="background: #fff; border: 1px solid #dcdfe6; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">批量启用</button>
+                <button style="background: #fff; border: 1px solid #dcdfe6; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">批量停用</button>
+                <button style="background: #f56c6c; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">批量删除</button>
+                <button style="background: transparent; border: none; color: #909399; cursor: pointer; font-size: 12px;">清空</button>
+              </div>
+              <table class="mock-table">
+                <thead><tr><th style="width: 30px;"><input type="checkbox" checked /></th><th>账户编号</th><th>账户名称</th><th>币种</th><th>状态</th><th>操作</th></tr></thead>
+                <tbody>
+                  <tr style="background: #ecf5ff;"><td><input type="checkbox" checked /></td><td>SH_CNY_001</td><td>上海分公司CNY基本户</td><td>CNY</td><td><span class="tag green">启用</span></td><td><span class="op-link">编辑</span><span class="op-link red">删除</span></td></tr>
+                  <tr style="background: #ecf5ff;"><td><input type="checkbox" checked /></td><td>HZ_USD_001</td><td>杭州分公司USD基本户</td><td>USD</td><td><span class="tag green">启用</span></td><td><span class="op-link">编辑</span><span class="op-link red">删除</span></td></tr>
+                  <tr style="background: #ecf5ff;"><td><input type="checkbox" checked /></td><td>TEST_USD_002</td><td>集团总部建行USD账户</td><td>USD</td><td><span class="tag green">启用</span></td><td><span class="op-link">编辑</span><span class="op-link red">删除</span></td></tr>
+                  <tr><td><input type="checkbox" /></td><td>TEST_CNY_001</td><td>集团总部中行CNY账户</td><td>CNY</td><td><span class="tag green">启用</span></td><td><span class="op-link">编辑</span><span class="op-link red">删除</span></td></tr>
+                </tbody>
+              </table>
+              <p style="margin-top: 10px; font-size: 12px; color: #67c23a;">💡 选中行变蓝底 + 顶部 BatchBar 显示 · 删除前 refCount 校验</p>
+            </div>
+
+            <!-- Tab 6: 列表空态/错误态 -->
+            <div v-if="activeTab === 6">
+              <div class="demo-tabs">
+                <span class="t active">空数据(无筛选结果)</span>
+                <span class="t">加载失败(网络异常)</span>
+                <span class="t">首次进入(无主体)</span>
+              </div>
+              <div class="empty-state">
+                <div class="icon">🔍</div>
+                <div class="text">未找到匹配 "USD + 主体A" 的银行账户</div>
+                <button style="background: #409eff; color: #fff; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer;">清空筛选条件</button>
+                <button style="background: #fff; border: 1px solid #dcdfe6; padding: 6px 16px; border-radius: 4px; cursor: pointer; margin-left: 8px;">+ 新增账户</button>
+              </div>
+              <div class="mock-alert" style="margin-top: 16px;">
+                💡 改进点: 0 行 vs 网络异常 vs 无主体, 三种状态区分, 提供 Retry / 清空筛选 / 新增 按钮
+              </div>
+            </div>
+
+            <!-- Tab 7: 详情页一屏布局 -->
+            <div v-if="activeTab === 7">
+              <div class="breadcrumb">
+                <a>首页</a> <span class="sep">/</span>
+                <a>交易管理</a> <span class="sep">/</span>
+                <a>FX 外汇交易</a> <span class="sep">/</span>
+                <span>FX202607100001</span>
+              </div>
+              <div class="key-info-bar">
+                <div class="key-item"><span class="label">交易编号</span><span class="value">FX202607100001</span></div>
+                <div class="key-item highlight"><span class="label">总金额</span><span class="value">$ 218,000.00</span></div>
+                <div class="key-item"><span class="label">卖出</span><span class="value" style="color: #f56c6c;">200,000 EUR</span></div>
+                <div class="key-item"><span class="label">买入</span><span class="value" style="color: #67c23a;">218,000 USD</span></div>
+                <div class="key-item"><span class="label">汇率</span><span class="value">1.0900</span></div>
+                <div class="key-item"><span class="label">状态</span><span class="value"><span class="tag green">Approved</span></span></div>
+                <div style="margin-left: auto; display: flex; gap: 8px;">
+                  <button style="background: #67c23a; color: #fff; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">复制</button>
+                  <button style="background: #409eff; color: #fff; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">编辑</button>
+                  <button style="background: #f56c6c; color: #fff; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">删除</button>
+                </div>
+              </div>
+              <div class="demo-tabs">
+                <span class="t">基本信息</span>
+                <span class="t active">Cashflow (2)</span>
+                <span class="t">DealMap (3)</span>
+                <span class="t">Action (3)</span>
+                <span class="t">审计</span>
+              </div>
+              <table class="mock-table">
+                <thead><tr><th>现金流编号</th><th>方向</th><th>金额</th><th>币种</th><th>起息日</th><th>状态</th></tr></thead>
+                <tbody>
+                  <tr><td>CF202607100001</td><td><span class="tag red">Outflow</span></td><td>200,000.00</td><td>EUR</td><td>2026-07-12</td><td><span class="tag orange">Pending</span></td></tr>
+                  <tr><td>CF202607100002</td><td><span class="tag green">Inflow</span></td><td>218,000.00</td><td>USD</td><td>2026-07-12</td><td><span class="tag orange">Pending</span></td></tr>
+                </tbody>
+              </table>
+              <p style="margin-top: 10px; font-size: 12px; color: #67c23a;">💡 关键信息条左对齐 / 右上角快捷操作 / 默认 Tab = Cashflow(业务核心) · 面包屑 + Tabs</p>
+            </div>
+
+            <!-- Tab 8: 全局面包屑 -->
+            <div v-if="activeTab === 8">
+              <div class="breadcrumb">
+                <a>首页</a> <span class="sep">/</span>
+                <a>基础数据</a> <span class="sep">/</span>
+                <a>银行账户管理</a> <span class="sep">/</span>
+                <span>SH_CNY_001</span>
+              </div>
+              <div class="breadcrumb">
+                <a>首页</a> <span class="sep">/</span>
+                <a>基础数据</a> <span class="sep">/</span>
+                <a>默认银行账户规则</a> <span class="sep">/</span>
+                <span>RULE20260710-0001</span>
+              </div>
+              <div class="breadcrumb">
+                <a>首页</a> <span class="sep">/</span>
+                <a>交易管理</a> <span class="sep">/</span>
+                <a>FX 外汇交易</a> <span class="sep">/</span>
+                <a>FX202607100001</a> <span class="sep">/</span>
+                <span>Cashflow</span>
+              </div>
+              <div class="mock-alert success" style="margin-top: 16px;">
+                ✅ 三层面包屑(模块 / 子页 / 详情) · 点击可跳转 · 与 Vue Router meta 配置联动
+              </div>
+              <div style="margin-top: 16px; padding: 16px; background: #fff; border-radius: 4px; border: 1px solid #ebeef5;">
+                <h3 style="font-size: 14px; margin-bottom: 8px;">实现要点</h3>
+                <ul style="font-size: 12px; color: #606266; line-height: 1.8; padding-left: 20px;">
+                  <li>路由 meta 配置 breadcrumb: ['基础数据', '银行账户管理']</li>
+                  <li>提取 <code>&lt;BreadcrumbBar /&gt;</code> 公共组件</li>
+                  <li>详情页支持三层路径(模块 / 列表 / 详情)</li>
+                  <li>移动端 / 多页签场景下不迷路</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Tab 9: 改进总览 -->
+            <div v-if="activeTab === 9">
+              <div class="mock-kpi-row">
+                <div class="mock-kpi red"><span class="label">P0 问题</span><span class="value">6</span></div>
+                <div class="mock-kpi orange"><span class="label">P1 问题</span><span class="value">4</span></div>
+                <div class="mock-kpi blue"><span class="label">总工作量</span><span class="value">~9 天</span></div>
+                <div class="mock-kpi green"><span class="label">影响页面</span><span class="value">9 个</span></div>
+              </div>
+              <table class="mock-table">
+                <thead><tr><th>#</th><th>问题</th><th>优先级</th><th>工作量</th><th>对标</th></tr></thead>
+                <tbody>
+                  <tr><td>1</td><td>DefaultBankAccountRule 首屏空白</td><td><span class="tag red">P0</span></td><td>XS (1h)</td><td>Bloomberg AIM</td></tr>
+                  <tr><td>2</td><td>FX 列表 v3.2 alert 清理</td><td><span class="tag red">P0</span></td><td>XS (0.5h)</td><td>Bloomberg AIM</td></tr>
+                  <tr><td>3</td><td>筛选器 6 项平铺</td><td><span class="tag red">P0</span></td><td>M (1 天)</td><td>Murex MX.3</td></tr>
+                  <tr><td>4</td><td>BankAccount 余额/IBAN 列</td><td><span class="tag red">P0</span></td><td>L (2 天)</td><td>FIS Quantum</td></tr>
+                  <tr><td>5</td><td>FX 列表 ID 输入</td><td><span class="tag red">P0</span></td><td>XS (0.5h)</td><td>Murex</td></tr>
+                  <tr><td>6</td><td>无批量操作栏</td><td><span class="tag red">P0</span></td><td>S (1.5 天)</td><td>Murex</td></tr>
+                  <tr><td>7</td><td>创建时间列宽溢出</td><td><span class="tag orange">P1</span></td><td>XS (0.5h)</td><td>通用</td></tr>
+                  <tr><td>8</td><td>Total 0 错位</td><td><span class="tag orange">P1</span></td><td>XS (1h)</td><td>必备</td></tr>
+                  <tr><td>9</td><td>缺面包屑导航</td><td><span class="tag orange">P1</span></td><td>S (1 天)</td><td>必备</td></tr>
+                  <tr><td>10</td><td>详情页 activeTab 默认值</td><td><span class="tag orange">P1</span></td><td>XS (0.5h)</td><td>SAP TRM</td></tr>
+                </tbody>
+              </table>
+              <div style="margin-top: 16px; padding: 12px; background: #f0f9ff; border-radius: 4px; border-left: 3px solid #409eff; font-size: 13px;">
+                <strong>建议执行节奏:</strong> 本周 6 个 P0(总工作量 ~3.5 天)→ 本月 4 个 P1(总工作量 ~3 天)→ 季度做架构补完
+              </div>
+            </div>
+
+          </component>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer: Reference + Workload -->
+    <div class="tab-footer">
+      <div class="item">
+        <span class="key">优先级:</span>
+        <span class="val" :class="priorityColor(tabs[activeTab].priority)">{{ tabs[activeTab].priority }}</span>
+      </div>
+      <div class="item">
+        <span class="key">工作量:</span>
+        <span class="val blue">{{ tabs[activeTab].workload }}</span>
+      </div>
+      <div class="item">
+        <span class="key">对标业界:</span>
+        <span class="val">{{ tabs[activeTab].benchmark }}</span>
+      </div>
+      <div class="item">
+        <span class="key">影响页面:</span>
+        <span class="val">{{ tabs[activeTab].affected }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Page Index -->
+  <div class="page-switcher">
+    <a href="../REAL-PAGES-UX-ANALYSIS.md" target="_blank">📄 分析报告</a>
+    <a href="../REAL-PAGES-README.md" target="_blank">📑 README 索引</a>
+  </div>
+</div>
+
+<script>
+// Vue 3.4+ vue.global.prod.js 走 IIFE 闭包不挂 window,这里手动兜底
+if (typeof Vue === "undefined" && typeof window.Vue !== "undefined") { var Vue = window.Vue; }
+const { createApp, ref, computed } = Vue;
+
+const __protoApp = createApp({
+  setup() {
+    const activeTab = ref(0);
+
+    const tabs = [
+      {
+        title: 'DefaultBankAccountRule 首屏预填',
+        priority: 'P0',
+        bannerType: 'warning',
+        pain: '用户首屏看到 0 行表,以为是 bug',
+        fix: '从 user profile 预填默认主体,首屏直接显示数据',
+        beforeImg: 'screenshots/real/DefaultBankAccountRuleList.png',
+        beforeDesc: '7 个筛选项一字排开,表格 0 行,Total 0,用户不知道要选哪个',
+        beforeIssues: '首屏空白 / 强制必填主体 / 无任何引导 / 与同模块 BankAccount(直接展示 7 行)对比体验断崖',
+        afterDesc: '主体预填 + 状态高频显示 + KPI Banner(总规则/启用/本月命中)',
+        workload: 'XS (1h)',
+        benchmark: 'Bloomberg AIM 列表默认带 default user 查询',
+        affected: 'DefaultBankAccountRuleList + 同模块所有需要预填主体的页面'
+      },
+      {
+        title: 'FX 列表 v3.2 alert 清理',
+        priority: 'P0',
+        bannerType: 'warning',
+        pain: '顶部"v3.2 开发日志" alert 不可关闭,占用首屏 56px',
+        fix: '彻底删除 + 帮助移到 tooltip hover',
+        beforeImg: 'screenshots/real/FxDealList.png',
+        beforeDesc: '"v3.2: DX 创建即生成 3 DealMap + 0/2 Cashflow..." 用户看不懂技术术语',
+        beforeIssues: '不可关闭 / 技术术语 / 占首屏 56px / 与 AcDealList "v2.0" 同款问题',
+        afterDesc: '删除 alert + 面包屑 + 帮助 tooltip hover 显示业务规则',
+        workload: 'XS (0.5h)',
+        benchmark: 'Bloomberg AIM 列表页无开发者提示',
+        affected: 'FxDealList + AcDealList 共 2 页'
+      },
+      {
+        title: '筛选器 6 项平铺折叠',
+        priority: 'P0',
+        bannerType: 'warning',
+        pain: '6 项筛选条件一字排开,首屏被挤出表格',
+        fix: '高频 2 项常显 + 低频折叠到 Popover + 已选徽标',
+        beforeImg: 'screenshots/real/BankAccountList.png',
+        beforeDesc: '6 个筛选条件一字排开,Filter Card 高度 140px',
+        beforeIssues: '首屏被挤出 / 高频低频混排 / 无记忆 / 10 个列表页同款问题',
+        afterDesc: '关键字 + 状态高频常显,币种/类型/主体折叠,已选条件显示为蓝色徽标',
+        workload: 'M (1 天,公共 hook)',
+        benchmark: 'Murex MX.3 Reference Data 一级筛选 1-2 项 + 折叠高级',
+        affected: 'BankAccount / Currency / Subsidiary / Counterparty / Instrument / Trader 等 10 页'
+      },
+      {
+        title: 'BankAccount 余额 / IBAN 列',
+        priority: 'P0',
+        bannerType: 'warning',
+        pain: '银行账户缺余额 / IBAN / 对账时间,财务对账无法在该页完成',
+        fix: '新增余额 / IBAN / SWIFT / 对账时间 4 列 + KPI Banner',
+        beforeImg: 'screenshots/real/BankAccountList.png',
+        beforeDesc: '仅 11 列(账户编号、名称、银行、币种、类型、主体、状态、创建时间、操作)',
+        beforeIssues: '缺余额 / 缺 IBAN/SWIFT / 缺对账时间 / 财务调度周一要跳 3 个页面才能查余额',
+        afterDesc: '余额列(等宽字体)+ IBAN/SWIFT + 对账时间 + 顶部 4 KPI(总数/启用/USD 总余额/未对账)',
+        workload: 'L (2 天,后端聚合 1 天 + 前端 1 天)',
+        benchmark: 'FIS Quantum Account List 必有 Current Balance + Last Statement Date',
+        affected: 'BankAccountList 单页'
+      },
+      {
+        title: 'FX 列表 BaseDataPicker',
+        priority: 'P0',
+        bannerType: 'warning',
+        pain: '"管理主体 [-][ID][+]" 让用户输入纯数字 ID,记不住',
+        fix: '改用 BaseDataPicker 下拉搜索,显示名称',
+        beforeImg: 'screenshots/real/FxDealList.png',
+        beforeDesc: '"管理主体 [-][ID][+] 对手方 [-][ID][+]" 让用户输入纯数字 ID',
+        beforeIssues: '用户记不住 ID / 与 AC/AT 列表 string 输入不一致 / 与 BaseDataPicker 已建立的规范不符',
+        afterDesc: '改用 BaseDataPicker 下拉搜索,已选项显示 name preload,支持清空',
+        workload: 'XS (0.5h)',
+        benchmark: 'Murex / FIS Quantum 列表筛选用 Picker 而非 ID 输入',
+        affected: 'FxDealList 单页'
+      },
+      {
+        title: '批量操作栏',
+        priority: 'P0',
+        bannerType: 'warning',
+        pain: '选择列存在但全无批量 handler,频启用/停用要走 4 步',
+        fix: '选中后顶部 BatchBar 显示批量启停 / 删除 / 清空',
+        beforeImg: 'screenshots/real/BankAccountList.png',
+        beforeDesc: '所有列表都有 selection 列,但全代码无 handleBatch* 函数',
+        beforeIssues: '设计意图 vs 实现脱节 / 风控季度清理 50 条规则只能逐条 / 删除前无影响笔数提示',
+        afterDesc: '选中行变蓝底 + 顶部 BatchBar(批量启用/停用/删除/清空)+ 删除前 refCount 校验',
+        workload: 'S (1.5 天,公共 BatchBar 组件)',
+        benchmark: 'Murex / FIS Quantum 批量操作通用做法',
+        affected: 'BankAccount / Currency / Subsidiary / Counterparty / Instrument / Trader / DefaultBankRule 等 9 页'
+      },
+      {
+        title: '列表空态/错误态',
+        priority: 'P1',
+        bannerType: 'success',
+        pain: '0 行表格 + Total 0 + "No Data" 单调,无引导',
+        fix: '区分 空数据 / 网络异常 / 无主体,提供 Retry / 清空筛选',
+        beforeImg: 'screenshots/real/DefaultBankAccountRuleList.png',
+        beforeDesc: '0 行时表格中只显示 "No Data",无任何引导',
+        beforeIssues: '无引导 / 网络异常仅 console.error 用户看不到 / 无重试按钮',
+        afterDesc: '三态区分: 0 行(显示清空筛选 + 新增按钮)/ 网络异常(显示 Retry)/ 无主体(显示空状态 + 去选择)',
+        workload: 'XS (1h,公共 hook)',
+        benchmark: '通用做法,Bloomberg AIM 错误态友好',
+        affected: '所有 9 个列表页'
+      },
+      {
+        title: '详情页一屏布局',
+        priority: 'P1',
+        bannerType: 'success',
+        pain: 'FX 默认 Tab 是审计信息,关键信息条被压缩到 80px',
+        fix: '默认 Tab 改 Cashflow + 关键信息条加 weight + 空 Tab 显示引导',
+        beforeImg: 'screenshots/real/FxDealDetail.png',
+        beforeDesc: '默认 Tab = 审计信息,显示 "最新 Action / 创建人 / 创建时间..." 用户不关心',
+        beforeIssues: 'activeTab 默认值不合理 / 关键信息条无视觉重量 / 空 Tab 无引导',
+        afterDesc: '面包屑 + 关键信息条(交易编号/总金额/方向/汇率/状态)+ 默认 Tab=Cashflow + 右上角快捷操作',
+        workload: 'XS (0.5h,activeTab 改 + 空状态文案)',
+        benchmark: 'SAP TRM / Murex 列出用户偏好 + 默认业务核心 Tab',
+        affected: 'AcDealDetail / FxDealDetail / AtDealDetail 共 3 页'
+      },
+      {
+        title: '全局面包屑',
+        priority: 'P1',
+        bannerType: 'success',
+        pain: '9 个页面无任何面包屑,用户无返回上级路径',
+        fix: '路由 meta 配置 breadcrumb + 公共 BreadcrumbBar 组件',
+        beforeImg: 'screenshots/real/AcDealDetail.png',
+        beforeDesc: '顶部 header 仅 "资金管理系统" + "管理员",无 breadcrumb',
+        beforeIssues: '深层页面无导航 / 移动端迷失 / 详情页"返回"按钮无路径指示',
+        afterDesc: '三层面包屑(模块 / 子页 / 详情),点击可跳转,详情页支持路径',
+        workload: 'S (1 天,公共组件 + 路由配置)',
+        benchmark: '任何企业级系统必备',
+        affected: '所有 9 个页面'
+      },
+      {
+        title: '改进总览',
+        priority: 'P2',
+        bannerType: 'success',
+        pain: '10 个问题分散在 3 份报告 + 4 个页面,执行节奏不清晰',
+        fix: 'P0 6 个 + P1 4 个 + 总工作量 ~9 天,本周收掉 P0',
+        beforeImg: 'screenshots/real/BankAccountList.png',
+        beforeDesc: '基于本原型 9 个 Tab 的整体汇总',
+        beforeIssues: '10 条改进的执行节奏 / 工作量估算 / 优先级分层',
+        afterDesc: 'P0(6 条,~3.5 天)/ P1(4 条,~3 天)/ 总工作量 ~9 天 / 影响 9 个页面',
+        workload: '执行计划',
+        benchmark: '执行节奏参考',
+        affected: '全部'
+      }
+    ];
+
+    const priorityColor = (p) => {
+      if (p === 'P0') return 'red';
+      if (p === 'P1') return 'orange';
+      return 'gray';
+    };
+
+    return { activeTab, tabs, priorityColor };
+  }
+});
+// 2026-07-11 主代理修复:补全 createApp → use(ElementPlus) → mount 链
+// (子代理原版丢失返回值,导致 {{ tabs[activeTab].title }} 不解析)
+if (typeof ElementPlus !== "undefined") __protoApp.use(ElementPlus);
+__protoApp.mount('#app');
+</script>
+
+</body>
+</html>

@@ -1,0 +1,153 @@
+{
+  "total": 24,
+  "passed": 14,
+  "failed": 10,
+  "skipped": 0,
+  "results": [
+    {
+      "id": "TC-US1-1",
+      "desc": "AC 创建 200",
+      "status": "FAIL",
+      "actual": "(200, \"{'code': 400, 'message': 'bankAccountId 不能为空', 'data': None, 'timestamp': 1783713677539}\")"
+    },
+    {
+      "id": "TC-US1-2",
+      "desc": "Inflow 创建 200",
+      "status": "FAIL",
+      "actual": "(200, \"{'code': 400, 'message': 'bankAccountId 不能为空', 'data': None, 'timestamp': 1783713677544}\")"
+    },
+    {
+      "id": "TC-US1-3",
+      "desc": "无匹配 → bankAccountId=null (降级不阻断)",
+      "status": "FAIL",
+      "actual": "(200, \"{'code': 400, 'message': 'bankAccountId 不能为空', 'data': None, 'timestamp': 1783713677548}\")"
+    },
+    {
+      "id": "TC-US2-1",
+      "desc": "AC 创建 (前置) 200",
+      "status": "FAIL",
+      "actual": "(200, \"{'code': 400, 'message': 'bankAccountId 不能为空', 'data': None, 'timestamp': 1783713677551}\")"
+    },
+    {
+      "id": "TC-US2-2",
+      "desc": "AC 创建 (前置) 200",
+      "status": "FAIL",
+      "actual": "(200, \"{'code': 400, 'message': 'bankAccountId 不能为空', 'data': None, 'timestamp': 1783713677555}\")"
+    },
+    {
+      "id": "TC-US2-3",
+      "desc": "AC 创建 (前置) 200",
+      "status": "FAIL",
+      "actual": "(200, \"{'code': 400, 'message': 'bankAccountId 不能为空', 'data': None, 'timestamp': 1783713677558}\")"
+    },
+    {
+      "id": "TC-US3-1",
+      "desc": "DELETE 镜像(改前值字段完整)",
+      "status": "PASS",
+      "actual": "{'rows': [{'image_type': 'DELETE', 'cnt': 2}], 'deal_number': 'AC202607110002'}"
+    },
+    {
+      "id": "TC-US3-2",
+      "desc": "同笔交易累积多种镜像类型",
+      "status": "PASS",
+      "actual": "{'types': {'CREATE': 2, 'DELETE': 2}, 'rows': [{'image_type': 'CREATE', 'cnt': 2}, {'image_type': 'DELETE', 'cnt': 2}]}"
+    },
+    {
+      "id": "TC-US3-3",
+      "desc": "整笔删除 → cashflow 镜像保留",
+      "status": "PASS",
+      "actual": "{'main': [{'deleted': '1'}], 'img_cnt': 4}"
+    },
+    {
+      "id": "TC-US4-1",
+      "desc": "FX 创建 200",
+      "status": "FAIL",
+      "actual": "(200, \"{'code': 400, 'message': '管理主体不能为空', 'data': None, 'timestamp': 1783713678346}\")"
+    },
+    {
+      "id": "TC-US4-2",
+      "desc": "FX (NDF) 创建 200",
+      "status": "FAIL",
+      "actual": "(200, \"{'code': 400, 'message': '管理主体不能为空', 'data': None, 'timestamp': 1783713678350}\")"
+    },
+    {
+      "id": "TC-US5-4",
+      "desc": "GET /versions 列表 200,t≥1",
+      "status": "PASS",
+      "actual": "{'code': 200, 'inner_code': 200, 'total': 2, 'records_len': 2}"
+    },
+    {
+      "id": "TC-EXC-1",
+      "desc": "404 当 dealNumber 不存在",
+      "status": "FAIL",
+      "actual": "{'code': 200, 'inner': 200, 'msg': 'success'}"
+    },
+    {
+      "id": "TC-EXC-2b",
+      "desc": "不存在交易 → 404 (业务码)",
+      "status": "PASS",
+      "actual": "{'code': 200, 'inner': 200}"
+    },
+    {
+      "id": "TC-US6-2",
+      "desc": "3 段(dealImage/specificDealImage/cashflowImages)齐全",
+      "status": "PASS",
+      "actual": "{'code': 200, 'has_deal': True, 'has_specific': True, 'has_cfs': True, 'cf_count': 4, 'raw_keys': ['dealImage', 'specificDealImage', 'cashflowImages', 'actionNumber', 'imageNumber']}"
+    },
+    {
+      "id": "TC-EXC-2",
+      "desc": "version=9999 不存在 → 404",
+      "status": "PASS",
+      "actual": "{'code': 200, 'inner': 404}"
+    },
+    {
+      "id": "TC-US2-3",
+      "desc": "AC 创建 (前置) 200",
+      "status": "FAIL",
+      "actual": "(200, \"{'code': 400, 'message': 'bankAccountId 不能为空', 'data': None, 'timestamp': 1783713678446}\")"
+    },
+    {
+      "id": "TC-US8-1",
+      "desc": "versions 列表 P95 < 300ms",
+      "status": "PASS",
+      "actual": "{'durations_ms': ['13.6', '14.7', '14.9', '15.3', '15.5'], 'p95_ms': '15.5'}"
+    },
+    {
+      "id": "TC-US8-3",
+      "desc": "version 详情 P95 < 300ms",
+      "status": "PASS",
+      "actual": "{'durations_ms': ['15.0', '17.4', '20.9', '23.0', '46.8'], 'p95_ms': '46.8'}"
+    },
+    {
+      "id": "TC-US8-2",
+      "desc": "pageSize 10/50/100 切换 OK",
+      "status": "PASS",
+      "actual": "{10: {'code': 200, 'len': 2, 'passed': True}, 50: {'code': 200, 'len': 2, 'passed': True}, 100: {'code': 200, 'len': 2, 'passed': True}}"
+    },
+    {
+      "id": "TC-US8-4",
+      "desc": "分页(pageNum=1,2,3) 稳定",
+      "status": "PASS",
+      "actual": "{'durations_ms': ['14.5', '10.2', '14.2']}"
+    },
+    {
+      "id": "TC-EXC-3",
+      "desc": "tms_cashflow_t 新字段可空",
+      "status": "PASS",
+      "actual": "[{'column_name': 'bank_account_id', 'is_nullable': 'YES'}, {'column_name': 'counterparty_bank_account_id', 'is_nullable': 'YES'}]"
+    },
+    {
+      "id": "TC-EXC-4",
+      "desc": "image_type 白名单 CHECK 约束生效(预期抛错)",
+      "status": "PASS",
+      "actual": "{'S': '错误', 'V': 'ERROR', 'C': '23514', 'M': '关系 \"tms_cashflow_image_t\" 的新列违反了检查约束 \"chk_cf_image_type\"', 'D': '失败, 行包含(6, QA_TEST_1783713679.049068, CF202607110004, AC202607110003, 1, null, null, null"
+    },
+    {
+      "id": "TC-UI-前端",
+      "desc": "Vite 前端 3000 可达",
+      "status": "PASS",
+      "actual": "{'status': 200}"
+    }
+  ],
+  "rating": "D"
+}

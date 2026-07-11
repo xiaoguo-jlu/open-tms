@@ -98,6 +98,14 @@ POST   /api/v1/{resource}/images/{n}        # 历史镜像查询
 - 公共组件:`web/src/components/picker/BaseDataPicker.vue`(跨模块基础数据查找)、`ModeBadge.vue`(4 模式徽章)、`FormContainer.vue`
 - Vite 代理:`/api/v1/dealing` → 8082,`/api/v1/*` → 8081
 
+### API 一致性扫描(2026-07-10 新增)
+```bash
+python scripts/api_scanner.py                  # 扫 web/src/api → docs/api/frontend-api-consistency.html
+python scripts/api_scanner.py --ci             # CI 模式,P0 存在 exit 1
+bash scripts/gen-openapi.sh && python scripts/api_scanner.py   # 拉最新契约再扫
+```
+报告:**评级 D(有 P0)阻塞 / C(有 P1)修复后过 / B(仅 P2)通过 / A 无问题**。详见 `docs/api/FRONTEND-API-SCANNER.md` 和 `docs/api/frontend-api-consistency.html`。
+
 ---
 
 ## Key Enums(`common.constant.GlobalConstants`)

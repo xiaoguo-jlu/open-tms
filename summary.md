@@ -316,3 +316,9 @@ ffd44a4 - fix: optimize skills and test scripts based on bug fixes
 ---
 
 *本文档随项目进度实时更新*
+## 📅 自动更新 2026-07-11
+
+**模块变更**: dealing, basedata
+**新增页面(13)**: BankAccountList, CounterpartyAccountList, CounterpartyList, CountryList, CurrencyList + 8 more
+
+---

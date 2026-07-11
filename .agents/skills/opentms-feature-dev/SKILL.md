@@ -1,6 +1,11 @@
 ---
 name: opentms-feature-dev
-description: Use when implementing a complete Open-TMS feature from design to testing, orchestrating all team role skills (PM→UX→DB→API→FE→BE→QA)
+description: Use when implementing a complete Open-TMS feature from design to testing, orchestrating all team role skills (PM→UX→DB→API→FE→BE→QA). 每个 Phase 出口嵌入 6 维审核门禁。
+references:
+  - skill: opentms-review-common
+    files:
+      - SKILL.md
+      - standards/rating-system.md
 ---
 
 # Open-TMS 特性全流程开发 Skill (Orchestrator)
@@ -79,6 +84,14 @@ description: Use when implementing a complete Open-TMS feature from design to te
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────┐
+│   🔒 审核门禁 #1: 需求审核 (P0 必做)                            │
+│   Skill: opentms-review-requirement                            │
+│   报告: docs/reviews/{feature}/requirement-review.md           │
+│   通过(A/B) → 进 Phase 2 | C → 修复后复审 | D → 返工          │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────┐
 │   Phase 2: UX交互设计 (UX)                                     │
 │   ┌─────────────────────────────────────────────────────────┐   │
 │   │  Skill: opentms-ux-design                               │   │
@@ -86,6 +99,14 @@ description: Use when implementing a complete Open-TMS feature from design to te
 │   └─────────────────────────────────────────────────────────┘   │
 │   质量门禁: 原型已评审通过 ✓                                   │
 │   ⚠️ UX Task → Done                                           │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│   🔒 审核门禁 #2: UX 审核                                       │
+│   Skill: opentms-review-ux                                     │
+│   报告: docs/reviews/{feature}/ux-review.md                    │
+│   通过(A/B) → 进 Phase 3 | C → 修复后复审 | D → 返工          │
 └─────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
@@ -121,6 +142,22 @@ description: Use when implementing a complete Open-TMS feature from design to te
                    ⚠️ TA Task → Done
                                     │
                                     ▼
+┌─────────────────────────────────────────────────────────────────┐
+│   🔒 审核门禁 #3: DB 审核 (P0 必做)                             │
+│   Skill: opentms-review-db                                     │
+│   报告: docs/reviews/{feature}/db-review.md                    │
+│   通过(A/B) → 进 Phase 5 | C → 修复后复审 | D → 返工          │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│   🔒 审核门禁 #4: API 审核 (P0 必做)                            │
+│   Skill: opentms-review-api                                    │
+│   报告: docs/reviews/{feature}/api-review.md                   │
+│   通过(A/B) → 进 Phase 5 | C → 修复后复审 | D → 返工          │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
                 ┌────────────────────────────────────┐
                 │        并行开发阶段 (Phases 5+6)    │
                 │                                     │
@@ -140,6 +177,22 @@ description: Use when implementing a complete Open-TMS feature from design to te
                                     │
                    质量门禁: 后端单元测试通过 + 前后端联调通过 ✓
                    ⚠️ Dev Task → Done
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│   🔒 审核门禁 #5: 后端代码审核                                  │
+│   Skill: opentms-review-backend                                │
+│   报告: docs/reviews/{feature}/backend-review.md               │
+│   通过(A/B) → 进 Phase 6 | C → 修复后复审 | D → 返工          │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│   🔒 审核门禁 #6: 前端代码审核                                  │
+│   Skill: opentms-review-frontend                               │
+│   报告: docs/reviews/{feature}/frontend-review.md              │
+│   通过(A/B) → 进 Phase 7 | C → 修复后复审 | D → 返工          │
+└─────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
                 ┌────────────────────────────────────┐
@@ -175,6 +228,20 @@ description: Use when implementing a complete Open-TMS feature from design to te
                    质量门禁: P0用例100%通过 ✓            │
                                     │                    │
                                     ▼                    │
+┌─────────────────────────────────────────────────────────────────┐
+│   🔒 审核门禁 #7: 测试报告审核 (QA 自评)                        │
+│   Skill: opentms-test-execution                                │
+│   通过 → 进 Phase 9 (交付前总审核)                             │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│   🔒 Phase 9: 交付前总审核 (6 维全量复审)                        │
+│   PM-Lead 触发,6 维审核 skill 各跑一次                          │
+│   输出综合报告 → 全部 P0 通过才能关闭 Feature                  │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                        特性交付 (Feature Done)                   │
 │  关闭Feature Issue → 更新发布说明 → 标记版本                    │
@@ -666,6 +733,109 @@ cd web && npm run dev
 
 ---
 
+### 5.3 产出物与审核对应表
+
+| Phase | 产出物 | 审核维度 | 审核 Skill |
+|-------|--------|---------|-----------|
+| 1 | PRD / Feature Issue / US | 需求 | opentms-review-requirement |
+| 2 | UX 原型 / 交互说明 | UX | opentms-review-ux |
+| 3 | DDL SQL 脚本 | DB | opentms-review-db |
+| 4 | API 接口文档 | API | opentms-review-api |
+| 5 | Java 代码 | 后端 | opentms-review-backend |
+| 6 | Vue 代码 | 前端 | opentms-review-frontend |
+| 7 | 测试用例 | QA 自评 | opentms-test-case-design |
+| 8 | 测试报告 / Bug 单 | QA 自评 | opentms-test-execution |
+| 9 | 全部交付物 | 6 维全量复审 | 6 个 review skill 联调 |
+
+---
+
+### 5.4 审核门禁体系(新增, 2026-07-05)
+
+**核心原则**:每个 Phase 完成后, **必须** 启动对应审核 skill, 审核通过才能进入下一阶段。
+
+#### 5.4.1 7 级审核门禁映射表
+
+| Phase | 触发审核 | Skill | 必须 P0 通过 |
+|-------|---------|-------|-------------|
+| 1 PM 设计 | 需求审核 | opentms-review-requirement | ✓ |
+| 2 UX 设计 | UX 审核 | opentms-review-ux | ✓ |
+| 3 DB 设计 | DB 审核 | opentms-review-db | ✓ |
+| 4 API 设计 | API 审核 | opentms-review-api | ✓ |
+| 5 后端开发 | 后端审核 | opentms-review-backend | ✓ |
+| 6 前端开发 | 前端审核 | opentms-review-frontend | ✓ |
+| 7 测试设计 | QA 评审 | (QA 自评) | ✓ |
+| 8 测试执行 | 测试报告审核 | opentms-test-execution | ✓ |
+| **9 交付** | **6 维全量复审** | **6 个 review skill** | **✓** |
+
+#### 5.4.2 评级体系
+
+| 评级 | 含义 | 后续动作 |
+|------|------|---------|
+| **A** | 无 P0/P1/P2 问题 | 直接进入下一 Phase |
+| **B** | 仅 P2 问题(可优化但不阻塞) | 直接进入下一 Phase,P2 记录到 `[待优化]` |
+| **C** | 有 P1 问题(必须修复后通过) | 立即修复 → 复审 → 通过才能进下一 Phase |
+| **D** | 有 P0 问题(必须返工) | 退回该 Phase 返工 → 重新产出 → 重新审核 |
+
+#### 5.4.3 问题严重度
+
+| 等级 | 定义 | 示例 | 阻塞 |
+|------|------|------|------|
+| **P0** | 阻塞性:违反核心规范/破坏存量/合规风险 | 缺失审计字段、模块循环依赖、缺失幂等键、命名违规 | 强阻塞 |
+| **P1** | 重要:影响可维护性/可测试性/扩展性 | 缺单元测试、错误码不规范、阈值硬编码 | 修复后通过 |
+| **P2** | 优化:代码风格/文档/注释 | 命名风格、注释不全、变量命名 | 不阻塞 |
+
+#### 5.4.4 审核不通过的处置
+
+| 评级 | 处置流程 |
+|------|---------|
+| A/B | ✅ 通过 → 关闭当前 Phase Task → 进入下一 Phase |
+| C | 🟡 修复 P1 → 提交 → 复审 → 通过后进入下一 Phase |
+| D | 🔴 退回 Phase N → 返工(不只是修 P0, 重做整个 Phase) → 重新产出 → 重新审核 |
+
+#### 5.4.5 审核输出
+
+- **报告路径**: `docs/reviews/{feature-name}/{dimension}-review.md`
+- **报告模板**: `.claude/skills/opentms-review-common/templates/report-base.md`
+- **评级同步**: 评级 (A/B/C/D) 同步到 GitHub Issue
+- **签字**: 审核人 / 审核日期 / 复审日期(如有)
+
+#### 5.4.6 公共规范引用
+
+所有审核 skill 共享公共基础: `.claude/skills/opentms-review-common/SKILL.md`
+- 评级体系 (`standards/rating-system.md`)
+- 流程标准 (`standards/workflow.md`)
+- 报告模板 (`templates/report-base.md`)
+- 一页纸摘要 (`templates/summary.md`)
+
+#### 5.4.7 Phase 9: 交付前总审核
+
+**触发时机**: 特性交付前, PM-Lead 启动
+
+**执行流程**:
+1. PM-Lead 触发,6 维审核 skill 各跑一次(requirement / ux / db / api / backend / frontend)
+2. 每个审核 skill 输出独立的审核报告
+3. PM-Lead 汇总输出综合报告 (`docs/reviews/{feature}/final-review.md`)
+4. 全部 P0 通过才能关闭 Feature Issue
+
+**综合报告模板**:
+```markdown
+# {Feature Name} 交付前总审核报告
+
+| 审核维度 | Skill | 评级 | P0 | P1 | P2 | 报告链接 |
+|---------|-------|------|----|----|----|---------|
+| 需求 | opentms-review-requirement | A/B/C/D | N | N | N | [link] |
+| UX | opentms-review-ux | ... | ... | ... | ... | [link] |
+| DB | opentms-review-db | ... | ... | ... | ... | [link] |
+| API | opentms-review-api | ... | ... | ... | ... | [link] |
+| 后端 | opentms-review-backend | ... | ... | ... | ... | [link] |
+| 前端 | opentms-review-frontend | ... | ... | ... | ... | [link] |
+
+**总评级**: {A/B/C/D}
+**关闭条件**: 所有维度评级 ≥ B 且无 P0 问题
+```
+
+---
+
 ## 六、各阶段产出物路径总表
 
 | 阶段 | 产出物类型 | 存放路径 |
@@ -692,11 +862,15 @@ cd web && npm run dev
 
 | 阶段 | 门禁项 | 责任人 | 触发下一阶段 |
 |------|--------|--------|-------------|
-| PM→UX | PRD已评审通过 | PM-Lead | UX启动 |
-| UX→设计 | 原型已评审通过 | PM-Lead | 表结构+API启动 |
-| 设计→开发 | DDL+API已评审 | TA | 后端+前端启动 |
-| 开发→测试 | 联调通过+无阻塞Bug | Dev Lead | QA启动 |
-| 测试→交付 | P0通过率100%+无高优Bug | QA | 特性关闭 |
+| PM→UX | PRD已评审通过 + 需求审核评级 A/B | PM-Lead | UX启动 |
+| UX→设计 | 原型已评审通过 + UX审核评级 A/B | PM-Lead | 表结构+API启动 |
+| 设计→开发 | DDL+API已评审 + DB/API审核评级 A/B | TA | 后端+前端启动 |
+| 开发→测试 | 联调通过+无阻塞Bug + 后端/前端审核评级 A/B | Dev Lead | QA启动 |
+| 测试→交付 | P0通过率100%+无高优Bug + 测试报告审核通过 | QA | 特性关闭 |
+| 交付前 | 6 维全量复审全部 P0 通过 | PM-Lead | Feature 关闭 |
+
+> ⚠️ **新增(2026-07-05)**:每个阶段门禁现在包含对应的**审核评级门禁**,
+> 详见 5.4 节"审核门禁体系"。审核评级 C/D 不能进入下一阶段。
 
 ### 7.2 门禁触发规则
 
@@ -706,6 +880,22 @@ cd web && npm run dev
 | 当前阶段有阻塞 | 解决阻塞后再进入下一阶段 |
 | 当前阶段有高风险 | 风险评估通过后再进入下一阶段 |
 | 当前阶段有争议 | 由PM-Lead裁决 |
+| 审核评级 A/B | ✅ 直接进入下一阶段 |
+| 审核评级 C | 🟡 修复 P1 后复审, 通过才能进入下一阶段 |
+| 审核评级 D | 🔴 退回该 Phase 返工, 重新审核通过才能进入下一阶段 |
+
+### 7.3 审核与门禁的对应关系
+
+```
+Phase N 产出 → 调用 opentms-review-{N} → 评级判定
+                                          │
+                              ┌───────────┼───────────┐
+                              ▼           ▼           ▼
+                          A/B 通过      C 复审       D 返工
+                              │           │           │
+                              ▼           ▼           ▼
+                          进入 N+1    修复后复审    退回 Phase N
+```
 
 ---
 
@@ -762,6 +952,42 @@ PM设计（明确定义模块边界）
 - 接口契约必须在各模块开发前对齐
 - 集成测试专用用例覆盖模块间交互
 - 数据一致性需设计验证
+
+---
+
+### 8.4 紧急 Bug 修复路径
+
+```
+生产 Bug → 创建 Hotfix Task → 直接进入开发 → 简化测试 → Hotfix 上线
+                │                                       │
+                └─────── PM-Lead 口头批准 ──────────────┘
+```
+
+详见 `open-tms团队协作规范.md` 中的 Hotfix 流程。
+
+---
+
+### 8.5 审核跳过的例外(新增)
+
+**默认规则**: 所有特性必须按 5.4 节"审核门禁体系"在每个 Phase 出口触发审核。
+
+**例外情况**(可跳过审核):
+
+| 例外类型 | 适用场景 | 跳过条件 | 后续动作 |
+|---------|---------|---------|---------|
+| **Hotfix** | 紧急修复 P0/P1 生产 Bug | PR 描述注明 "Hotfix - 跳过审核" | PM-Lead 事后审计 |
+| **文档修改** | 仅修改 `.md` 注释/文档 | 无任何代码变更 | 无需审核 |
+| **配置调整** | 调整端口/超时等参数 | PM-Lead 口头确认 | 记录到 CHANGELOG |
+
+**禁止跳过审核**:
+- 任何涉及新表/新字段的 DDL
+- 任何新增/修改 API
+- 任何业务逻辑变更
+- 任何数据库 schema 变更
+
+**跳过后补救**:
+- Hotfix: 下一个 Sprint 必须补一次集中审核(PM-Lead 安排)
+- 文档/配置: 无需补救
 
 ---
 
@@ -834,7 +1060,25 @@ PM设计（明确定义模块边界）
 | QA | `opentms-test-case-design` | 测试用例设计 |
 | QA | `opentms-test-execution` | 测试执行 |
 
-### 10.2 本skill与其它skill的核心区别
+### 10.2 本skill调用的审核Skill(6 + 1 公共)
+
+每个 Phase 出口嵌入审核门禁,以下 6 个审核 skill + 1 个公共基础:
+
+| 审核 Skill | 审核维度 | 触发位置 | 必须 P0 |
+|-----------|---------|---------|---------|
+| `opentms-review-common` | 公共基础(评级/报告/流程) | 所有审核前置引用 | — |
+| `opentms-review-requirement` | 需求 | Phase 1 → 2 | ✓ |
+| `opentms-review-ux` | UX | Phase 2 → 3 | — |
+| `opentms-review-db` | DB | Phase 3 → 4 | ✓ |
+| `opentms-review-api` | API | Phase 4 → 5 | ✓ |
+| `opentms-review-backend` | 后端代码 | Phase 5 → 6 | — |
+| `opentms-review-frontend` | 前端代码 | Phase 6 → 7 | — |
+| `opentms-test-execution` | 测试报告 | Phase 8 → 9 | ✓ |
+| 6 维全量复审 | Phase 9 交付前 | ✓ |
+
+> 详见 5.4 节"审核门禁体系"。
+
+### 10.3 本skill与其它skill的核心区别
 
 | 对比维度 | 本skill | 各角色skill |
 |----------|---------|-------------|
@@ -842,7 +1086,8 @@ PM设计（明确定义模块边界）
 | 关注点 | **流程完整性**——确保各阶段衔接、门禁达标 | **专业深度**——确保本领域技术最佳 |
 | 受众 | PM-Lead/项目协调者 | 各角色专业人员 |
 | 视角 | **水平视角**——跨阶段、跨角色 | **垂直视角**——本领域纵向深入 |
-| 产出 | Feature进度跟踪、质量门禁检查 | 专业交付物（PRD/原型/代码/测试用例） |
+| 产出 | Feature进度跟踪、质量门禁检查、审核门禁触发 | 专业交付物（PRD/原型/代码/测试用例） |
+| 嵌入审核 | 在每个 Phase 出口触发 6 维审核 | 不直接触发审核 |
 
 ---
 
@@ -925,5 +1170,6 @@ echo "特性 $NAME 已启动！Feature Issue: #$FEATURE_ISSUE"
 
 | 版本 | 日期 | 变更内容 |
 |------|------|---------|
+| v1.2 | 2026-07-05 | **审核门禁体系集成**: 1. 在流程图每个 Phase 出口嵌入 7 级审核门禁(需求/UX/DB/API/后端/前端/QA) 2. 新增 5.4 节"审核门禁体系"(评级 A/B/C/D + P0/P1/P2) 3. 新增 5.3 节"产出物与审核对应表" 4. 新增 Phase 9 "交付前总审核"(6 维全量复审) 5. 新增 8.5 节"审核跳过的例外" 6. 更新 7.1-7.3 质量门禁总表, 整合审核评级 |
 | v1.1 | 2026-05-27 | 1. 完善GitHub Project协同：各阶段完成后必须更新Task状态为Done 2. 增加开发后启动本地服务步骤：后端run_backend.py start + 前端npm run dev 3. 完善Bug修复流程：高优Bug立即修复→QA回归验证→关闭Bug 4. 流程图标注关键节点 |
 | v1.0 | 2026-05-01 | 初始版本 |

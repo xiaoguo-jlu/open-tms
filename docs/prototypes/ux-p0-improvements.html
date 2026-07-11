@@ -1,0 +1,2074 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open-TMS UX P0 改进原型 v1.0</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-plus/2.5.6/index.css">
+<style>
+  /* ============ Base ============ */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 14px;
+    color: #303133;
+    background: #f5f7fa;
+  }
+  .mono { font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace; }
+
+  /* ============ Header ============ */
+  .app-header {
+    height: 60px;
+    background: #1f2d3d;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    box-shadow: 0 2px 4px rgba(0,21,41,.08);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .app-header .logo {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 18px; font-weight: 600;
+  }
+  .app-header .logo-mark {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, #409EFF 0%, #36CFC9 100%);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; color: #fff;
+  }
+  .app-header .right-info {
+    display: flex; align-items: center; gap: 16px;
+    font-size: 13px; color: rgba(255,255,255,.85);
+  }
+  .app-header .right-info .version-tag {
+    background: rgba(64,158,255,.18);
+    color: #5fa7ff;
+    border: 1px solid rgba(64,158,255,.4);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  /* ============ Main container ============ */
+  .main-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 16px 24px 32px;
+  }
+  .page-meta {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  }
+  .page-meta .meta-text { color: #606266; font-size: 13px; }
+  .page-meta .meta-text strong { color: #303133; }
+  .page-meta .meta-badges { display: flex; gap: 8px; }
+
+  /* ============ Tabs ============ */
+  .prototype-tabs { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+  .prototype-tabs .el-tabs__header { margin: 0; }
+  .prototype-tabs .el-tabs__item {
+    height: 48px; line-height: 48px;
+    font-size: 14px;
+  }
+  .prototype-tabs .el-tabs__item .tab-meta {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    background: #ecf5ff;
+    color: #409EFF;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .prototype-tabs .el-tabs__item.is-active .tab-meta { background: #fff; color: #409EFF; }
+  .tab-content {
+    padding: 16px 20px 20px;
+    background: #fafbfc;
+    min-height: 600px;
+  }
+
+  /* ============ Section title ============ */
+  .section-title {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .section-title h3 {
+    font-size: 16px; font-weight: 600; color: #303133;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title h3 .el-tag { font-weight: 500; }
+
+  /* ============ Cards & KPI ============ */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .kpi-card {
+    position: relative;
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+    overflow: hidden;
+    transition: transform .2s;
+    cursor: pointer;
+  }
+  .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+  .kpi-card .kpi-label {
+    color: #909399; font-size: 13px; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .kpi-card .kpi-value {
+    font-size: 26px; font-weight: 700; color: #303133;
+    font-family: "JetBrains Mono", monospace;
+    line-height: 1.2;
+  }
+  .kpi-card .kpi-delta {
+    margin-top: 6px;
+    font-size: 12px;
+  }
+  .kpi-card .kpi-delta.up { color: #67c23a; }
+  .kpi-card .kpi-delta.down { color: #f56c6c; }
+  .kpi-card .kpi-icon {
+    position: absolute;
+    top: 14px; right: 14px;
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    color: #fff;
+  }
+  .kpi-card .kpi-icon.bg-blue   { background: linear-gradient(135deg, #409EFF 0%, #1890ff 100%); }
+  .kpi-card .kpi-icon.bg-green  { background: linear-gradient(135deg, #67c23a 0%, #36CFC9 100%); }
+  .kpi-card .kpi-icon.bg-orange { background: linear-gradient(135deg, #E6A23C 0%, #F56C6C 100%); }
+  .kpi-card .kpi-icon.bg-purple { background: linear-gradient(135deg, #8e44ad 0%, #6c5ce7 100%); }
+  .kpi-card .kpi-icon.bg-cyan   { background: linear-gradient(135deg, #36CFC9 0%, #1890ff 100%); }
+  .kpi-card .kpi-icon.bg-red    { background: linear-gradient(135deg, #f56c6c 0%, #c0392b 100%); }
+
+  .kpi-card-mini {
+    background: #fff;
+    border-radius: 8px;
+    padding: 14px 18px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  }
+  .kpi-card-mini .label { font-size: 12px; color: #909399; }
+  .kpi-card-mini .value { font-size: 20px; font-weight: 700; margin-top: 4px; }
+  .kpi-card-mini .value .unit { font-size: 12px; color: #909399; font-weight: normal; margin-left: 2px; }
+
+  /* ============ Filter Card ============ */
+  .filter-card { background: #fff; border-radius: 8px; padding: 16px 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+  .filter-row { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; }
+  .filter-row .el-form-item { margin: 0; }
+  .filter-actions { display: flex; gap: 8px; align-items: center; }
+
+  .advanced-toggle {
+    background: #f4f4f5;
+    border: 1px solid #e9e9eb;
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #606266;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: all .2s;
+  }
+  .advanced-toggle:hover { color: #409EFF; border-color: #b3d8ff; }
+  .advanced-toggle .count-badge {
+    background: #409EFF;
+    color: #fff;
+    border-radius: 8px;
+    padding: 0 6px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .advanced-toggle.is-expanded { background: #ecf5ff; border-color: #b3d8ff; color: #409EFF; }
+
+  .advanced-panel {
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: #fafafa;
+    border-radius: 6px;
+    border: 1px dashed #e4e7ed;
+  }
+  .advanced-panel .el-form-item { margin: 6px 12px 6px 0; }
+
+  /* ============ Table Card ============ */
+  .table-card { background: #fff; border-radius: 8px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+  .balance-positive { color: #67c23a; font-weight: 600; font-family: "JetBrains Mono", monospace; }
+  .balance-negative { color: #f56c6c; font-weight: 600; font-family: "JetBrains Mono", monospace; }
+  .text-mono { font-family: "JetBrains Mono", monospace; }
+  .text-muted { color: #909399; font-size: 12px; }
+
+  /* ============ Detail Page ============ */
+  .detail-header {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  }
+  .breadcrumb {
+    font-size: 13px; color: #909399;
+    margin-bottom: 12px;
+  }
+  .breadcrumb .el-icon { vertical-align: middle; margin: 0 4px; }
+  .breadcrumb a { color: #409EFF; text-decoration: none; cursor: pointer; }
+  .breadcrumb a:hover { text-decoration: underline; }
+
+  .detail-title-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .detail-title-bar h2 {
+    font-size: 20px; font-weight: 600;
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  /* Key Info Bar (M3 一屏布局) */
+  .key-info-bar {
+    background: linear-gradient(90deg, #f8fbff 0%, #f0f5ff 100%);
+    border: 1px solid #d6e4ff;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    display: flex; align-items: stretch;
+    flex-wrap: wrap;
+    gap: 0;
+  }
+  .key-item {
+    flex: 1 1 0;
+    min-width: 140px;
+    padding: 0 18px;
+    border-right: 1px solid #d6e4ff;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .key-item:last-child { border-right: none; }
+  .key-item .key-label { font-size: 12px; color: #909399; }
+  .key-item .key-value {
+    font-size: 16px; font-weight: 600; color: #303133;
+    font-family: "JetBrains Mono", monospace;
+  }
+  .key-item .key-value.highlight { color: #409EFF; font-size: 18px; }
+  .key-item .key-value .key-sub { font-size: 12px; color: #909399; margin-left: 4px; font-weight: 400; }
+
+  /* Tabs inside detail */
+  .detail-tabs {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  }
+  .basic-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px 24px;
+  }
+  .basic-info-grid .field { display: flex; flex-direction: column; gap: 4px; }
+  .basic-info-grid .field .label { font-size: 12px; color: #909399; }
+  .basic-info-grid .field .value { font-size: 14px; color: #303133; font-family: "JetBrains Mono", monospace; }
+
+  /* Timeline (审计) */
+  .timeline-card { padding: 8px 0; }
+  .timeline-row {
+    position: relative;
+    padding: 0 0 16px 28px;
+    border-left: 2px solid #e4e7ed;
+    margin-left: 12px;
+  }
+  .timeline-row:last-child { border-left: 2px solid transparent; padding-bottom: 0; }
+  .timeline-row::before {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: 4px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #c0c4cc;
+  }
+  .timeline-row.is-active::before { background: #67c23a; box-shadow: 0 0 0 3px rgba(103,194,58,.18); }
+  .timeline-row.is-warn::before { background: #E6A23C; box-shadow: 0 0 0 3px rgba(230,162,60,.18); }
+  .timeline-row.is-danger::before { background: #f56c6c; box-shadow: 0 0 0 3px rgba(245,108,108,.18); }
+  .timeline-row .ts { font-size: 12px; color: #909399; margin-bottom: 2px; }
+  .timeline-row .act { font-size: 14px; color: #303133; font-weight: 500; }
+  .timeline-row .meta { font-size: 12px; color: #606266; margin-top: 2px; }
+
+  /* 影响范围 cards */
+  .impact-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .impact-stat {
+    background: #fafbfc;
+    border: 1px solid #ebeef5;
+    border-radius: 6px;
+    padding: 14px 16px;
+  }
+  .impact-stat .label { font-size: 12px; color: #909399; }
+  .impact-stat .value { font-size: 22px; font-weight: 700; margin-top: 6px; font-family: "JetBrains Mono", monospace; }
+  .impact-stat .value.success { color: #67c23a; }
+  .impact-stat .value.warning { color: #E6A23C; }
+  .impact-stat .value.danger  { color: #f56c6c; }
+
+  /* FX 列表 quick date range */
+  .quick-range {
+    display: inline-flex;
+    background: #f4f4f5;
+    border-radius: 4px;
+    padding: 2px;
+    gap: 2px;
+  }
+  .quick-range .qr-btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #606266;
+    transition: all .15s;
+    border: none;
+    background: transparent;
+  }
+  .quick-range .qr-btn:hover { color: #409EFF; }
+  .quick-range .qr-btn.is-active {
+    background: #fff;
+    color: #409EFF;
+    box-shadow: 0 1px 2px rgba(0,0,0,.06);
+    font-weight: 600;
+  }
+
+  /* FX copy comparison */
+  .copy-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .copy-compare .col {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    border-top: 3px solid #409EFF;
+  }
+  .copy-compare .col.before { border-top-color: #909399; }
+  .copy-compare .col.after  { border-top-color: #67c23a; }
+  .copy-compare .col h4 {
+    font-size: 14px; font-weight: 600; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .copy-compare .col h4 .el-tag { font-size: 11px; }
+  .copy-compare .row {
+    display: flex; justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f2f5;
+    font-size: 13px;
+  }
+  .copy-compare .row:last-child { border-bottom: none; }
+  .copy-compare .row .k { color: #909399; }
+  .copy-compare .row .v { font-family: "JetBrains Mono", monospace; }
+  .copy-compare .row.cleared .v { color: #c0c4cc; text-decoration: line-through; }
+  .copy-compare .row.cleared { opacity: .55; }
+  .copy-compare .row.cleared-now .v { color: #67c23a; font-weight: 600; text-decoration: none; opacity: 1; }
+
+  /* FX detail mini panel */
+  .fx-detail-mini {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  }
+  .tab-toolbar {
+    display: flex; gap: 8px; align-items: center; margin-bottom: 12px;
+  }
+
+  /* Notification mimic */
+  .fake-notification {
+    position: fixed;
+    top: 80px; right: 24px;
+    width: 360px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 6px 16px rgba(0,0,0,.15);
+    padding: 14px 16px;
+    border-left: 4px solid #67c23a;
+    z-index: 9999;
+    animation: slide-in .3s ease-out;
+  }
+  @keyframes slide-in {
+    from { transform: translateX(40px); opacity: 0; }
+    to   { transform: translateX(0); opacity: 1; }
+  }
+  .fake-notification.is-error { border-left-color: #f56c6c; }
+  .fake-notification.is-warning { border-left-color: #E6A23C; }
+  .fake-notification .nt-title {
+    font-size: 14px; font-weight: 600; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .fake-notification .nt-body { font-size: 12px; color: #606266; line-height: 1.5; }
+  .fake-notification .nt-actions {
+    margin-top: 8px;
+    display: flex; gap: 8px;
+  }
+  .fake-notification .nt-actions a {
+    color: #409EFF; font-size: 12px; cursor: pointer; text-decoration: none;
+  }
+  .fake-notification .nt-actions a:hover { text-decoration: underline; }
+
+  .toast-triggers {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+
+  /* User switcher */
+  .user-switcher {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.18);
+    padding: 4px 10px 4px 4px;
+    border-radius: 24px;
+    cursor: pointer;
+  }
+  .user-switcher .avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #409EFF 0%, #67c23a 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 600; font-size: 12px;
+  }
+  .user-switcher .info { color: #fff; font-size: 12px; line-height: 1.3; }
+  .user-switcher .info .name { font-weight: 600; }
+  .user-switcher .info .role { color: rgba(255,255,255,.65); font-size: 11px; }
+
+  /* Helper */
+  .muted-block {
+    color: #909399;
+    font-size: 12px;
+    text-align: center;
+    padding: 8px;
+    border-top: 1px dashed #e4e7ed;
+    margin-top: 16px;
+  }
+  .el-card { margin-bottom: 12px; }
+  .pulse {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #E6A23C;
+    animation: pulse 1.5s infinite;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(230,162,60,.6); }
+    70% { box-shadow: 0 0 0 8px rgba(230,162,60,0); }
+    100% { box-shadow: 0 0 0 0 rgba(230,162,60,0); }
+  }
+  .pulse.green { background: #67c23a; animation: none; }
+
+  /* Fix bar */
+  .action-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #fff;
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  }
+  .action-bar .left { font-size: 13px; color: #606266; }
+  .action-bar .right { display: flex; gap: 8px; }
+</style>
+</head>
+<body>
+<div id="app" v-cloak>
+  <!-- ============ Header ============ -->
+  <header class="app-header">
+    <div class="logo">
+      <div class="logo-mark">T</div>
+      <span>Open-TMS</span>
+      <span style="font-size:13px;color:rgba(255,255,255,.6);font-weight:400;">企业级资金管理系统</span>
+    </div>
+    <div class="right-info">
+      <span class="version-tag">UX P0 改进原型 v1.0 · 2026-07-10</span>
+      <span style="color:rgba(255,255,255,.5);">|</span>
+      <span>评审环境 · 非生产</span>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <div class="page-meta">
+      <div class="meta-text">
+        <strong>9 项 P0 改进交互原型</strong> · 基础数据 / 交易 / 规则 三大模块 ·
+        对标 <span style="color:#409EFF;">FIS Quantum</span> ·
+        <span style="color:#67c23a;">Murex MX.3</span> ·
+        <span style="color:#E6A23C;">Bloomberg AIM</span>
+      </div>
+      <div class="meta-badges">
+        <el-tag type="info" size="small">Element Plus 2.4.6</el-tag>
+        <el-tag type="success" size="small">Vue 3 CDN</el-tag>
+        <el-tag type="warning" size="small">9 Tabs</el-tag>
+      </div>
+    </div>
+
+    <div class="prototype-tabs">
+      <el-tabs v-model="activeTab" type="border-card">
+        <!-- ========== Tab 1 ========== -->
+        <el-tab-pane>
+          <template #label>
+            <span>1. 折叠筛选器</span>
+            <span class="tab-meta">P0</span>
+          </template>
+          <div class="tab-content">
+            <div class="section-title">
+              <h3>BankAccount 列表 · 折叠筛选器 <el-tag type="info" size="small">2.1</el-tag></h3>
+              <div class="text-muted">默认首屏折叠「高级筛选」,只露出高频 2 项;已选条件用徽标展示</div>
+            </div>
+
+            <!-- Filter -->
+            <div class="filter-card">
+              <div class="filter-row">
+                <el-form-item label="账户名称">
+                  <el-input v-model="t1.query.accountName" placeholder="账户名称" clearable style="width:180px" />
+                </el-form-item>
+                <el-form-item label="开户银行">
+                  <el-select v-model="t1.query.bankId" placeholder="请选择" clearable filterable style="width:160px">
+                    <el-option v-for="b in bankList" :key="b.id" :label="b.name" :value="b.id" />
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="状态">
+                  <el-select v-model="t1.query.status" placeholder="全部" clearable style="width:120px">
+                    <el-option label="启用" value="1" />
+                    <el-option label="停用" value="0" />
+                  </el-select>
+                </el-form-item>
+                <div
+                  class="advanced-toggle"
+                  :class="{ 'is-expanded': t1.advancedOpen }"
+                  @click="t1.advancedOpen = !t1.advancedOpen"
+                >
+                  <el-icon><component :is="t1.advancedOpen ? 'ArrowUp' : 'ArrowDown'" /></el-icon>
+                  <span>高级筛选</span>
+                  <span v-if="t1.advancedCount > 0" class="count-badge">已选 {{ t1.advancedCount }} 项</span>
+                </div>
+                <div class="filter-actions">
+                  <el-button type="primary" @click="t1Apply">查询</el-button>
+                  <el-button @click="t1Reset">重置</el-button>
+                  <el-button type="success">+ 新增账户</el-button>
+                </div>
+              </div>
+
+              <el-collapse-transition>
+                <div v-show="t1.advancedOpen" class="advanced-panel">
+                  <el-form-item label="币种">
+                    <el-select v-model="t1.query.currency" placeholder="全部" clearable style="width:130px">
+                      <el-option label="CNY 人民币" value="CNY" />
+                      <el-option label="USD 美元" value="USD" />
+                      <el-option label="EUR 欧元" value="EUR" />
+                      <el-option label="JPY 日元" value="JPY" />
+                      <el-option label="HKD 港币" value="HKD" />
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item label="账户类型">
+                    <el-select v-model="t1.query.accountType" placeholder="全部" clearable style="width:130px">
+                      <el-option label="活期" value="CURRENT" />
+                      <el-option label="定期" value="TERM" />
+                      <el-option label="保证金" value="MARGIN" />
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item label="管理主体">
+                    <el-select v-model="t1.query.entityId" placeholder="全部" clearable filterable style="width:160px">
+                      <el-option v-for="e in entityList" :key="e.id" :label="e.name" :value="e.id" />
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item label="SWIFT">
+                    <el-input v-model="t1.query.swift" placeholder="SWIFT Code" clearable style="width:140px" />
+                  </el-form-item>
+                  <el-form-item label="IBAN">
+                    <el-input v-model="t1.query.iban" placeholder="IBAN" clearable style="width:200px" />
+                  </el-form-item>
+                  <el-form-item label="余额范围">
+                    <el-input-number v-model="t1.query.balanceMin" :min="0" placeholder="最小" style="width:110px" />
+                    <span style="margin: 0 6px;">~</span>
+                    <el-input-number v-model="t1.query.balanceMax" :min="0" placeholder="最大" style="width:110px" />
+                  </el-form-item>
+                </div>
+              </el-collapse-transition>
+            </div>
+
+            <!-- Table -->
+            <div class="table-card">
+              <el-table :data="t1.filtered" stripe size="default" :max-height="380">
+                <el-table-column type="selection" width="50" />
+                <el-table-column type="index" label="#" width="60" align="center" />
+                <el-table-column prop="accountNo" label="账户编号" width="130" />
+                <el-table-column prop="accountName" label="账户名称" min-width="180" />
+                <el-table-column label="开户银行" width="140">
+                  <template #default="{ row }">{{ getBankName(row.bankId) }}</template>
+                </el-table-column>
+                <el-table-column prop="currency" label="币种" width="80" align="center" />
+                <el-table-column label="类型" width="80" align="center">
+                  <template #default="{ row }">
+                    <el-tag size="small">{{ getTypeLabel(row.accountType) }}</el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column label="状态" width="80" align="center">
+                  <template #default="{ row }">
+                    <el-tag :type="row.status === '1' ? 'success' : 'danger'" size="small">
+                      {{ row.status === '1' ? '启用' : '停用' }}
+                    </el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="balance" label="余额(本币)" width="140" align="right">
+                  <template #default="{ row }">
+                    <span :class="row.balance >= 0 ? 'balance-positive' : 'balance-negative'">
+                      {{ formatMoney(row.balance) }} {{ row.currency }}
+                    </span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="操作" width="160" fixed="right">
+                  <template #default>
+                    <el-button type="primary" link>编辑</el-button>
+                    <el-button type="primary" link>详情</el-button>
+                    <el-button type="danger" link>删除</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+                <span class="text-muted">共 {{  t1.filtered?.length  }} 条(已应用筛选条件)</span>
+                <el-pagination layout="prev, pager, next" :total="t1.filtered.length" :page-size="10" :current-page="1" />
+              </div>
+            </div>
+
+            <div class="muted-block">数据为模拟,与生产无关 · 引用: docs/ux-review/basedata-pages-ux-improvements.md §2.1</div>
+          </div>
+        </el-tab-pane>
+
+        <!-- ========== Tab 2 ========== -->
+        <el-tab-pane>
+          <template #label>
+            <span>2. 主体预填</span>
+            <span class="tab-meta">P0</span>
+          </template>
+          <div class="tab-content">
+            <div class="section-title">
+              <h3>DefaultBankAccountRule 列表 · 自动预填当前用户主体 <el-tag type="info" size="small">2.2</el-tag></h3>
+              <div class="text-muted">首屏不再空白,自动预填当前用户主体并加载规则;可切换用户演示</div>
+            </div>
+
+            <!-- 用户切换器 -->
+            <div class="filter-card">
+              <div class="filter-row" style="justify-content: space-between;">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span class="text-muted">当前用户</span>
+                  <el-select v-model="t2.currentUserId" @change="t2SwitchUser" style="width:280px">
+                    <el-option v-for="u in t2.users" :key="u.id" :label="u.name + ' · ' + u.role + ' · 默认主体: ' + u.entityName" :value="u.id">
+                      <span style="float:left">{{ u.name }}</span>
+                      <span style="float:right;color:#909399;font-size:12px">{{ u.entityName }}</span>
+                    </el-option>
+                  </el-select>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <el-tag type="success" effect="plain" size="small">
+                    <el-icon style="vertical-align:middle"><Check /></el-icon>
+                    <span>已自动预填主体</span>
+                  </el-tag>
+                  <span class="text-muted">避免首屏空白</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- KPI -->
+            <div class="kpi-row">
+              <div class="kpi-card">
+                <div class="kpi-icon bg-blue"><el-icon><Document /></el-icon></div>
+                <div class="kpi-label">当前主体规则</div>
+                <div class="kpi-value">{{  t2.rulesForCurrent?.length  }}</div>
+                <div class="kpi-delta">总 {{  t2.allRules?.length  }} 条</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-icon bg-green"><el-icon><CircleCheckFilled /></el-icon></div>
+                <div class="kpi-label">启用</div>
+                <div class="kpi-value">{{ t2.rulesForCurrent.filter(r => r.status === 'Active').length }}</div>
+                <div class="kpi-delta up">Inflow/Outflow 双方向</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-icon bg-orange"><el-icon><Warning /></el-icon></div>
+                <div class="kpi-label">停用</div>
+                <div class="kpi-value">{{ t2.rulesForCurrent.filter(r => r.status === 'Inactive').length }}</div>
+                <div class="kpi-delta down">需复核</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-icon bg-purple"><el-icon><DataAnalysis /></el-icon></div>
+                <div class="kpi-label">本月命中</div>
+                <div class="kpi-value">{{ t2.hitCount }}</div>
+                <div class="kpi-delta up">+12.5% MoM</div>
+              </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <span class="text-muted">规则列表 · 自动按预填主体过滤</span>
+                <div>
+                  <el-button>导出</el-button>
+                  <el-button type="success">+ 新增规则</el-button>
+                </div>
+              </div>
+              <el-table :data="t2.rulesForCurrent" stripe size="default" :max-height="380">
+                <el-table-column type="index" label="#" width="50" align="center" />
+                <el-table-column prop="ruleNumber" label="规则编号" width="170">
+                  <template #default="{ row }">
+                    <span class="text-mono" style="color:#409EFF">{{ row.ruleNumber }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="对手方" width="120">
+                  <template #default="{ row }">
+                    <span :class="row.counterpartyId ? '' : 'text-muted'">{{ row.counterpartyName || 'ALL 通配' }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="金融产品" min-width="160">
+                  <template #default="{ row }">
+                    <span :class="row.instrumentId ? '' : 'text-muted'">{{ row.instrumentName || 'ALL 通配' }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="方向" width="90" align="center">
+                  <template #default="{ row }">
+                    <el-tag :type="row.direction === 'Inflow' ? 'success' : row.direction === 'Outflow' ? 'warning' : 'info'" size="small">
+                      {{ row.direction }}
+                    </el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column label="币种" width="80" align="center">
+                  <template #default="{ row }">{{ row.currency || 'ALL' }}</template>
+                </el-table-column>
+                <el-table-column prop="bankAccountName" label="默认账户" min-width="200" />
+                <el-table-column prop="priority" label="优先级" width="100" align="center" />
+                <el-table-column label="状态" width="80" align="center">
+                  <template #default="{ row }">
+                    <el-switch v-model="row.status" active-value="Active" inactive-value="Inactive" />
+                  </template>
+                </el-table-column>
+                <el-table-column label="操作" width="180" fixed="right">
+                  <template #default>
+                    <el-button type="primary" link @click="t2OpenDetail">详情</el-button>
+                    <el-button type="primary" link>编辑</el-button>
+                    <el-button type="primary" link>复制</el-button>
+                    <el-button type="danger" link>删除</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+
+            <div class="muted-block">数据为模拟,与生产无关 · 引用: docs/ux-review/rules-pages-ux-improvements.md §2.1</div>
+          </div>
+        </el-tab-pane>
+
+        <!-- ========== Tab 3 ========== -->
+        <el-tab-pane>
+          <template #label>
+            <span>3. 余额列</span>
+            <span class="tab-meta">P0</span>
+          </template>
+          <div class="tab-content">
+            <div class="section-title">
+              <h3>BankAccount 列表 · 新增余额/IBAN/SWIFT 列 <el-tag type="info" size="small">2.3</el-tag></h3>
+              <div class="text-muted">基础数据核心字段缺失补全,顶栏加 KPI 总览(各币种折 USD)</div>
+            </div>
+
+            <!-- KPI -->
+            <div class="kpi-row">
+              <div class="kpi-card">
+                <div class="kpi-icon bg-blue"><el-icon><CreditCard /></el-icon></div>
+                <div class="kpi-label">总账户数</div>
+                <div class="kpi-value">{{  t3.allAccounts?.length  }}</div>
+                <div class="kpi-delta">CNY / USD / EUR / JPY / HKD</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-icon bg-green"><el-icon><CircleCheckFilled /></el-icon></div>
+                <div class="kpi-label">活跃账户</div>
+                <div class="kpi-value">{{ t3.activeCount }}</div>
+                <div class="kpi-delta up">{{  ((t3.activeCount / t3.allAccounts?.length) * 100).toFixed(1)  }}% 启用率</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-icon bg-cyan"><el-icon><Coin /></el-icon></div>
+                <div class="kpi-label">总余额(折 USD)</div>
+                <div class="kpi-value">$ {{ formatNumberShort(t3.totalBalanceUsd) }}</div>
+                <div class="kpi-delta up">+8.3% MoM</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-icon bg-orange"><el-icon><Histogram /></el-icon></div>
+                <div class="kpi-label">跨境账户(SWIFT/IBAN)</div>
+                <div class="kpi-value">{{ t3.crossBorderCount }}</div>
+                <div class="kpi-delta">{{  ((t3.crossBorderCount / t3.allAccounts?.length) * 100).toFixed(0)  }}%</div>
+              </div>
+            </div>
+
+            <!-- Table horizontal scroll -->
+            <div class="table-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <span class="text-muted">表格可横向滚动,新增 4 列: 余额 / IBAN / SWIFT / 最后同步</span>
+                <div>
+                  <el-button>导出余额</el-button>
+                  <el-button type="primary">同步余额</el-button>
+                </div>
+              </div>
+              <div style="overflow-x:auto;border-radius:6px;border:1px solid #ebeef5">
+                <el-table :data="t3.allAccounts" stripe size="default" style="min-width:1500px">
+                  <el-table-column type="index" label="#" width="50" align="center" fixed="left" />
+                  <el-table-column prop="accountNo" label="账户编号" width="120" fixed="left" />
+                  <el-table-column prop="accountName" label="账户名称" width="180" />
+                  <el-table-column label="开户银行" width="130">
+                    <template #default="{ row }">{{ getBankName(row.bankId) }}</template>
+                  </el-table-column>
+                  <el-table-column prop="currency" label="币种" width="70" align="center" />
+                  <el-table-column label="余额(本币)" width="160" align="right">
+                    <template #default="{ row }">
+                      <span :class="row.balance >= 0 ? 'balance-positive' : 'balance-negative'">
+                        {{ formatMoney(row.balance) }} {{ row.currency }}
+                      </span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="余额(USD 折算)" width="160" align="right">
+                    <template #default="{ row }">
+                      <span class="text-mono">$ {{ formatNumberShort(row.balanceUsd) }}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="iban" label="IBAN" width="220" show-overflow-tooltip>
+                    <template #default="{ row }">
+                      <span v-if="row.iban" class="text-mono">{{ row.iban }}</span>
+                      <span v-else class="text-muted">—</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="swift" label="SWIFT" width="120" show-overflow-tooltip>
+                    <template #default="{ row }">
+                      <span v-if="row.swift" class="text-mono">{{ row.swift }}</span>
+                      <span v-else class="text-muted">—</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="lastSync" label="最后同步" width="160">
+                    <template #default="{ row }">
+                      <span class="text-mono">{{ row.lastSync }}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="状态" width="80" align="center">
+                    <template #default="{ row }">
+                      <el-tag :type="row.status === '1' ? 'success' : 'danger'" size="small">
+                        {{ row.status === '1' ? '启用' : '停用' }}
+                      </el-tag>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="操作" width="120" fixed="right">
+                    <template #default>
+                      <el-button type="primary" link>编辑</el-button>
+                      <el-button type="danger" link>删除</el-button>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </div>
+              <div style="display:flex;justify-content:flex-end;margin-top:12px">
+                <el-pagination layout="total, prev, pager, next" :total="t3.allAccounts.length" :page-size="10" :current-page="1" />
+              </div>
+            </div>
+
+            <div class="muted-block">数据为模拟,与生产无关 · 引用: docs/ux-review/basedata-pages-ux-improvements.md §2.3</div>
+          </div>
+        </el-tab-pane>
+
+        <!-- ========== Tab 4 ========== -->
+        <el-tab-pane>
+          <template #label>
+            <span>4. AT 审批按钮</span>
+            <span class="tab-meta">P0</span>
+          </template>
+          <div class="tab-content">
+            <div class="section-title">
+              <h3>AT 交易详情页 · 补「审批通过 / 驳回 / 撤回」按钮 <el-tag type="info" size="small">2.1</el-tag></h3>
+              <div class="text-muted">修复 AT 流程断点;弹窗必填审批意见/驳回原因</div>
+            </div>
+
+            <!-- Action bar -->
+            <div class="action-bar">
+              <div class="left">
+                <span style="color:#909399">AT 交易 · 状态:</span>
+                <el-tag type="warning" size="small" style="margin-left:6px">Submitted 已提交</el-tag>
+                <span style="margin-left:12px" class="text-muted">交易号 AT20260710-0007</span>
+              </div>
+              <div class="right">
+                <el-button :icon="'CopyDocument'" plain>复制</el-button>
+                <el-button :icon="'Edit'" plain>编辑</el-button>
+                <el-button :icon="'Check'" type="primary" @click="t4ApproveDialog = true">审批通过</el-button>
+                <el-button :icon="'Close'" type="danger" plain @click="t4RejectDialog = true">驳回</el-button>
+                <el-button :icon="'RefreshLeft'" type="warning" plain @click="t4Withdraw">撤回</el-button>
+                <el-button :icon="'Delete'" type="danger" plain>删除</el-button>
+              </div>
+            </div>
+
+            <!-- Key Info Bar -->
+            <div class="key-info-bar">
+              <div class="key-item">
+                <span class="key-label">交易编号</span>
+                <span class="key-value">AT20260710-0007</span>
+              </div>
+              <div class="key-item">
+                <span class="key-label">管理主体</span>
+                <span class="key-value">BU_HEAD <span class="key-sub">总部</span></span>
+              </div>
+              <div class="key-item">
+                <span class="key-label">金额</span>
+                <span class="key-value highlight">¥ 1,250,000.00 <span class="key-sub">CNY</span></span>
+              </div>
+              <div class="key-item">
+                <span class="key-label">付款方</span>
+                <span class="key-value">招商银行 深分行 <span class="key-sub">7559...001</span></span>
+              </div>
+              <div class="key-item">
+                <span class="key-label">收款方</span>
+                <span class="key-value">工商银行 北京分行 <span class="key-sub">6222...888</span></span>
+              </div>
+              <div class="key-item">
+                <span class="key-label">类型</span>
+                <span class="key-value">同主体转账</span>
+              </div>
+            </div>
+
+            <!-- Detail card with lifecycle -->
+            <div class="detail-tabs">
+              <h3 style="font-size:15px;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+                <el-icon style="color:#409EFF"><Clock /></el-icon>
+                审批生命周期
+              </h3>
+              <div class="timeline-card">
+                <div class="timeline-row is-active">
+                  <div class="ts">2026-07-10 09:32 · 张三</div>
+                  <div class="act">提交审批</div>
+                  <div class="meta">提交人: 张三 (财务主管) · IP: 10.0.0.21</div>
+                </div>
+                <div class="timeline-row">
+                  <div class="ts">2026-07-10 09:35 · 系统</div>
+                  <div class="act">自动校验通过</div>
+                  <div class="meta">同主体、同币种、余额充足</div>
+                </div>
+                <div class="timeline-row">
+                  <div class="ts">2026-07-10 09:36 · 系统</div>
+                  <div class="act">路由到一级审批人: 李四</div>
+                  <div class="meta">基于审批规则 R-APPROVE-001</div>
+                </div>
+                <div class="timeline-row" style="opacity:.5">
+                  <div class="ts">等待中...</div>
+                  <div class="act" style="color:#E6A23C">
+                    <span class="pulse"></span>等待李四审批
+                  </div>
+                  <div class="meta">已等待 12 分钟</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Approve dialog -->
+            <el-dialog v-model="t4ApproveDialog" title="审批通过" width="520px" :close-on-click-modal="false">
+              <el-alert type="info" :closable="false" style="margin-bottom:16px">
+                <template #title>
+                  审批交易 <strong>AT20260710-0007</strong> · ¥ 1,250,000.00 CNY
+                </template>
+              </el-alert>
+              <el-form :model="t4ApproveForm" label-width="100px">
+                <el-form-item label="审批人">
+                  <el-select v-model="t4ApproveForm.approver" placeholder="请选择" style="width:100%">
+                    <el-option label="李四 (财务总监)" value="李四" />
+                    <el-option label="王五 (CFO)" value="王五" />
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="审批意见" required>
+                  <el-input v-model="t4ApproveForm.comment" type="textarea" :rows="4" placeholder="请填写审批意见..." />
+                </el-form-item>
+                <el-form-item label="通知提交人">
+                  <el-switch v-model="t4ApproveForm.notify" />
+                </el-form-item>
+              </el-form>
+              <template #footer>
+                <el-button @click="t4ApproveDialog = false">取消</el-button>
+                <el-button type="primary" @click="t4DoApprove">确认通过</el-button>
+              </template>
+            </el-dialog>
+
+            <!-- Reject dialog -->
+            <el-dialog v-model="t4RejectDialog" title="驳回交易" width="520px" :close-on-click-modal="false">
+              <el-alert type="warning" :closable="false" style="margin-bottom:16px">
+                <template #title>
+                  驳回 <strong>AT20260710-0007</strong> 后,交易将回到 New 状态,需提交人重新编辑
+                </template>
+              </el-alert>
+              <el-form :model="t4RejectForm" label-width="100px">
+                <el-form-item label="驳回原因" required>
+                  <el-select v-model="t4RejectForm.reason" placeholder="请选择驳回原因" style="width:100%">
+                    <el-option label="金额异常" value="AMOUNT_ABNORMAL" />
+                    <el-option label="付款方账户错误" value="PAYER_WRONG" />
+                    <el-option label="收款方账户错误" value="PAYEE_WRONG" />
+                    <el-option label="缺少附件凭证" value="MISSING_DOC" />
+                    <el-option label="业务背景不明" value="BUSINESS_UNCLEAR" />
+                    <el-option label="重复提交" value="DUPLICATE" />
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="详细说明" required>
+                  <el-input v-model="t4RejectForm.detail" type="textarea" :rows="3" placeholder="详细说明..." />
+                </el-form-item>
+                <el-form-item label="通知提交人">
+                  <el-switch v-model="t4RejectForm.notify" />
+                </el-form-item>
+              </el-form>
+              <template #footer>
+                <el-button @click="t4RejectDialog = false">取消</el-button>
+                <el-button type="danger" @click="t4DoReject">确认驳回</el-button>
+              </template>
+            </el-dialog>
+
+            <div class="muted-block">数据为模拟,与生产无关 · 引用: docs/ux-review/dealing-pages-ux-improvements.md §2.1</div>
+          </div>
+        </el-tab-pane>
+
+        <!-- ========== Tab 5 ========== -->
+        <el-tab-pane>
+          <template #label>
+            <span>5. FX 列表 Picker</span>
+            <span class="tab-meta">P0</span>
+          </template>
+          <div class="tab-content">
+            <div class="section-title">
+              <h3>FX 列表 · ID 输入改 BaseDataPicker + 快速日期 <el-tag type="info" size="small">2.5/2.6</el-tag></h3>
+              <div class="text-muted">管理主体/对手方不再用 el-input-number,改 filterable 远程搜索 Picker</div>
+            </div>
+
+            <!-- Filter -->
+            <div class="filter-card">
+              <div class="filter-row">
+                <el-form-item label="管理主体">
+                  <el-select
+                    v-model="t5.query.entityId"
+                    placeholder="搜索主体名/编码"
+                    filterable
+                    remote
+                    :remote-method="t5SearchEntity"
+                    :loading="t5.entityLoading"
+                    style="width:200px"
+                  >
+                    <el-option v-for="e in t5.entityOptions" :key="e.id" :label="e.name + ' (' + e.code + ')'" :value="e.id" />
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="对手方">
+                  <el-select
+                    v-model="t5.query.cpId"
+                    placeholder="搜索对手方名/编码"
+                    filterable
+                    remote
+                    :remote-method="t5SearchCp"
+                    :loading="t5.cpLoading"
+                    style="width:200px"
+                  >
+                    <el-option v-for="c in t5.cpOptions" :key="c.id" :label="c.name + ' (' + c.code + ')'" :value="c.id" />
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="交易类型">
+                  <el-select v-model="t5.query.dealType" placeholder="全部" clearable style="width:120px">
+                    <el-option label="SPOT" value="SPOT" />
+                    <el-option label="FWD" value="FWD" />
+                    <el-option label="NDF" value="NDF" />
+                    <el-option label="SWAP" value="SWAP" />
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="状态">
+                  <el-select v-model="t5.query.status" placeholder="全部" clearable style="width:110px">
+                    <el-option label="New" value="New" />
+                    <el-option label="Approved" value="Approved" />
+                    <el-option label="Settled" value="Settled" />
+                    <el-option label="Canceled" value="Canceled" />
+                  </el-select>
+                </el-form-item>
+                <div class="filter-actions">
+                  <el-button type="primary">查询</el-button>
+                  <el-button>重置</el-button>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;margin-top:12px;border-top:1px dashed #e4e7ed;padding-top:12px">
+                <span class="text-muted">快速日期</span>
+                <div class="quick-range">
+                  <button v-for="r in t5.ranges" :key="r.key" class="qr-btn" :class="{ 'is-active': t5.quickRange === r.key }" @click="t5ApplyRange(r.key)">{{ r.label }}</button>
+                </div>
+                <el-date-picker
+                  v-model="t5.query.dateRange"
+                  type="daterange"
+                  range-separator="→"
+                  start-placeholder="开始"
+                  end-placeholder="结束"
+                  style="width:260px"
+                  value-format="YYYY-MM-DD"
+                />
+                <span class="text-muted" style="margin-left:auto">已选日期范围: {{  t5.query.dateRange && t5.query.dateRange?.length ? t5.query.dateRange.join(' ~ ') : '全部'  }}</span>
+              </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <span class="text-muted">共 {{  t5.filtered?.length  }} 条 FX 交易</span>
+                <div>
+                  <el-button>导出</el-button>
+                  <el-button type="success">+ 新建 FX</el-button>
+                </div>
+              </div>
+              <el-table :data="t5.filtered" stripe :max-height="380">
+                <el-table-column type="index" label="#" width="50" fixed="left" />
+                <el-table-column prop="dealNumber" label="交易号" width="160" fixed="left">
+                  <template #default="{ row }">
+                    <span class="text-mono" style="color:#409EFF">{{ row.dealNumber }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="管理主体" min-width="160">
+                  <template #default="{ row }">
+                    <span>{{ getEntityName(row.entityId) }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="对手方" min-width="160">
+                  <template #default="{ row }">
+                    <span>{{ getCpName(row.cpId) }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="类型" width="80" align="center">
+                  <template #default="{ row }">
+                    <el-tag :type="row.dealType === 'NDF' ? 'warning' : ''" size="small">{{ row.dealType }}</el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column label="币对" width="100" align="center">
+                  <template #default="{ row }">
+                    <span class="text-mono">{{ row.buyCcy }}/{{ row.sellCcy }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="金额(USD 折)" width="140" align="right">
+                  <template #default="{ row }">
+                    <span class="text-mono">$ {{ formatNumberShort(row.amountUsd) }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="汇率" width="110" align="right">
+                  <template #default="{ row }">
+                    <span class="text-mono">{{ row.rate.toFixed(4) }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="状态" width="90" align="center">
+                  <template #default="{ row }">
+                    <el-tag :type="getStatusType(row.status)" size="small">{{ row.status }}</el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="tradeDate" label="交易日" width="110" />
+                <el-table-column label="操作" width="200" fixed="right">
+                  <template #default="{ row }">
+                    <el-button type="primary" link @click="t6Dialog = true; t6ActiveTab = 'dealmap'">详情</el-button>
+                    <el-button v-if="row.dealType === 'NDF' && !row.fixingRate" type="warning" link @click="t6Trigger('success')">RATE_FIX</el-button>
+                    <el-button type="primary" link @click="t7TriggerCopy">复制</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+
+            <div class="muted-block">数据为模拟,与生产无关 · 引用: docs/ux-review/dealing-pages-ux-improvements.md §2.5 / §2.6</div>
+          </div>
+        </el-tab-pane>
+
+        <!-- ========== Tab 6 ========== -->
+        <el-tab-pane>
+          <template #label>
+            <span>6. RATE_FIX Toast</span>
+            <span class="tab-meta">P0</span>
+          </template>
+          <div class="tab-content">
+            <div class="section-title">
+              <h3>FX NDF RATE_FIX · Toast 不打断当前 Tab <el-tag type="info" size="small">2.3</el-tag></h3>
+              <div class="text-muted">完成后 ElNotification 右上角弹出,4 秒自动消失,保留用户当前 Tab</div>
+            </div>
+
+            <!-- Tab toolbar -->
+            <div class="fx-detail-mini">
+              <div class="tab-toolbar">
+                <span class="text-muted">交易 FX20260710-0023 · NDF · 状态:</span>
+                <el-tag type="warning" size="small">Pending (待 fixing)</el-tag>
+                <el-tag type="info" size="small" plain>
+                  <span class="pulse"></span>Fix 状态
+                </el-tag>
+                <div style="margin-left:auto;display:flex;gap:8px">
+                  <el-button :type="t6ActiveTab === 'basic' ? 'primary' : 'default'" size="small" @click="t6ActiveTab = 'basic'">基本信息</el-button>
+                  <el-button :type="t6ActiveTab === 'dealmap' ? 'primary' : 'default'" size="small" @click="t6ActiveTab = 'dealmap'">DealMap</el-button>
+                  <el-button :type="t6ActiveTab === 'cashflow' ? 'primary' : 'default'" size="small" @click="t6ActiveTab = 'cashflow'">Cashflow</el-button>
+                  <el-button :type="t6ActiveTab === 'audit' ? 'primary' : 'default'" size="small" @click="t6ActiveTab = 'audit'">审计</el-button>
+                </div>
+              </div>
+
+              <!-- Current tab display -->
+              <div v-if="t6ActiveTab === 'basic'">
+                <el-alert type="info" :closable="false" style="margin-bottom:12px">
+                  <template #title>当前 Tab: 基本信息 · 你正在查看交易的关键字段</template>
+                </el-alert>
+                <div class="basic-info-grid">
+                  <div class="field"><span class="label">交易号</span><span class="value">FX20260710-0023</span></div>
+                  <div class="field"><span class="label">产品类型</span><span class="value">NDF (无本金交割远期)</span></div>
+                  <div class="field"><span class="label">币对</span><span class="value">USD/CNY</span></div>
+                  <div class="field"><span class="label">买入金额</span><span class="value">1,000,000.00 USD</span></div>
+                  <div class="field"><span class="label">锁定汇率</span><span class="value">7.2850</span></div>
+                  <div class="field"><span class="label">Fix 日期</span><span class="value">2026-07-15</span></div>
+                  <div class="field"><span class="label">对手方</span><span class="value">UBS AG</span></div>
+                  <div class="field"><span class="label">交易员</span><span class="value">张三</span></div>
+                  <div class="field"><span class="label">状态</span><span class="value" style="color:#E6A23C">Pending</span></div>
+                </div>
+              </div>
+
+              <div v-else-if="t6ActiveTab === 'dealmap'">
+                <el-alert type="info" :closable="false" style="margin-bottom:12px">
+                  <template #title>当前 Tab: DealMap · 3 行映射 (FX_RATE / FX_BUY / FX_SELL)</template>
+                </el-alert>
+                <el-table :data="t6Dealmap" size="default">
+                  <el-table-column prop="mapType" label="Map Type" width="120" />
+                  <el-table-column prop="fieldKey" label="字段" width="120" />
+                  <el-table-column prop="amount" label="金额" align="right" />
+                  <el-table-column prop="currency" label="币种" width="80" align="center" />
+                  <el-table-column prop="status" label="状态" width="100" align="center">
+                    <template #default="{ row }">
+                      <el-tag :type="row.status === 'Active' ? 'success' : 'info'" size="small">{{ row.status }}</el-tag>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </div>
+
+              <div v-else-if="t6ActiveTab === 'cashflow'">
+                <el-alert type="info" :closable="false" style="margin-bottom:12px">
+                  <template #title>当前 Tab: Cashflow · RATE_FIX 前 0 条,RATE_FIX 后将自动增加 1 条 settlement</template>
+                </el-alert>
+                <el-empty description="暂无 Cashflow · 待 RATE_FIX 后自动生成" :image-size="80" />
+              </div>
+
+              <div v-else-if="t6ActiveTab === 'audit'">
+                <el-alert type="info" :closable="false" style="margin-bottom:12px">
+                  <template #title>当前 Tab: 审计 · 生命周期事件</template>
+                </el-alert>
+                <div class="timeline-card">
+                  <div class="timeline-row is-active"><div class="ts">2026-07-10 09:00</div><div class="act">FX Deal 创建</div><div class="meta">actionNumber: A-FX-20260710-0001</div></div>
+                  <div class="timeline-row is-active"><div class="ts">2026-07-10 09:05</div><div class="act">FX 即时 Approved</div><div class="meta">FX 无审批流,直接进入 Approved</div></div>
+                  <div class="timeline-row" style="opacity:.5"><div class="ts">等待 Fix 日期 2026-07-15</div><div class="act" style="color:#E6A23C"><span class="pulse"></span>等待 RATE_FIX</div><div class="meta">fix_market_rate 未录入</div></div>
+                </div>
+              </div>
+
+              <!-- Triggers -->
+              <div style="border-top:1px dashed #e4e7ed;margin-top:16px;padding-top:16px">
+                <h4 style="font-size:13px;color:#606266;margin-bottom:8px">模拟 RATE_FIX 触发 (右上角 Toast)</h4>
+                <div class="toast-triggers">
+                  <el-button type="success" @click="t6Trigger('success')">RATE_FIX 成功(正向结算)</el-button>
+                  <el-button type="warning" @click="t6Trigger('reverse')">RATE_FIX 成功(反向结算)</el-button>
+                  <el-button type="danger" @click="t6Trigger('error')">RATE_FIX 异常</el-button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Notification mock -->
+            <div v-if="t6Notification.visible" class="fake-notification" :class="t6Notification.tone">
+              <div class="nt-title">
+                <el-icon v-if="t6Notification.tone === '' || t6Notification.tone === 'is-success'"><component :is="t6Notification.icon" /></el-icon>
+                <el-icon v-else><component :is="t6Notification.icon" /></el-icon>
+                {{ t6Notification.title }}
+              </div>
+              <div class="nt-body">{{ t6Notification.body }}</div>
+              <div class="nt-body" style="margin-top:6px">
+                <span style="color:#909399">Cashflow:</span> <span class="text-mono">{{ t6Notification.cf }}</span>
+              </div>
+              <div class="nt-actions">
+                <a @click="t6JumpTo('cashflow')">查看 cashflow →</a>
+                <a @click="t6JumpTo('dealmap')">查看 DealMap →</a>
+                <a @click="t6Notification.visible = false">关闭</a>
+              </div>
+            </div>
+
+            <div class="muted-block">数据为模拟,与生产无关 · 引用: docs/ux-review/dealing-pages-ux-improvements.md §2.3</div>
+          </div>
+        </el-tab-pane>
+
+        <!-- ========== Tab 7 ========== -->
+        <el-tab-pane>
+          <template #label>
+            <span>7. FX NDF 复制清空</span>
+            <span class="tab-meta">P0</span>
+          </template>
+          <div class="tab-content">
+            <div class="section-title">
+              <h3>FX NDF 复制 · 清空 4 个 fixing 字段 <el-tag type="info" size="small">2.17</el-tag></h3>
+              <div class="text-muted">修复 fixingRate/fixDate/settlementAmount/notional 残留问题</div>
+            </div>
+
+            <div style="margin-bottom:12px;display:flex;gap:8px">
+              <el-button type="primary" :icon="'CopyDocument'" @click="t7TriggerCopy">模拟「复制」按钮</el-button>
+              <el-button @click="t7Reset">重置回复制前</el-button>
+              <span class="text-muted" style="margin-left:auto;align-self:center">点击复制查看 fixing 字段被自动清空</span>
+            </div>
+
+            <div class="copy-compare">
+              <!-- Before -->
+              <div class="col before">
+                <h4>
+                  <el-icon><Document /></el-icon>
+                  复制前(原 NDF)
+                  <el-tag type="info" size="small">已 RATE_FIX</el-tag>
+                </h4>
+                <div class="row"><span class="k">交易号</span><span class="v">FX20260615-0008</span></div>
+                <div class="row"><span class="k">产品类型</span><span class="v">NDF</span></div>
+                <div class="row"><span class="k">币对</span><span class="v">USD/CNY</span></div>
+                <div class="row"><span class="k">对手方</span><span class="v">UBS AG</span></div>
+                <div class="row"><span class="k">买入金额</span><span class="v">1,000,000.00 USD</span></div>
+                <div class="row cleared"><span class="k">notional</span><span class="v">1,000,000.00</span></div>
+                <div class="row cleared"><span class="k">fixingRate</span><span class="v">7.2850</span></div>
+                <div class="row cleared"><span class="k">fixDate</span><span class="v">2026-07-15</span></div>
+                <div class="row cleared"><span class="k">settlementAmount</span><span class="v">+215,000.00 CNY</span></div>
+                <div class="row"><span class="k">fixRemark</span><span class="v">正常 fixing,无偏差</span></div>
+                <div class="row"><span class="k">fixMarketRate</span><span class="v">7.2925</span></div>
+              </div>
+
+              <!-- After -->
+              <div class="col after">
+                <h4>
+                  <el-icon><DocumentChecked /></el-icon>
+                  复制后(新建)
+                  <el-tag type="success" size="small">fixing 已清空</el-tag>
+                </h4>
+                <div class="row"><span class="k">交易号</span><span class="v text-muted">(新建,自动生成)</span></div>
+                <div class="row"><span class="k">产品类型</span><span class="v">NDF</span></div>
+                <div class="row"><span class="k">币对</span><span class="v">USD/CNY</span></div>
+                <div class="row"><span class="k">对手方</span><span class="v">UBS AG</span></div>
+                <div class="row"><span class="k">买入金额</span><span class="v">1,000,000.00 USD</span></div>
+                <div class="row cleared-now"><span class="k">notional</span><span class="v">— (空)</span></div>
+                <div class="row cleared-now"><span class="k">fixingRate</span><span class="v">— (空)</span></div>
+                <div class="row cleared-now"><span class="k">fixDate</span><span class="v">— (空)</span></div>
+                <div class="row cleared-now"><span class="k">settlementAmount</span><span class="v">— (空)</span></div>
+                <div class="row"><span class="k">fixRemark</span><span class="v text-muted">(空,待填写)</span></div>
+                <div class="row"><span class="k">fixMarketRate</span><span class="v text-muted">(空,fixing 后录入)</span></div>
+              </div>
+            </div>
+
+            <div class="muted-block">数据为模拟,与生产无关 · 引用: docs/ux-review/dealing-pages-ux-improvements.md §2.17</div>
+          </div>
+        </el-tab-pane>
+
+        <!-- ========== Tab 8 ========== -->
+        <el-tab-pane>
+          <template #label>
+            <span>8. 规则详情 4 Tabs</span>
+            <span class="tab-meta">P0</span>
+          </template>
+          <div class="tab-content">
+            <!-- Breadcrumb -->
+            <div class="detail-header">
+              <div class="breadcrumb">
+                <el-icon><HomeFilled /></el-icon>
+                <a @click="activeTab = 't2'">规则列表</a>
+                <el-icon><ArrowRight /></el-icon>
+                <span>规则 R20260708-0001</span>
+              </div>
+              <div class="detail-title-bar">
+                <h2>
+                  R20260708-0001
+                  <el-tag type="success" size="default">Active</el-tag>
+                  <el-tag type="warning" size="default">Inflow</el-tag>
+                </h2>
+                <div>
+                  <el-button>编辑</el-button>
+                  <el-button>复制</el-button>
+                  <el-button type="danger">停用</el-button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Key info bar -->
+            <div class="key-info-bar">
+              <div class="key-item">
+                <span class="key-label">规则编号</span>
+                <span class="key-value">R20260708-0001</span>
+              </div>
+              <div class="key-item">
+                <span class="key-label">管理主体</span>
+                <span class="key-value">BU_HEAD <span class="key-sub">总部</span></span>
+              </div>
+              <div class="key-item">
+                <span class="key-label">默认账户</span>
+                <span class="key-value">招商银行 USD 收款 <span class="key-sub">#7559...001</span></span>
+              </div>
+              <div class="key-item">
+                <span class="key-label">优先级</span>
+                <span class="key-value highlight">100</span>
+              </div>
+              <div class="key-item">
+                <span class="key-label">状态</span>
+                <span class="key-value" style="color:#67c23a">Active</span>
+              </div>
+              <div class="key-item">
+                <span class="key-label">生效日</span>
+                <span class="key-value">2026-07-08</span>
+              </div>
+            </div>
+
+            <!-- 4 Tabs -->
+            <div class="detail-tabs">
+              <el-tabs v-model="t8ActiveTab" type="card">
+                <el-tab-pane label="1. 基本信息" name="basic">
+                  <div class="basic-info-grid">
+                    <div class="field"><span class="label">规则编号</span><span class="value">R20260708-0001</span></div>
+                    <div class="field"><span class="label">管理主体</span><span class="value">BU_HEAD (总部)</span></div>
+                    <div class="field"><span class="label">方向</span><span class="value">Inflow (收)</span></div>
+                    <div class="field"><span class="label">对手方</span><span class="value">UBS AG (通配 ALL)</span></div>
+                    <div class="field"><span class="label">金融产品</span><span class="value">FX SPOT / FWD / NDF</span></div>
+                    <div class="field"><span class="label">币种</span><span class="value">USD (通配 ALL)</span></div>
+                    <div class="field"><span class="label">默认账户</span><span class="value">招商银行 USD 收款 (#75590001)</span></div>
+                    <div class="field"><span class="label">优先级</span><span class="value">100 (高)</span></div>
+                    <div class="field"><span class="label">状态</span><span class="value" style="color:#67c23a">Active</span></div>
+                    <div class="field"><span class="label">生效日</span><span class="value">2026-07-08</span></div>
+                    <div class="field"><span class="label">失效日</span><span class="value">永久</span></div>
+                    <div class="field"><span class="label">描述</span><span class="value" style="font-family:inherit">USD 收款优先走招行账户</span></div>
+                  </div>
+                </el-tab-pane>
+
+                <el-tab-pane :label="`2. 命中历史 (${t8Hits.length})`" name="hit">
+                  <el-table :data="t8Hits" size="default">
+                    <el-table-column prop="dealNumber" label="交易号" width="160">
+                      <template #default="{ row }">
+                        <span class="text-mono" style="color:#409EFF">{{ row.dealNumber }}</span>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="cpName" label="对手方" width="140" />
+                    <el-table-column prop="instrument" label="产品" width="80" align="center" />
+                    <el-table-column label="方向" width="90" align="center">
+                      <template #default="{ row }">
+                        <el-tag :type="row.direction === 'Inflow' ? 'success' : 'warning'" size="small">{{ row.direction }}</el-tag>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="amount" label="金额(USD)" width="140" align="right">
+                      <template #default="{ row }">
+                        <span class="text-mono">$ {{ formatNumberShort(row.amount) }}</span>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="currency" label="币种" width="70" align="center" />
+                    <el-table-column prop="hitAt" label="命中时间" width="160" />
+                    <el-table-column label="命中的字段" min-width="200">
+                      <template #default="{ row }">
+                        <el-tag v-for="f in row.matchedFields" :key="f" size="small" style="margin-right:4px">{{ f }}</el-tag>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </el-tab-pane>
+
+                <el-tab-pane label="3. 审计" name="audit">
+                  <div class="timeline-card">
+                    <div class="timeline-row is-active">
+                      <div class="ts">2026-07-08 09:15 · 张三</div>
+                      <div class="act">创建规则</div>
+                      <div class="meta">初始优先级 100,默认账户 #75590001,描述「USD 收款优先走招行账户」</div>
+                    </div>
+                    <div class="timeline-row is-active">
+                      <div class="ts">2026-07-08 09:16 · 张三</div>
+                      <div class="act">启用规则</div>
+                      <div class="meta">status: Inactive → Active</div>
+                    </div>
+                    <div class="timeline-row">
+                      <div class="ts">2026-07-09 14:22 · 王五</div>
+                      <div class="act">优先级调整</div>
+                      <div class="meta">priority: 80 → 100 (调整以匹配业务优先级)</div>
+                    </div>
+                    <div class="timeline-row is-danger">
+                      <div class="ts">2026-07-12 11:08 · 李四</div>
+                      <div class="act">临时停用</div>
+                      <div class="meta">status: Active → Inactive · 原因: 招行接口维护,临时切换至建行</div>
+                    </div>
+                    <div class="timeline-row is-active">
+                      <div class="ts">2026-07-12 18:30 · 李四</div>
+                      <div class="act">重新启用</div>
+                      <div class="meta">status: Inactive → Active · 备注: 接口恢复</div>
+                    </div>
+                    <div class="timeline-row">
+                      <div class="ts">2026-07-15 09:00 · 张三</div>
+                      <div class="act">描述更新</div>
+                      <div class="meta">追加「NDF 类型不命中此规则」</div>
+                    </div>
+                  </div>
+                </el-tab-pane>
+
+                <el-tab-pane label="4. 影响范围" name="impact">
+                  <div class="impact-stat-grid">
+                    <div class="impact-stat">
+                      <div class="label">被引用交易数</div>
+                      <div class="value">128 <span style="font-size:14px;color:#909399">笔</span></div>
+                    </div>
+                    <div class="impact-stat">
+                      <div class="label">活跃度(过去 30 天)</div>
+                      <div class="value success">86.4%</div>
+                    </div>
+                    <div class="impact-stat">
+                      <div class="label">月平均命中次数</div>
+                      <div class="value warning">42</div>
+                    </div>
+                    <div class="impact-stat">
+                      <div class="label">禁用后影响交易方向</div>
+                      <div class="value danger">3 <span style="font-size:14px;color:#909399">个</span></div>
+                    </div>
+                  </div>
+
+                  <h4 style="font-size:13px;color:#606266;margin:12px 0 8px">禁用本规则将影响的交易方向:</h4>
+                  <el-table :data="t8ImpactDeals" size="default">
+                    <el-table-column prop="dealNumber" label="交易号" width="170">
+                      <template #default="{ row }">
+                        <span class="text-mono">{{ row.dealNumber }}</span>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="方向" width="100" align="center">
+                      <template #default="{ row }">
+                        <el-tag :type="row.direction === 'Inflow' ? 'success' : 'warning'" size="small">{{ row.direction }}</el-tag>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="cpName" label="对手方" width="160" />
+                    <el-table-column prop="instrument" label="产品" width="80" align="center" />
+                    <el-table-column prop="amount" label="金额(USD)" width="140" align="right">
+                      <template #default="{ row }">
+                        <span class="text-mono">$ {{ formatNumberShort(row.amount) }}</span>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="status" label="状态" width="100" align="center">
+                      <template #default="{ row }">
+                        <el-tag :type="getStatusType(row.status)" size="small">{{ row.status }}</el-tag>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="若规则停用后" min-width="200">
+                      <template #default="{ row }">
+                        <span style="color:#f56c6c">→ 将路由至 R20260705-0003 (优先级 200)</span>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+
+                  <div style="margin-top:12px;background:#fdf6ec;border:1px solid #faecd8;border-radius:6px;padding:10px 14px;font-size:12px;color:#E6A23C">
+                    <el-icon style="vertical-align:middle"><Warning /></el-icon>
+                    <strong style="margin-left:4px">风控提示:</strong> 禁用本规则后,过去 30 天 86.4% 的 USD 收款交易将路由到 R20260705-0003(优先级较低),可能影响交易成功率 5-8%。
+                  </div>
+                </el-tab-pane>
+              </el-tabs>
+            </div>
+
+            <div class="muted-block">数据为模拟,与生产无关 · 引用: docs/ux-review/rules-pages-ux-improvements.md §2.2</div>
+          </div>
+        </el-tab-pane>
+
+        <!-- ========== Tab 9 ========== -->
+        <el-tab-pane>
+          <template #label>
+            <span>9. 规则 KPI Banner</span>
+            <span class="tab-meta">P0</span>
+          </template>
+          <div class="tab-content">
+            <div class="section-title">
+              <h3>DefaultBankAccountRule 列表 · 4 张 KPI 卡片 <el-tag type="info" size="small">2.3</el-tag></h3>
+              <div class="text-muted">列表顶栏加 KPI,点击可下钻(模拟),配色用渐变 + Element Plus 图标</div>
+            </div>
+
+            <!-- KPI -->
+            <div class="kpi-row">
+              <div class="kpi-card" @click="t9Drill('total')">
+                <div class="kpi-icon bg-blue"><el-icon><Files /></el-icon></div>
+                <div class="kpi-label">总规则数</div>
+                <div class="kpi-value">12</div>
+                <div class="kpi-delta up">+3 (本周新建)</div>
+              </div>
+              <div class="kpi-card" @click="t9Drill('active')">
+                <div class="kpi-icon bg-green"><el-icon><CircleCheckFilled /></el-icon></div>
+                <div class="kpi-label">启用</div>
+                <div class="kpi-value">9</div>
+                <div class="kpi-delta up">75% 启用率</div>
+              </div>
+              <div class="kpi-card" @click="t9Drill('inactive')">
+                <div class="kpi-icon bg-red"><el-icon><CircleCloseFilled /></el-icon></div>
+                <div class="kpi-label">停用</div>
+                <div class="kpi-value">3</div>
+                <div class="kpi-delta down">需复核</div>
+              </div>
+              <div class="kpi-card" @click="t9Drill('hit')">
+                <div class="kpi-icon bg-purple"><el-icon><DataAnalysis /></el-icon></div>
+                <div class="kpi-label">本月命中次数</div>
+                <div class="kpi-value">428</div>
+                <div class="kpi-delta up">+12.5% MoM</div>
+              </div>
+            </div>
+
+            <!-- Drill down result -->
+            <transition name="el-fade-in-linear">
+              <div v-if="t9DrillTarget" class="filter-card" style="border-left:4px solid #409EFF">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <strong style="color:#303133">下钻结果 · {{ t9DrillTarget.label }}</strong>
+                  <el-button link @click="t9DrillTarget = null">关闭</el-button>
+                </div>
+                <div class="text-muted" style="margin-top:6px">
+                  <span v-if="t9DrillTarget.key === 'total'">全部 12 条规则按主体分布:</span>
+                  <span v-if="t9DrillTarget.key === 'active'">9 条启用规则详情:</span>
+                  <span v-if="t9DrillTarget.key === 'inactive'">3 条停用规则详情:</span>
+                  <span v-if="t9DrillTarget.key === 'hit'">本月命中规则排行 Top 5:</span>
+                </div>
+                <div v-if="t9DrillTarget.key === 'total'" style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
+                  <div class="kpi-card-mini" style="min-width:160px"><div class="label">BU_HEAD</div><div class="value">5 <span class="unit">条</span></div></div>
+                  <div class="kpi-card-mini" style="min-width:160px"><div class="label">BU_SHENZHEN</div><div class="value">3 <span class="unit">条</span></div></div>
+                  <div class="kpi-card-mini" style="min-width:160px"><div class="label">BU_SHANGHAI</div><div class="value">2 <span class="unit">条</span></div></div>
+                  <div class="kpi-card-mini" style="min-width:160px"><div class="label">BU_BEIJING</div><div class="value">2 <span class="unit">条</span></div></div>
+                </div>
+                <div v-if="t9DrillTarget.key === 'hit'" style="margin-top:12px">
+                  <el-table :data="t9HitsTop5" size="default" :show-header="true">
+                    <el-table-column type="index" label="排名" width="80" align="center" />
+                    <el-table-column prop="ruleNumber" label="规则编号" width="170">
+                      <template #default="{ row }"><span class="text-mono">{{ row.ruleNumber }}</span></template>
+                    </el-table-column>
+                    <el-table-column prop="description" label="描述" min-width="220" />
+                    <el-table-column prop="hitCount" label="本月命中" width="120" align="right">
+                      <template #default="{ row }"><span class="text-mono">{{ row.hitCount }}</span></template>
+                    </el-table-column>
+                    <el-table-column prop="share" label="占比" width="120">
+                      <template #default="{ row }">
+                        <el-progress :percentage="row.share" :stroke-width="8" />
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </div>
+                <div v-if="t9DrillTarget.key === 'active'" style="margin-top:12px">
+                  <el-tag v-for="r in t9ActiveRules" :key="r" style="margin:4px" effect="plain" type="success">{{ r }}</el-tag>
+                </div>
+                <div v-if="t9DrillTarget.key === 'inactive'" style="margin-top:12px">
+                  <el-tag v-for="r in t9InactiveRules" :key="r" style="margin:4px" effect="plain" type="danger">{{ r }}</el-tag>
+                </div>
+              </div>
+            </transition>
+
+            <!-- Avg priority small KPI row -->
+            <div class="impact-stat-grid" style="margin-top:16px">
+              <div class="impact-stat">
+                <div class="label">平均优先级</div>
+                <div class="value" style="color:#409EFF">85</div>
+              </div>
+              <div class="impact-stat">
+                <div class="label">最高优先级规则</div>
+                <div class="value" style="color:#67c23a">10</div>
+              </div>
+              <div class="impact-stat">
+                <div class="label">最低优先级规则</div>
+                <div class="value" style="color:#909399">200</div>
+              </div>
+              <div class="impact-stat">
+                <div class="label">缓存命中率</div>
+                <div class="value success">94.2%</div>
+              </div>
+            </div>
+
+            <div class="muted-block">数据为模拟,与生产无关 · 引用: docs/ux-review/rules-pages-ux-improvements.md §2.3</div>
+          </div>
+        </el-tab-pane>
+      </el-tabs>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-plus/2.5.6/index.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-plus-icons-vue/2.1.0/index.iife.min.js"></script>
+<script>
+  const { createApp, ref, reactive, computed, onMounted, watch } = Vue
+  const ElNotification = ElementPlus.ElNotification
+  const ElMessage = ElementPlus.ElMessage
+  const ElMessageBox = ElementPlus.ElMessageBox
+
+  const app = createApp({
+    setup() {
+      const activeTab = ref('t1')
+
+      // ============ Common data ============
+      const bankList = reactive([
+        { id: 1, name: '招商银行' },
+        { id: 2, name: '工商银行' },
+        { id: 3, name: '建设银行' },
+        { id: 4, name: '中国银行' },
+        { id: 5, name: '汇丰银行' },
+        { id: 6, name: 'UBS AG' }
+      ])
+      const entityList = reactive([
+        { id: 1, code: 'BU_HEAD', name: '总部' },
+        { id: 2, code: 'BU_SHENZHEN', name: '深圳分公司' },
+        { id: 3, code: 'BU_SHANGHAI', name: '上海分公司' },
+        { id: 4, code: 'BU_BEIJING', name: '北京分公司' }
+      ])
+      const cpList = reactive([
+        { id: 1, code: 'CP_UBS', name: 'UBS AG' },
+        { id: 2, code: 'CP_CITI', name: 'Citibank' },
+        { id: 3, code: 'CP_HSBC', name: '汇丰银行' },
+        { id: 4, code: 'CP_BOC', name: '中国银行' },
+        { id: 5, code: 'CP_JPMC', name: 'JP Morgan' }
+      ])
+
+      const getBankName = (id) => (bankList.find(b => b.id === id) || {}).name || id
+      const getEntityName = (id) => (entityList.find(e => e.id === id) || {}).name || id
+      const getCpName = (id) => (cpList.find(c => c.id === id) || {}).name || id
+      const getTypeLabel = (t) => ({ CURRENT: '活期', TERM: '定期', MARGIN: '保证金' }[t] || t)
+      const getStatusType = (s) => ({ New: 'info', Pending: 'warning', Submitted: 'warning', Approved: 'success', Settled: 'success', Canceled: 'danger', Rejected: 'danger', Active: 'success', Inactive: 'info' }[s] || '')
+
+      const formatMoney = (n) => n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      const formatNumberShort = (n) => {
+        if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B'
+        if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M'
+        if (n >= 1e3) return (n / 1e3).toFixed(2) + 'K'
+        return n.toFixed(2)
+      }
+
+      // ============ Tab 1: 折叠筛选器 ============
+      const t1 = reactive({
+        query: {
+          accountName: '', bankId: '', status: '',
+          currency: '', accountType: '', entityId: '',
+          swift: '', iban: '', balanceMin: null, balanceMax: null
+        },
+        advancedOpen: false
+      })
+
+      // base bank account mock data (shared across T1 & T3)
+      const baseAccounts = [
+        { id: 1, accountNo: '75590001', accountName: '招商银行 USD 收款', bankId: 1, currency: 'USD', accountType: 'CURRENT', entityId: 1, status: '1', balance: 12500000.50, balanceUsd: 12500000.50, iban: 'CN12 CMBJ CNBN 7559 0001', swift: 'CMBCCNBS', lastSync: '2026-07-10 09:00' },
+        { id: 2, accountNo: '62220218', accountName: '工商银行 CNY 基本户', bankId: 2, currency: 'CNY', accountType: 'CURRENT', entityId: 1, status: '1', balance: 86420000.00, balanceUsd: 11894565.40, iban: '', swift: 'ICBKCNBJ', lastSync: '2026-07-10 09:05' },
+        { id: 3, accountNo: '43674281', accountName: '建设银行 USD 付款', bankId: 3, currency: 'USD', accountType: 'CURRENT', entityId: 1, status: '1', balance: 8200000.00, balanceUsd: 8200000.00, iban: '', swift: 'PCBCCNBJ', lastSync: '2026-07-10 09:01' },
+        { id: 4, accountNo: '45631890', accountName: '中国银行 EUR 收款', bankId: 4, currency: 'EUR', accountType: 'CURRENT', entityId: 2, status: '1', balance: 1500000.00, balanceUsd: 1648500.00, iban: 'DE89 3704 0044 0532 0130 00', swift: 'BKCHCNBJ', lastSync: '2026-07-10 08:55' },
+        { id: 5, accountNo: '62170012', accountName: '汇丰银行 HKD 收款', bankId: 5, currency: 'HKD', accountType: 'CURRENT', entityId: 3, status: '1', balance: 3500000.00, balanceUsd: 448750.00, iban: 'HK29 HSBC 0123 4567 8901', swift: 'HSBCHKHH', lastSync: '2026-07-10 08:50' },
+        { id: 6, accountNo: '75590002', accountName: '招商银行 CNY 定期', bankId: 1, currency: 'CNY', accountType: 'TERM', entityId: 1, status: '1', balance: 50000000.00, balanceUsd: 6880000.00, iban: '', swift: 'CMBCCNBS', lastSync: '2026-07-10 07:00' },
+        { id: 7, accountNo: '002-202-009', accountName: 'UBS USD 保证金', bankId: 6, currency: 'USD', accountType: 'MARGIN', entityId: 1, status: '1', balance: -250000.00, balanceUsd: -250000.00, iban: '', swift: 'UBSWCHZH80A', lastSync: '2026-07-10 09:10' },
+        { id: 8, accountNo: '88880001', accountName: '中国银行 JPY 收款', bankId: 4, currency: 'JPY', accountType: 'CURRENT', entityId: 4, status: '0', balance: 0, balanceUsd: 0, iban: '', swift: 'BKCHCNBJ', lastSync: '2026-07-08 18:00' }
+      ]
+      const t1Accounts = ref(baseAccounts)
+
+      const t1Filtered = computed(() => {
+        return baseAccounts.filter(a => {
+          if (t1.query.accountName && !a.accountName.includes(t1.query.accountName)) return false
+          if (t1.query.bankId && a.bankId !== t1.query.bankId) return false
+          if (t1.query.status && a.status !== t1.query.status) return false
+          if (t1.query.currency && a.currency !== t1.query.currency) return false
+          if (t1.query.accountType && a.accountType !== t1.query.accountType) return false
+          if (t1.query.entityId && a.entityId !== t1.query.entityId) return false
+          if (t1.query.swift && !a.swift.toLowerCase().includes(t1.query.swift.toLowerCase())) return false
+          if (t1.query.iban && !a.iban.includes(t1.query.iban)) return false
+          if (t1.query.balanceMin !== null && a.balance < t1.query.balanceMin) return false
+          if (t1.query.balanceMax !== null && a.balance > t1.query.balanceMax) return false
+          return true
+        })
+      })
+
+      const t1AdvancedCount = computed(() => {
+        const q = t1.query
+        return [q.currency, q.accountType, q.entityId, q.swift, q.iban, q.balanceMin, q.balanceMax].filter(v => v !== '' && v !== null && v !== undefined).length
+      })
+
+      const t1Apply = () => ElMessage.success(`查询已应用 · 命中 ${t1Filtered.value.length} 条`)
+      const t1Reset = () => {
+        Object.assign(t1.query, {
+          accountName: '', bankId: '', status: '',
+          currency: '', accountType: '', entityId: '',
+          swift: '', iban: '', balanceMin: null, balanceMax: null
+        })
+        ElMessage.info('筛选条件已重置')
+      }
+
+      // ============ Tab 2: 主体预填 ============
+      const t2 = reactive({
+        currentUserId: 1,
+        users: [
+          { id: 1, name: '张三', role: '财务主管', entityId: 1, entityName: '总部' },
+          { id: 2, name: '李四', role: '深圳财务', entityId: 2, entityName: '深圳分公司' },
+          { id: 3, name: '王五', role: '上海财务', entityId: 3, entityName: '上海分公司' },
+          { id: 4, name: '赵六', role: '北京财务', entityId: 4, entityName: '北京分公司' }
+        ]
+      })
+
+      const allRules = [
+        { id: 1, ruleNumber: 'R20260708-0001', entityId: 1, counterpartyId: null, counterpartyName: '', instrumentId: null, instrumentName: '', direction: 'Inflow', currency: 'USD', bankAccountId: 1, bankAccountName: '招商银行 USD 收款', priority: 100, status: 'Active' },
+        { id: 2, ruleNumber: 'R20260705-0003', entityId: 1, counterpartyId: null, counterpartyName: '', instrumentId: 2, instrumentName: 'FX SPOT', direction: 'Outflow', currency: '', bankAccountId: 3, bankAccountName: '建设银行 USD 付款', priority: 200, status: 'Active' },
+        { id: 3, ruleNumber: 'R20260620-0007', entityId: 1, counterpartyId: 1, counterpartyName: 'UBS AG', instrumentId: 3, instrumentName: 'FX NDF', direction: 'Outflow', currency: 'USD', bankAccountId: 7, bankAccountName: 'UBS USD 保证金', priority: 50, status: 'Active' },
+        { id: 4, ruleNumber: 'R20260701-0002', entityId: 2, counterpartyId: null, counterpartyName: '', instrumentId: null, instrumentName: '', direction: 'Inflow', currency: 'EUR', bankAccountId: 4, bankAccountName: '中国银行 EUR 收款', priority: 80, status: 'Active' },
+        { id: 5, ruleNumber: 'R20260615-0004', entityId: 2, counterpartyId: null, counterpartyName: '', instrumentId: 5, instrumentName: 'AC', direction: 'Outflow', currency: 'CNY', bankAccountId: 2, bankAccountName: '工商银行 CNY 基本户', priority: 100, status: 'Inactive' },
+        { id: 6, ruleNumber: 'R20260708-0009', entityId: 3, counterpartyId: 3, counterpartyName: '汇丰银行', instrumentId: null, instrumentName: '', direction: 'Inflow', currency: 'HKD', bankAccountId: 5, bankAccountName: '汇丰银行 HKD 收款', priority: 90, status: 'Active' },
+        { id: 7, ruleNumber: 'R20260628-0006', entityId: 3, counterpartyId: null, counterpartyName: '', instrumentId: null, instrumentName: '', direction: 'Outflow', currency: 'CNY', bankAccountId: 6, bankAccountName: '招商银行 CNY 定期', priority: 110, status: 'Active' },
+        { id: 8, ruleNumber: 'R20260709-0010', entityId: 4, counterpartyId: null, counterpartyName: '', instrumentId: 4, instrumentName: 'FX FWD', direction: 'Inflow', currency: 'JPY', bankAccountId: 8, bankAccountName: '中国银行 JPY 收款', priority: 70, status: 'Inactive' }
+      ]
+
+      const t2rulesAll = ref(allRules)
+      const currentUser = computed(() => t2.users.find(u => u.id === t2.currentUserId))
+      const t2RulesForCurrent = computed(() => t2rulesAll.value.filter(r => r.entityId === currentUser.value.entityId))
+      const t2HitCount = computed(() => {
+        const map = { 1: 145, 2: 88, 3: 102, 4: 93 }
+        return map[t2.currentUserId] || 0
+      })
+      const t2SwitchUser = () => {
+        ElMessage.success(`已切换至 ${currentUser.value.name},自动预填主体: ${currentUser.value.entityName}`)
+      }
+      const t2OpenDetail = () => { activeTab.value = 't8' }
+
+      // ============ Tab 3: 余额列 ============
+      const t3 = reactive({
+        allAccounts: baseAccounts,
+        activeCount: baseAccounts.filter(a => a.status === '1').length,
+        crossBorderCount: baseAccounts.filter(a => a.swift || a.iban).length,
+        totalBalanceUsd: baseAccounts.reduce((s, a) => s + a.balanceUsd, 0)
+      })
+
+      // ============ Tab 4: AT 详情页审批 ============
+      const t4ApproveDialog = ref(false)
+      const t4RejectDialog = ref(false)
+      const t4ApproveForm = reactive({ approver: '', comment: '', notify: true })
+      const t4RejectForm = reactive({ reason: '', detail: '', notify: true })
+
+      const t4DoApprove = () => {
+        if (!t4ApproveForm.comment.trim()) {
+          ElMessage.warning('请填写审批意见')
+          return
+        }
+        t4ApproveDialog.value = false
+        ElMessage.success(`已审批通过 · 审批人: ${t4ApproveForm.approver || '李四'}`)
+        t4ApproveForm.comment = ''
+      }
+      const t4DoReject = () => {
+        if (!t4RejectForm.reason || !t4RejectForm.detail.trim()) {
+          ElMessage.warning('请填写驳回原因与详细说明')
+          return
+        }
+        t4RejectDialog.value = false
+        ElMessageBox.alert(`驳回成功 · 原因: ${t4RejectForm.reason}`, '已驳回', { type: 'warning' })
+        t4RejectForm.reason = ''
+        t4RejectForm.detail = ''
+      }
+      const t4Withdraw = () => {
+        ElMessageBox.confirm('撤回后交易将回到 New 状态,确认撤回?', '撤回确认', { type: 'warning' }).then(() => {
+          ElMessage.success('已撤回')
+        }).catch(() => {})
+      }
+
+      // ============ Tab 5: FX 列表 Picker ============
+      const t5 = reactive({
+        query: {
+          entityId: '', cpId: '', dealType: '', status: '',
+          dateRange: []
+        },
+        quickRange: 'month',
+        ranges: [
+          { key: 'today', label: '今日' },
+          { key: 'week', label: '本周' },
+          { key: 'month', label: '本月' },
+          { key: 'quarter', label: '本季' },
+          { key: 'year', label: '本年' },
+          { key: '', label: '自定义' }
+        ],
+        entityOptions: [],
+        entityLoading: false,
+        cpOptions: [],
+        cpLoading: false
+      })
+
+      const t5SearchEntity = (kw) => {
+        t5.entityLoading = true
+        setTimeout(() => {
+          t5.entityOptions = entityList.filter(e => !kw || e.name.includes(kw) || e.code.toLowerCase().includes(kw.toLowerCase()))
+          t5.entityLoading = false
+        }, 200)
+      }
+      const t5SearchCp = (kw) => {
+        t5.cpLoading = true
+        setTimeout(() => {
+          t5.cpOptions = cpList.filter(c => !kw || c.name.includes(kw) || c.code.toLowerCase().includes(kw.toLowerCase()))
+          t5.cpLoading = false
+        }, 200)
+      }
+      t5SearchEntity('')
+      t5SearchCp('')
+
+      const fxMock = [
+        { id: 1, dealNumber: 'FX20260710-0023', entityId: 1, cpId: 1, dealType: 'NDF', buyCcy: 'USD', sellCcy: 'CNY', amountUsd: 1000000, rate: 7.2850, status: 'Pending', tradeDate: '2026-07-10', fixingRate: null },
+        { id: 2, dealNumber: 'FX20260710-0019', entityId: 1, cpId: 2, dealType: 'SPOT', buyCcy: 'EUR', sellCcy: 'USD', amountUsd: 500000, rate: 1.0990, status: 'Settled', tradeDate: '2026-07-10' },
+        { id: 3, dealNumber: 'FX20260709-0015', entityId: 2, cpId: 3, dealType: 'FWD', buyCcy: 'USD', sellCcy: 'CNY', amountUsd: 2000000, rate: 7.2950, status: 'Approved', tradeDate: '2026-07-09' },
+        { id: 4, dealNumber: 'FX20260708-0012', entityId: 1, cpId: 5, dealType: 'SWAP', buyCcy: 'USD', sellCcy: 'JPY', amountUsd: 800000, rate: 152.30, status: 'Approved', tradeDate: '2026-07-08' },
+        { id: 5, dealNumber: 'FX20260707-0008', entityId: 3, cpId: 4, dealType: 'NDF', buyCcy: 'USD', sellCcy: 'CNY', amountUsd: 1500000, rate: 7.2800, status: 'Pending', tradeDate: '2026-07-07', fixingRate: null },
+        { id: 6, dealNumber: 'FX20260705-0005', entityId: 1, cpId: 1, dealType: 'SPOT', buyCcy: 'GBP', sellCcy: 'USD', amountUsd: 350000, rate: 1.2720, status: 'Settled', tradeDate: '2026-07-05' },
+        { id: 7, dealNumber: 'FX20260703-0003', entityId: 2, cpId: 2, dealType: 'FWD', buyCcy: 'EUR', sellCcy: 'USD', amountUsd: 750000, rate: 1.0980, status: 'Approved', tradeDate: '2026-07-03' },
+        { id: 8, dealNumber: 'FX20260701-0001', entityId: 1, cpId: 5, dealType: 'NDF', buyCcy: 'USD', sellCcy: 'CNY', amountUsd: 1200000, rate: 7.2750, status: 'Canceled', tradeDate: '2026-07-01' }
+      ]
+      const t5All = ref(fxMock)
+      const t5Filtered = computed(() => {
+        return fxMock.filter(r => {
+          if (t5.query.entityId && r.entityId !== t5.query.entityId) return false
+          if (t5.query.cpId && r.cpId !== t5.query.cpId) return false
+          if (t5.query.dealType && r.dealType !== t5.query.dealType) return false
+          if (t5.query.status && r.status !== t5.query.status) return false
+          return true
+        })
+      })
+      const t5ApplyRange = (k) => {
+        t5.quickRange = k
+        const today = new Date('2026-07-10')
+        let start, end
+        if (k === 'today') { start = end = '2026-07-10' }
+        else if (k === 'week') { start = '2026-07-06'; end = '2026-07-10' }
+        else if (k === 'month') { start = '2026-07-01'; end = '2026-07-10' }
+        else if (k === 'quarter') { start = '2026-04-01'; end = '2026-07-10' }
+        else if (k === 'year') { start = '2026-01-01'; end = '2026-07-10' }
+        else { start = ''; end = '' }
+        t5.query.dateRange = (start && end) ? [start, end] : []
+        if (k) ElMessage.success(`已应用快速日期: ${t5.ranges.find(r => r.key === k).label}`)
+      }
+
+      // ============ Tab 6: RATE_FIX Toast ============
+      const t6ActiveTab = ref('basic')
+      const t6Dialog = ref(false)
+      const t6Notification = reactive({
+        visible: false, tone: '', icon: 'CircleCheckFilled',
+        title: '', body: '', cf: '', timer: null
+      })
+      const t6Dealmap = ref([
+        { mapType: 'FX_RATE', fieldKey: 'exchange_rate', amount: '7.2850', currency: '—', status: 'Active' },
+        { mapType: 'FX_BUY_AMOUNT', fieldKey: 'buy_amount', amount: '1,000,000.00', currency: 'USD', status: 'Active' },
+        { mapType: 'FX_SELL_AMOUNT', fieldKey: 'sell_amount', amount: '7,285,000.00', currency: 'CNY', status: 'Active' }
+      ])
+
+      const t6Trigger = (kind) => {
+        t6Notification.visible = false
+        if (t6Notification.timer) clearTimeout(t6Notification.timer)
+        if (kind === 'success') {
+          t6Notification.tone = ''
+          t6Notification.icon = 'CircleCheckFilled'
+          t6Notification.title = 'RATE_FIX 完成(正向结算)'
+          t6Notification.body = 'Fix Rate: 7.2925(优于锁定 7.2850)· 结算: +7,500.00 CNY(收入)'
+          t6Notification.cf = 'CF20260710-0089'
+        } else if (kind === 'reverse') {
+          t6Notification.tone = 'is-warning'
+          t6Notification.icon = 'WarningFilled'
+          t6Notification.title = 'RATE_FIX 完成(反向结算)'
+          t6Notification.body = 'Fix Rate: 7.2700(劣于锁定 7.2850)· 结算: -15,000.00 CNY(支出)'
+          t6Notification.cf = 'CF20260710-0090'
+        } else {
+          t6Notification.tone = 'is-error'
+          t6Notification.icon = 'CircleCloseFilled'
+          t6Notification.title = 'RATE_FIX 异常'
+          t6Notification.body = 'Fix Market 数据源连接失败 (Reuters Feed timeout),请重试或切换数据源'
+          t6Notification.cf = '—'
+        }
+        t6Notification.visible = true
+        // Also use real ElNotification
+        ElNotification({
+          title: t6Notification.title,
+          message: t6Notification.body + ' · Cashflow: ' + t6Notification.cf,
+          type: kind === 'success' ? 'success' : (kind === 'reverse' ? 'warning' : 'error'),
+          duration: 4000,
+          position: 'top-right'
+        })
+        t6Notification.timer = setTimeout(() => { t6Notification.visible = false }, 4000)
+      }
+      const t6JumpTo = (tab) => {
+        t6ActiveTab.value = tab
+        t6Notification.visible = false
+        ElMessage.info(`已跳转到 ${tab} Tab`)
+      }
+
+      // ============ Tab 7: FX NDF 复制清空 ============
+      const t7TriggerCopy = () => {
+        ElNotification.success({
+          title: '复制成功',
+          message: '已清空 4 个 NDF fixing 字段(fixingRate / fixDate / settlementAmount / notional)',
+          duration: 3500,
+          position: 'top-right'
+        })
+        ElMessage.success('复制成功 · 新建交易表单已准备好,fixing 字段已清空')
+      }
+      const t7Reset = () => ElMessage.info('已重置回复制前状态')
+
+      // ============ Tab 8: 规则详情 4 Tabs ============
+      const t8ActiveTab = ref('basic')
+      const t8Hits = ref([
+        { dealNumber: 'FX20260710-0023', cpName: 'UBS AG', instrument: 'NDF', direction: 'Inflow', amount: 1000000, currency: 'USD', hitAt: '2026-07-10 09:00', matchedFields: ['Inflow', 'USD', 'FX'] },
+        { dealNumber: 'FX20260709-0015', cpName: 'Citibank', instrument: 'FWD', direction: 'Inflow', amount: 2000000, currency: 'USD', hitAt: '2026-07-09 14:22', matchedFields: ['Inflow', 'USD'] },
+        { dealNumber: 'FX20260708-0012', cpName: 'JP Morgan', instrument: 'SWAP', direction: 'Inflow', amount: 800000, currency: 'USD', hitAt: '2026-07-08 11:08', matchedFields: ['Inflow', 'USD', 'FX'] },
+        { dealNumber: 'FX20260705-0005', cpName: 'UBS AG', instrument: 'SPOT', direction: 'Inflow', amount: 350000, currency: 'USD', hitAt: '2026-07-05 09:30', matchedFields: ['Inflow', 'USD', 'FX'] },
+        { dealNumber: 'AC20260703-0008', cpName: 'HSBC', instrument: 'AC', direction: 'Inflow', amount: 450000, currency: 'USD', hitAt: '2026-07-03 16:45', matchedFields: ['Inflow', 'USD'] },
+        { dealNumber: 'FX20260702-0009', cpName: 'Citibank', instrument: 'SPOT', direction: 'Inflow', amount: 600000, currency: 'USD', hitAt: '2026-07-02 10:15', matchedFields: ['Inflow', 'USD', 'FX'] }
+      ])
+
+      const t8ImpactDeals = ref([
+        { dealNumber: 'FX20260715-0001', direction: 'Inflow', cpName: 'UBS AG', instrument: 'NDF', amount: 1500000, status: 'Approved' },
+        { dealNumber: 'FX20260720-0005', direction: 'Inflow', cpName: 'Citibank', instrument: 'FWD', amount: 850000, status: 'New' },
+        { dealNumber: 'AC20260722-0003', direction: 'Inflow', cpName: 'HSBC', instrument: 'AC', amount: 320000, status: 'Approved' }
+      ])
+
+      // ============ Tab 9: KPI Banner ============
+      const t9DrillTarget = ref(null)
+      const t9Drill = (k) => {
+        const map = {
+          total: { key: 'total', label: '总规则数(按主体)' },
+          active: { key: 'active', label: '启用规则明细' },
+          inactive: { key: 'inactive', label: '停用规则明细' },
+          hit: { key: 'hit', label: '本月命中 Top 5' }
+        }
+        t9DrillTarget.value = map[k]
+      }
+      const t9HitsTop5 = ref([
+        { ruleNumber: 'R20260708-0001', description: 'USD 收款优先走招行账户', hitCount: 145, share: 34 },
+        { ruleNumber: 'R20260705-0003', description: 'FX SPOT Outflow 走建行', hitCount: 112, share: 26 },
+        { ruleNumber: 'R20260620-0007', description: 'FX NDF × UBS × Outflow × USD', hitCount: 88, share: 21 },
+        { ruleNumber: 'R20260701-0002', description: 'EUR 收款优先中行', hitCount: 51, share: 12 },
+        { ruleNumber: 'R20260628-0006', description: 'CNY 大额 Outflow', hitCount: 32, share: 7 }
+      ])
+      const t9ActiveRules = ref([
+        'R20260708-0001 · USD 收款', 'R20260705-0003 · FX SPOT Outflow', 'R20260620-0007 · FX NDF × UBS',
+        'R20260701-0002 · EUR 收款', 'R20260708-0009 · HKD 收款', 'R20260628-0006 · CNY 大额 Outflow',
+        'R20260712-0008 · AC USD 收款', 'R20260703-0004 · FWD Outflow', 'R20260710-0011 · SWAP Outflow'
+      ])
+      const t9InactiveRules = ref([
+        'R20260615-0004 · AC × 深圳分公司', 'R20260709-0010 · FWD × 北京 JPY', 'R20260706-0005 · 已废弃'
+      ])
+
+      return {
+        activeTab,
+        bankList, entityList, cpList,
+        getBankName, getEntityName, getCpName, getTypeLabel, getStatusType,
+        formatMoney, formatNumberShort,
+        // Tab 1
+        t1, t1Accounts, t1Filtered, t1AdvancedCount, t1Apply, t1Reset,
+        // Tab 2
+        t2, allRules, t2rulesAll, currentUser, t2RulesForCurrent: t2RulesForCurrent, t2HitCount, t2SwitchUser, t2OpenDetail,
+        // Tab 3
+        t3,
+        // Tab 4
+        t4ApproveDialog, t4RejectDialog, t4ApproveForm, t4RejectForm, t4DoApprove, t4DoReject, t4Withdraw,
+        // Tab 5
+        t5, t5All, t5Filtered, t5SearchEntity, t5SearchCp, t5ApplyRange,
+        // Tab 6
+        t6ActiveTab, t6Dialog, t6Notification, t6Dealmap, t6Trigger, t6JumpTo,
+        // Tab 7
+        t7TriggerCopy, t7Reset,
+        // Tab 8
+        t8ActiveTab, t8Hits, t8ImpactDeals,
+        // Tab 9
+        t9DrillTarget, t9Drill, t9HitsTop5, t9ActiveRules, t9InactiveRules
+      }
+    }
+  })
+
+  // Register all icons
+  for (const [key, comp] of Object.entries(ElementPlusIconsVue)) {
+    app.component(key, comp)
+  }
+
+  app.use(ElementPlus)
+  app.mount('#app')
+</script>
+</body>
+</html>
