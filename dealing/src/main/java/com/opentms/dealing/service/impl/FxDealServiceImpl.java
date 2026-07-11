@@ -64,6 +64,10 @@ public class FxDealServiceImpl implements FxDealService {
     private final DealMapMapper dealMapMapper;
     private final CashflowMapper cashflowMapper;
     /**
+     * 现金流镜像服务 (v1.0 - 2026-07-11, 自动写 tms_cashflow_image_t)
+     */
+    private final com.opentms.dealing.service.CashflowImageService cashflowImageService;
+    /**
      * 跨模块关联实体名称查询 (用于 copy 端点补全名称字段, 2026-07-05)
      */
     private final EntityNameLookup entityNameLookup;
@@ -113,12 +117,14 @@ public class FxDealServiceImpl implements FxDealService {
                              ActionMapper actionMapper,
                              DealMapMapper dealMapMapper,
                              CashflowMapper cashflowMapper,
+                             com.opentms.dealing.service.CashflowImageService cashflowImageService,
                              EntityNameLookup entityNameLookup) {
         this.dealMapper = dealMapper;
         this.fxDealMapper = fxDealMapper;
         this.actionMapper = actionMapper;
         this.dealMapMapper = dealMapMapper;
         this.cashflowMapper = cashflowMapper;
+        this.cashflowImageService = cashflowImageService;
         this.entityNameLookup = entityNameLookup;
     }
 
@@ -339,8 +345,8 @@ public class FxDealServiceImpl implements FxDealService {
             Map<String, Object> pair = entityNameLookup.findCurrencyPair(fxDeal != null ? fxDeal.getCurrencyPairId() : null);
             if (pair != null) {
                 Object pc = pair.get("pairCode");
-                Object c1 = pair.get("baseCurrency");
-                Object c2 = pair.get("quoteCurrency");
+                Object c1 = pair.get("currency1");
+                Object c2 = pair.get("currency2");
                 StringBuilder sb = new StringBuilder();
                 if (pc != null) sb.append(pc);
                 if (c1 != null && c2 != null) {
@@ -399,10 +405,10 @@ public class FxDealServiceImpl implements FxDealService {
 
         Map<String, Object> pair = entityNameLookup.findCurrencyPair(fxDeal != null ? fxDeal.getCurrencyPairId() : null);
         if (pair != null) {
-            // pairCode (baseCurrency/quoteCurrency) - 与 picker displayFormat 一致
+            // pairCode (currency1/currency2) - 与 picker displayFormat 一致
             Object pc = pair.get("pairCode");
-            Object c1 = pair.get("baseCurrency");
-            Object c2 = pair.get("quoteCurrency");
+            Object c1 = pair.get("currency1");
+            Object c2 = pair.get("currency2");
             StringBuilder sb = new StringBuilder();
             if (pc != null) sb.append(pc);
             if (c1 != null && c2 != null) {
@@ -780,6 +786,14 @@ public class FxDealServiceImpl implements FxDealService {
                 .eq(DealMap::getDealNumber, dealNumber));
         if (!allDms.isEmpty()) {
             List<String> dmNumbers = allDms.stream().map(DealMap::getDealmapNumber).toList();
+            // v1.0: 先写 DELETE 镜像再软删
+            List<Cashflow> cfsToDel = cashflowMapper.selectList(
+                    new LambdaQueryWrapper<Cashflow>()
+                            .in(Cashflow::getDealmapNumber, dmNumbers)
+                            .eq(Cashflow::getDeleted, NOT_DELETED));
+            for (Cashflow cf : cfsToDel) {
+                writeCashflowImageSafe(cf, "DELETE");
+            }
             LambdaUpdateWrapper<Cashflow> cfDel = new LambdaUpdateWrapper<>();
             cfDel.in(Cashflow::getDealmapNumber, dmNumbers)
                     .eq(Cashflow::getDeleted, NOT_DELETED)
@@ -905,6 +919,8 @@ public class FxDealServiceImpl implements FxDealService {
         cf.setVersion(0);
         cf.setDeleted(NOT_DELETED);
         cashflowMapper.insert(cf);
+        // v1.0: NDF Rate Fix 触发 RATE_FIX 镜像
+        writeCashflowImageSafe(cf, "RATE_FIX");
 
         // 5. UPDATE FxDeal（fixingRate + settlementAmount + 新增 Phase 1 字段）
         fxDeal.setFixingRate(fixingRate);
@@ -1012,6 +1028,20 @@ public class FxDealServiceImpl implements FxDealService {
         cf.setVersion(0);
         cf.setDeleted(NOT_DELETED);
         cashflowMapper.insert(cf);
+        writeCashflowImageSafe(cf, "CREATE");
+    }
+
+    /**
+     * v1.0: 写 Cashflow 镜像（失败抛异常触发事务回滚）
+     */
+    private void writeCashflowImageSafe(Cashflow cf, String imageType) {
+        try {
+            cashflowImageService.append(cf, imageType);
+        } catch (RuntimeException e) {
+            log.error("[FxDealService] 写 {} 镜像失败,事务回滚: cflowNumber={}, err={}",
+                    imageType, cf.getCflowNumber(), e.getMessage(), e);
+            throw e;
+        }
     }
 
     private boolean isNdfInstrument(Long instrumentId) {

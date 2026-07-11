@@ -21,7 +21,7 @@ public class SubsidiaryVO {
 
     private String parentCode;
 
-    private String businessUnitCode;
+    private String managementEntityCode;
 
     private String legalPerson;
 

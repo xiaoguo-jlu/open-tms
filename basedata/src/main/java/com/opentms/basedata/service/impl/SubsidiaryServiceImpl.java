@@ -100,7 +100,7 @@ public class SubsidiaryServiceImpl extends ServiceImpl<SubsidiaryMapper, Subsidi
         wrapper.set(Subsidiary::getName, dto.getName());
         wrapper.set(Subsidiary::getEnName, dto.getEnName());
         wrapper.set(Subsidiary::getParentCode, dto.getParentCode());
-        wrapper.set(Subsidiary::getBusinessUnitCode, dto.getBusinessUnitCode());
+        wrapper.set(Subsidiary::getManagementEntityCode, dto.getManagementEntityCode());
         wrapper.set(Subsidiary::getLegalPerson, dto.getLegalPerson());
         wrapper.set(Subsidiary::getRegistrationNo, dto.getRegistrationNo());
         wrapper.set(Subsidiary::getTaxNo, dto.getTaxNo());
@@ -151,7 +151,7 @@ public class SubsidiaryServiceImpl extends ServiceImpl<SubsidiaryMapper, Subsidi
         vo.setName(entity.getName());
         vo.setEnName(entity.getEnName());
         vo.setParentCode(entity.getParentCode());
-        vo.setBusinessUnitCode(entity.getBusinessUnitCode());
+        vo.setManagementEntityCode(entity.getManagementEntityCode());
         vo.setLegalPerson(entity.getLegalPerson());
         vo.setRegistrationNo(entity.getRegistrationNo());
         vo.setTaxNo(entity.getTaxNo());
@@ -172,7 +172,7 @@ public class SubsidiaryServiceImpl extends ServiceImpl<SubsidiaryMapper, Subsidi
         entity.setName(dto.getName());
         entity.setEnName(dto.getEnName());
         entity.setParentCode(dto.getParentCode());
-        entity.setBusinessUnitCode(dto.getBusinessUnitCode());
+        entity.setManagementEntityCode(dto.getManagementEntityCode());
         entity.setLegalPerson(dto.getLegalPerson());
         entity.setRegistrationNo(dto.getRegistrationNo());
         entity.setTaxNo(dto.getTaxNo());

@@ -38,6 +38,20 @@ public interface CashflowService {
     List<CashflowVO> listByDealNumber(String dealNumber);
 
     /**
+     * 更新现金流（v1.0 - 透明下沉银行账户ID + 写镜像）
+     *
+     * <p>写入 UPDATE 镜像 → 重新调默认银行账户规则（若参数变化）→ 更新主表 → 失败回滚。</p>
+     */
+    boolean updateCashflow(Cashflow cashflow);
+
+    /**
+     * 软删除现金流（v1.0 - 写 DELETE 镜像）
+     *
+     * <p>写入 DELETE 镜像 → 软删主表 → 失败回滚。</p>
+     */
+    boolean deleteCashflow(Long id);
+
+    /**
      * 生成 cflow_number 编号
      */
     String generateCflowNumber();

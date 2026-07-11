@@ -38,6 +38,14 @@ public class Cashflow {
     @TableField("counterparty_account")
     private String counterpartyAccount;
 
+    /** 我方银行账户 ID（v1.0 新增 — 默认银行账户规则自动填充或人工选） */
+    @TableField("bank_account_id")
+    private Long bankAccountId;
+
+    /** 对手方银行账户 ID（v1.0 新增） */
+    @TableField("counterparty_bank_account_id")
+    private Long counterpartyBankAccountId;
+
     private String direction;
 
     private BigDecimal amount;

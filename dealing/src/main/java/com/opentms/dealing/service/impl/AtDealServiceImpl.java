@@ -24,6 +24,8 @@ import com.opentms.dealing.vo.AtDealImageVO;
 import com.opentms.dealing.vo.AtDealVO;
 import com.opentms.dealing.vo.CashflowVO;
 import com.opentms.dealing.vo.DealMapVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +50,8 @@ import java.util.Map;
 @Service
 public class AtDealServiceImpl implements AtDealService {
 
+    private static final Logger log = LoggerFactory.getLogger(AtDealServiceImpl.class);
+
     private final DealMapper dealMapper;
     private final AtDealMapper atDealMapper;
     private final AtDealImageMapper atDealImageMapper;
@@ -55,6 +59,10 @@ public class AtDealServiceImpl implements AtDealService {
     private final DealMapMapper dealMapMapper;
     private final CashflowMapper cashflowMapper;
     private final BankAccountLookup bankAccountLookup;
+    /**
+     * 现金流镜像服务 (v1.0 - 2026-07-11, 自动写 tms_cashflow_image_t)
+     */
+    private final com.opentms.dealing.service.CashflowImageService cashflowImageService;
     /**
      * 跨模块关联实体名称查询 (用于详情响应补全名称, 2026-07-05)
      */
@@ -97,6 +105,7 @@ public class AtDealServiceImpl implements AtDealService {
                              DealMapMapper dealMapMapper,
                              CashflowMapper cashflowMapper,
                              BankAccountLookup bankAccountLookup,
+                             com.opentms.dealing.service.CashflowImageService cashflowImageService,
                              EntityNameLookup entityNameLookup) {
         this.dealMapper = dealMapper;
         this.atDealMapper = atDealMapper;
@@ -105,6 +114,7 @@ public class AtDealServiceImpl implements AtDealService {
         this.bankAccountLookup = bankAccountLookup;
         this.dealMapMapper = dealMapMapper;
         this.cashflowMapper = cashflowMapper;
+        this.cashflowImageService = cashflowImageService;
         this.entityNameLookup = entityNameLookup;
     }
 
@@ -368,12 +378,19 @@ public class AtDealServiceImpl implements AtDealService {
                 .set(DealMap::getUpdatedAt, now);
         dealMapMapper.update(null, dmDel);
 
-        // 6. 软删旧 Cashflow（dealmap_number 指向旧 DealMap 的）
+        // 6. 软删旧 Cashflow（dealmap_number 指向旧 DealMap 的,v1.0: 先写 DELETE 镜像再软删）
         List<DealMap> oldDms = dealMapMapper.selectList(new LambdaQueryWrapper<DealMap>()
                 .eq(DealMap::getDealNumber, dealNumber)
                 .eq(DealMap::getDeleted, DELETED));
         if (!oldDms.isEmpty()) {
             List<String> oldNumbers = oldDms.stream().map(DealMap::getDealmapNumber).toList();
+            List<Cashflow> oldCfs = cashflowMapper.selectList(
+                    new LambdaQueryWrapper<Cashflow>()
+                            .in(Cashflow::getDealmapNumber, oldNumbers)
+                            .eq(Cashflow::getDeleted, DEALMAP_NOT_DELETED));
+            for (Cashflow cf : oldCfs) {
+                writeCashflowImageSafe(cf, "DELETE");
+            }
             LambdaUpdateWrapper<Cashflow> cfDel = new LambdaUpdateWrapper<>();
             cfDel.in(Cashflow::getDealmapNumber, oldNumbers)
                     .eq(Cashflow::getDeleted, DEALMAP_NOT_DELETED)
@@ -469,11 +486,19 @@ public class AtDealServiceImpl implements AtDealService {
                 .set(DealMap::getUpdatedAt, now);
         dealMapMapper.update(null, dmDel);
 
-        // 6. 级联软删 Cashflow
+        // 6. 级联软删 Cashflow (v1.0: 先写 DELETE 镜像再软删)
         List<DealMap> allDms = dealMapMapper.selectList(new LambdaQueryWrapper<DealMap>()
                 .eq(DealMap::getDealNumber, dealNumber));
         if (!allDms.isEmpty()) {
             List<String> numbers = allDms.stream().map(DealMap::getDealmapNumber).toList();
+            // 先把全部未删 cashflow 拉出来,逐条写 DELETE 镜像
+            List<Cashflow> cfsToDel = cashflowMapper.selectList(
+                    new LambdaQueryWrapper<Cashflow>()
+                            .in(Cashflow::getDealmapNumber, numbers)
+                            .eq(Cashflow::getDeleted, DEALMAP_NOT_DELETED));
+            for (Cashflow cf : cfsToDel) {
+                writeCashflowImageSafe(cf, "DELETE");
+            }
             LambdaUpdateWrapper<Cashflow> cfDel = new LambdaUpdateWrapper<>();
             cfDel.in(Cashflow::getDealmapNumber, numbers)
                     .eq(Cashflow::getDeleted, DEALMAP_NOT_DELETED)
@@ -637,6 +662,9 @@ public class AtDealServiceImpl implements AtDealService {
         cf1.setManagementEntity(dto.getManagementEntity());
         cf1.setBankAccount(String.valueOf(dto.getSourceAccountId()));
         cf1.setCounterpartyAccount(String.valueOf(dto.getDestAccountId()));
+        // v1.0: AT 内部转账,我方=源账户、对方=目标账户
+        cf1.setBankAccountId(dto.getSourceAccountId());
+        cf1.setCounterpartyBankAccountId(dto.getDestAccountId());
         cf1.setDirection(DIRECTION_OUTFLOW);
         cf1.setAmount(dto.getSourceAmount());
         cf1.setCurrency(dto.getSourceCurrency());
@@ -653,6 +681,7 @@ public class AtDealServiceImpl implements AtDealService {
         cf1.setVersion(0);
         cf1.setDeleted(DEALMAP_NOT_DELETED);
         cashflowMapper.insert(cf1);
+        writeCashflowImageSafe(cf1, "CREATE");
 
         // Cashflow #2: DESTINATION
         Cashflow cf2 = new Cashflow();
@@ -662,6 +691,9 @@ public class AtDealServiceImpl implements AtDealService {
         cf2.setManagementEntity(dto.getManagementEntity());
         cf2.setBankAccount(String.valueOf(dto.getDestAccountId()));
         cf2.setCounterpartyAccount(String.valueOf(dto.getSourceAccountId()));
+        // v1.0: AT 内部转账,我方=目标账户、对方=源账户
+        cf2.setBankAccountId(dto.getDestAccountId());
+        cf2.setCounterpartyBankAccountId(dto.getSourceAccountId());
         cf2.setDirection(DIRECTION_INFLOW);
         cf2.setAmount(dto.getDestAmount());
         cf2.setCurrency(dto.getDestCurrency());
@@ -678,6 +710,20 @@ public class AtDealServiceImpl implements AtDealService {
         cf2.setVersion(0);
         cf2.setDeleted(DEALMAP_NOT_DELETED);
         cashflowMapper.insert(cf2);
+        writeCashflowImageSafe(cf2, "CREATE");
+    }
+
+    /**
+     * v1.0: 写 Cashflow 镜像（失败抛异常触发事务回滚）
+     */
+    private void writeCashflowImageSafe(Cashflow cf, String imageType) {
+        try {
+            cashflowImageService.append(cf, imageType);
+        } catch (RuntimeException e) {
+            log.error("[AtDealService] 写 {} 镜像失败,事务回滚: cflowNumber={}, err={}",
+                    imageType, cf.getCflowNumber(), e.getMessage(), e);
+            throw e;
+        }
     }
 
     // ======================== Copy ========================
@@ -748,9 +794,9 @@ public class AtDealServiceImpl implements AtDealService {
             throw new RuntimeException("目标账户不存在或已删除: id=" + dto.getDestAccountId());
         }
         Object sourceCurrency = sourceSnap.get("currency");
-        Object sourceMgmtObj  = sourceSnap.get("business_unit_id");
+        Object sourceMgmtObj  = sourceSnap.get("management_entity_id");
         Object destCurrency   = destSnap.get("currency");
-        Object destMgmtObj    = destSnap.get("business_unit_id");
+        Object destMgmtObj    = destSnap.get("management_entity_id");
 
         // 跨币种直接拒绝 (哪怕填了汇率也不允许, AT 不做汇兑)
         if (sourceCurrency != null && destCurrency != null

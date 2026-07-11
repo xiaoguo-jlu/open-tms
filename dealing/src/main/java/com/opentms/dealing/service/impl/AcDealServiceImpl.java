@@ -15,6 +15,8 @@ import com.opentms.dealing.vo.ActionVO;
 import com.opentms.dealing.vo.CashflowVO;
 import com.opentms.dealing.vo.DealMapVO;
 import com.opentms.dealing.vo.DealVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements AcDealService {
+
+    private static final Logger log = LoggerFactory.getLogger(AcDealServiceImpl.class);
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
@@ -58,8 +62,13 @@ public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements 
     private final ActionMapper actionMapper;
     private final DealImageMapper dealImageMapper;
     private final AcDealImageMapper acDealImageMapper;
+    private final CashflowMapper cashflowMapper;
     private final DealMapService dealMapService;
     private final CashflowService cashflowService;
+    /**
+     * 现金流镜像服务 (v1.0 - 2026-07-11, 自动写 tms_cashflow_image_t)
+     */
+    private final com.opentms.dealing.service.CashflowImageService cashflowImageService;
     /**
      * 跨模块关联实体名称查询 (用于 copy 端点补全名称字段, 2026-07-05)
      */
@@ -69,15 +78,19 @@ public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements 
                              ActionMapper actionMapper,
                              DealImageMapper dealImageMapper,
                              AcDealImageMapper acDealImageMapper,
+                             CashflowMapper cashflowMapper,
                              @Lazy DealMapService dealMapService,
                              @Lazy CashflowService cashflowService,
+                             @Lazy com.opentms.dealing.service.CashflowImageService cashflowImageService,
                              EntityNameLookup entityNameLookup) {
         this.acDealMapper = acDealMapper;
         this.actionMapper = actionMapper;
         this.dealImageMapper = dealImageMapper;
         this.acDealImageMapper = acDealImageMapper;
+        this.cashflowMapper = cashflowMapper;
         this.dealMapService = dealMapService;
         this.cashflowService = cashflowService;
+        this.cashflowImageService = cashflowImageService;
         this.entityNameLookup = entityNameLookup;
     }
 
@@ -284,6 +297,9 @@ public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements 
         cashflow.setManagementEntity(dto.getManagementEntity());
         cashflow.setBankAccount(dto.getBankAccountId() != null ? String.valueOf(dto.getBankAccountId()) : null);
         cashflow.setCounterpartyAccount(dto.getCounterpartyAccountId() != null ? String.valueOf(dto.getCounterpartyAccountId()) : null);
+        // v1.0: 直接写入 v1.1 规则匹配的 ID（DTO 已通过 BankAccountLookup 解析过,避免再触发 HTTP 规则匹配）
+        cashflow.setBankAccountId(dto.getBankAccountId());
+        cashflow.setCounterpartyBankAccountId(dto.getCounterpartyAccountId());
         cashflow.setDirection(dto.getDirection());
         cashflow.setAmount(dto.getAmount());
         cashflow.setCurrency(dto.getCurrency());
@@ -296,6 +312,15 @@ public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements 
         cashflow.setCreatedAt(now);
         cashflow.setVersion(1);
         cashflowService.save(cashflow);
+
+        // ⑤b v1.0: 写 CREATE 镜像（@Transactional 整体回滚,镜像失败 → AC 创建失败）
+        try {
+            cashflowImageService.append(cashflow, "CREATE");
+        } catch (RuntimeException e) {
+            log.error("[AcDealService] CREATE 镜像写入失败,事务回滚: cflowNumber={}, err={}",
+                    cashflow.getCflowNumber(), e.getMessage(), e);
+            throw e;
+        }
 
         // ⑥ ❌ CREATE 不生成 DealImage
 
@@ -418,7 +443,61 @@ public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements 
 
         // ⑨ ✅ UPDATE Cashflow - 指向新 DealMap
         if (StringUtils.hasText(oldDealMapNumber)) {
-            cashflowService.updateDealMapNumber(oldDealMapNumber, newDealMapNumber);
+            // v1.0: 先写 DELETE 镜像（旧 cashflow 改前快照）
+            List<Cashflow> oldCashflows = cashflowMapper.selectList(
+                    new LambdaQueryWrapper<Cashflow>()
+                            .eq(Cashflow::getDealmapNumber, oldDealMapNumber)
+                            .eq(Cashflow::getDeleted, "0"));
+            for (Cashflow oldCf : oldCashflows) {
+                try {
+                    cashflowImageService.append(oldCf, "DELETE");
+                } catch (RuntimeException e) {
+                    log.error("[AcDealService] UPDATE 镜像(DELETE)写入失败,事务回滚: cflowNumber={}, err={}",
+                            oldCf.getCflowNumber(), e.getMessage(), e);
+                    throw e;
+                }
+                // 软删旧 cashflow
+                Cashflow delCf = new Cashflow();
+                delCf.setId(oldCf.getId());
+                delCf.setDeleted("1");
+                delCf.setUpdatedBy(dto.getOperator());
+                delCf.setUpdatedAt(now);
+                delCf.setVersion(oldCf.getVersion() != null ? oldCf.getVersion() + 1 : 1);
+                cashflowMapper.updateById(delCf);
+            }
+            // INSERT 新 cashflow (改后)
+            Cashflow newCf = new Cashflow();
+            newCf.setCflowNumber(cashflowService.generateCflowNumber());
+            newCf.setDealNumber(dealNumber);
+            newCf.setDealmapNumber(newDealMapNumber);
+            newCf.setManagementEntity(dto.getManagementEntity());
+            newCf.setBankAccount(dto.getBankAccountId() != null ? String.valueOf(dto.getBankAccountId()) : null);
+            newCf.setCounterpartyAccount(dto.getCounterpartyAccountId() != null ? String.valueOf(dto.getCounterpartyAccountId()) : null);
+            newCf.setBankAccountId(dto.getBankAccountId());
+            newCf.setCounterpartyBankAccountId(dto.getCounterpartyAccountId());
+            newCf.setDirection(dto.getDirection());
+            newCf.setAmount(dto.getAmount());
+            newCf.setCurrency(dto.getCurrency());
+            newCf.setCflowDate(dto.getValueDate() != null ? dto.getValueDate() : dto.getDealDate());
+            newCf.setValueDate(dto.getValueDate());
+            newCf.setSourceType("AC_DEAL");
+            newCf.setSourceRef(dealNumber);
+            newCf.setStatus("Created");
+            newCf.setCreatedBy(dto.getOperator());
+            newCf.setCreatedAt(now);
+            newCf.setUpdatedBy(dto.getOperator());
+            newCf.setUpdatedAt(now);
+            newCf.setVersion(1);
+            newCf.setDeleted("0");
+            cashflowService.save(newCf);
+            // v1.0: 写 CREATE 镜像
+            try {
+                cashflowImageService.append(newCf, "CREATE");
+            } catch (RuntimeException e) {
+                log.error("[AcDealService] UPDATE 镜像(CREATE)写入失败,事务回滚: cflowNumber={}, err={}",
+                        newCf.getCflowNumber(), e.getMessage(), e);
+                throw e;
+            }
         }
 
         return true;
@@ -507,8 +586,21 @@ public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements 
         List<DealMapVO> activeDealMaps = dealMapService.listByDealNumber(dealNumber);
         dealMapService.softDeleteByDealNumber(dealNumber);
 
-        // ⑥ ✅ 级联软删除 Cashflow
+        // ⑥ ✅ 级联软删除 Cashflow (v1.0: 先写 DELETE 镜像再软删)
         for (DealMapVO dm : activeDealMaps) {
+            List<Cashflow> dms = cashflowMapper.selectList(
+                    new LambdaQueryWrapper<Cashflow>()
+                            .eq(Cashflow::getDealmapNumber, dm.getDealmapNumber())
+                            .eq(Cashflow::getDeleted, "0"));
+            for (Cashflow cf : dms) {
+                try {
+                    cashflowImageService.append(cf, "DELETE");
+                } catch (RuntimeException e) {
+                    log.error("[AcDealService] DELETE 镜像写入失败,事务回滚: cflowNumber={}, err={}",
+                            cf.getCflowNumber(), e.getMessage(), e);
+                    throw e;
+                }
+            }
             cashflowService.softDeleteByDealMapNumber(dm.getDealmapNumber());
         }
 

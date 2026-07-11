@@ -8,7 +8,6 @@ import lombok.EqualsAndHashCode;
 /**
  * 子公司表实体
  * 表名: tms_subsidiary_t
- * 字段对齐:tms_subsidiary_t.business_unit_code(2026-07-09 修复)
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -19,8 +18,11 @@ public class Subsidiary extends BasedataEntity {
 
     private String parentCode;
 
+    /**
+     * 归属业务单元代码(tms_subsidiary_t.business_unit_code)
+     */
     @TableField("business_unit_code")
-    private String businessUnitCode;
+    private String managementEntityCode;
 
     private String legalPerson;
 

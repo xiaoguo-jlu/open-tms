@@ -29,12 +29,8 @@ public class BankAccount {
     @TableField("account_type")
     private String accountType;
 
-    /**
-     * 归属管理主体(基于业务单元)
-     * 字段对齐:tms_bank_account_t.business_unit_id(2026-07-09 修复)
-     */
-    @TableField("business_unit_id")
-    private Long businessUnitId;
+    @TableField("management_entity_id")
+    private Long managementEntityId;
 
     private String status;
 
