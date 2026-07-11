@@ -1,0 +1,144 @@
+# Open-TMS UX 类报告 — HTML 公共样式规范
+
+> 本文件是 **opentms-ux-design / opentms-review-ux / opentms-review-frontend** 三类 HTML 报告的共享样式与结构规范。所有该类报告必须遵循,以保证视觉一致。
+
+---
+
+## 1. 适用范围
+
+| Skill | 输出文件 | 模板 |
+|-------|---------|------|
+| `opentms-ux-design` | `docs/原型/M{x}-*UX原型.html` | `references/prototype-template.html` |
+| `opentms-review-ux` | `docs/reviews/{feature}/ux-review.html` | `templates/report.html` |
+| `opentms-review-frontend` | `docs/reviews/{feature}/frontend-review.html` | `templates/report.html` |
+
+> 注:`.md` 旧文件保留(不删除,git 历史可追溯);新增产物一律为 `.html`。
+
+---
+
+## 2. 技术栈
+
+- **Vue 3.x** CDN(`vue.global.js`)
+- **Element Plus** CDN(`element-plus/dist/index.css` + `element-plus` global)
+- **@element-plus/icons-vue** CDN
+- **零构建** — 直接双击 `.html` 即可在浏览器打开
+
+### 2.1 CDN 列表(必须用 jsDelivr + 显式版本 — 2026-07-10 修复)
+
+> ⚠️ 之前用 `unpkg.com/element-plus` 路径,自动重定向到 2.14.3/dist/index.full.js,网络不稳;后改为 `unpkg.com/element-plus@2.4.6/...` 又因 2.4.6 不存在 404。**现统一 jsDelivr 显式版本**。
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-plus@2.14.3/dist/index.css">
+<script src="https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/element-plus@2.14.3/dist/index.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/index.iife.min.js"></script>
+```
+
+Element Plus 走 UMD 包装,会暴露 `window.ElementPlus` 全局,Vue 脚本里 `app.use(ElementPlus)` 即可。
+
+---
+
+## 3. 视觉规范
+
+### 3.1 顶栏 `.op-header`
+
+- 背景 `#1f2d3d` 深色,白字
+- 左侧:`Open-TMS · {文档名}`
+- 右侧:`{meta info}` 半透明小字(opacity .75)
+- 高度 50px,圆角无,横跨全屏
+
+### 3.2 主区域 `.op-main`
+
+- 最大宽度 1280px,居中
+- 浅灰背景 `#f5f7fa`
+- 上下内边距 24px
+
+### 3.3 卡片 `.op-card`
+
+- 背景白,圆角 12px
+- 阴影 `0 2px 12px rgba(0,0,0,.04)`(极淡)
+- 内边距 20px,卡片间距 16px
+
+### 3.4 评级徽章 `.op-grade-{A|B|C|D}`
+
+| 评级 | 背景 | 含义 |
+|------|------|------|
+| A | `#67c23a` 绿 | 无问题 |
+| B | `#409eff` 蓝 | 仅 P2 |
+| C | `#e6a23c` 橙 | 有 P1 |
+| D | `#f56c6c` 红 | 有 P0 |
+
+### 3.5 严重度徽章 `.op-sev-{P0|P1|P2}`
+
+| 严重度 | 背景 | 文字 |
+|--------|------|------|
+| P0 | `#fef0f0` | `#f56c6c` 红 |
+| P1 | `#fdf6ec` | `#e6a23c` 橙 |
+| P2 | `#f4f4f5` | `#909399` 灰 |
+
+---
+
+## 4. 字体
+
+- 正文: `-apple-system, "PingFang SC", "Microsoft YaHei", sans-serif`
+- 代码/路径: `'JetBrains Mono', monospace`
+
+---
+
+## 5. 公共章节(所有报告必备)
+
+1. **顶栏**(品牌 + meta)
+2. **总评级** — 评级徽章 + 含义对照表
+3. **审核/原型概览** — 元信息卡 + 计数卡
+4. **主体内容** — UX 原型:页面清单 + 详述; 审核报告:P0/P1/P2 三段
+5. **整改建议 / 总结**
+6. **签字**(仅审核报告)
+7. **页脚** — "由 {skill-name} 自动生成 · 模板 v1.0"
+
+---
+
+## 6. 变量替换约定
+
+模板中所有 `{xxx}` 占位符:
+
+| 占位符 | 含义 | 示例 |
+|--------|------|------|
+| `{feature-name}` | 特性名 | `default-bank-account-rule` |
+| `{module}` | 所属模块 | `basedata` / `dealing` |
+| `{YYYY-MM-DD}` | 日期 | `2026-07-10` |
+| `{reviewer}` | 审核人 | `Claude` |
+| `{N}` | 文件数 / 规则数 | `3` |
+| `{A|B|C|D}` | 评级 | `B` |
+| `{pass}` `{p0}` `{p1}` `{p2}` | 各计数 | `12` `0` `2` `5` |
+
+---
+
+## 7. Vue 数据绑定约定
+
+P0/P1/P2 列表用 `v-for` 渲染 `ref([...])` 数组,每个 item 结构:
+
+```js
+{ id: 'P0-001', name: '...', standard: '...', current: '...', fix: '...' }
+```
+
+空数据用 `<div v-if="items.length === 0" class="op-quote">✅ 无 X 问题</div>` 兜底。
+
+---
+
+## 8. 验证清单
+
+- [ ] 文件 < 100KB(纯文本)
+- [ ] 双击 HTML 在浏览器打开,Vue 正确挂载
+- [ ] Element Plus 组件可见(ElMessage / ElCard / ElTable 等)
+- [ ] 顶栏品牌 + 主题色与 `fx-trading-prototype.html` 一致
+- [ ] 1440px 视口不出现横向滚动(报告类表格内可横滚)
+- [ ] 评级徽章颜色与 A/B/C/D 一一对应
+- [ ] P0/P1/P2 段落标题与严重度徽章颜色一致
+
+---
+
+## 版本历史
+
+| 版本 | 日期 | 变更 |
+|------|------|------|
+| v1.0 | 2026-07-10 | 初版,统一 3 个 UX skill 的 HTML 报告样式 |

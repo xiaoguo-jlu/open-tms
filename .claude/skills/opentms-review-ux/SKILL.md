@@ -27,8 +27,10 @@ Open-TMS 既有页面规范与成熟资金管理系统 (FIS Quantum / Murex MX.3
 
 ## 输出
 
-- 审核报告: `docs/reviews/{feature-name}/ux-review.md`
-- 按 `templates/report.md` 填充
+- 审核报告: `docs/reviews/{feature-name}/ux-review.html`
+- 按 `templates/report.html` 填充(Vue 3 + Element Plus CDN,双击浏览器即可查看)
+- 公共样式规范:`../opentms-review-common/templates/report.html`
+- **历史 .md 文件保留作为归档,不再作为主交付物**(2026-07-10 PM-Lead 决定)
 
 ## 工作流程
 

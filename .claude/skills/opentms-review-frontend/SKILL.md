@@ -29,8 +29,10 @@ Open-TMS 既有规范与成熟资金管理系统 (FIS Quantum / Murex MX.3) 前�
 
 ## 输出
 
-- 审核报告: `docs/reviews/{feature-name}/frontend-review.md`
-- 按 `templates/report.md` 填充
+- 审核报告: `docs/reviews/{feature-name}/frontend-review.html`
+- 按 `templates/report.html` 填充(Vue 3 + Element Plus CDN,双击浏览器即可查看)
+- 公共样式规范:`../opentms-review-common/templates/report.html`
+- **历史 .md 文件保留作为归档,不再作为主交付物**(2026-07-10 PM-Lead 决定)
 
 ## 工作流程
 
@@ -40,6 +42,7 @@ Open-TMS 既有规范与成熟资金管理系统 (FIS Quantum / Murex MX.3) 前�
 4. **对标检查** — 对比 Open-TMS 既有页面(AcDealList / FxDealList / CountryList)
 5. **加载 checklist** — 按 `checklists/01-component-pattern.md` / `02-api-binding.md` / `03-error-ux.md` 逐项打勾
 6. **逐项审核** — 按下方 YAML checklist 逐项判定 PASS/FAIL
+6.5 **运行 API 一致性扫描**(2026-07-11):`python scripts/api_scanner.py`,把扫描评级纳入报告评级
 7. **输出报告** — 评级 A/B/C/D + P0/P1/P2 问题清单 + 整改建议
 
 ---
@@ -373,6 +376,23 @@ frontend_review_items:
       4. 验证无 BaseDataPicker 实例缺失事件处理
     pass_criteria: 100% BaseDataPicker 实例有 @change 处理;编辑场景 100% 有 preloadRow
     failure_action: 补充缺失的事件处理
+
+  # ============= 2026-07-11 新增:API 一致性 =============
+  - id: FE-032
+    name: 前端 API 一致性扫描
+    severity: P0
+    standard: 跑 scripts/api_scanner.py,验证前端 API 调用 (web/src/api/**/*.js) 与后端 OpenAPI 契约一致 — 路径 / 方法 / 参数 / body 字段 100% 对齐
+    check_method: |
+      1. 运行 python scripts/api_scanner.py(必要时先 bash scripts/gen-openapi.sh 拉最新契约);
+      2. 读取 docs/api/frontend-api-consistency.html,确认评级 (A/B/C/D);
+      3. CI 模式可用 python scripts/api_scanner.py --ci(P0 存在 exit 1)。
+    pass_criteria: 扫描评级 A(无问题) 或 B(仅 P2);无 P0/P1
+    failure_p1: 评级 C(有 P1) — 退回修复后复审
+    failure_p0: 评级 D(有 P0) — 强制返工,修改 API 封装代码后重新提交
+    failure_action: 退回 FE 开发者按 P0/P1 清单修改 web/src/api/ 下的 API 封装
+    references:
+      - docs/api/FRONTEND-API-SCANNER.md(详细使用指南)
+      - CLAUDE.md "API 一致性扫描" 小节
 ```
 
 ---

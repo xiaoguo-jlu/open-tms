@@ -80,6 +80,7 @@ Phase 5+6: 并行开发阶段 (⚠️ 联调后启动本地服务供测试)
   └─ Phase 6: 前端开发 (FE) → opentms-frontend-dev → Vue代码
   🔒 [审核门禁#5] opentms-review-backend → A/B通过
   🔒 [审核门禁#6] opentms-review-frontend → A/B通过
+  🔒 [API 一致性门禁] Phase 6 完成后跑 scripts/api_scanner.py → A/B 通过 (见 §3.1.1)
 
 Phase 7+8: 测试阶段
   ├─ Phase 7: 测试用例设计 (QA) → opentms-test-case-design → 测试用例
@@ -89,6 +90,30 @@ Phase 7+8: 测试阶段
 Phase 9: 交付前总审核 → 6维全量复审(6个review skill各跑一次)
   → 全部P0通过 → 关闭Feature Issue → 特性交付
 ```
+
+### 3.1.1 API 一致性门禁(2026-07-11 新增)
+
+**Phase 6 前端开发完成后、进入 Phase 7 前** 必须运行:
+
+```bash
+# 1) 拉最新 OpenAPI(若后端有改动)
+bash scripts/gen-openapi.sh
+
+# 2) 扫前端 API
+python scripts/api_scanner.py
+
+# 3) 读报告
+# 浏览器打开 docs/api/frontend-api-consistency.html
+```
+
+**评级要求**:**A 或 B** 才能进入 Phase 7;C 修复后复审;D **强制返工**(回流 Phase 6 修改 API 封装)。
+
+**检查维度**(对应 P0/P1/P2 评级):
+- **P0 阻塞**:路径错(`url:` 与 OpenAPI 不匹配)、必传 query/body 字段缺失
+- **P1 重要**:路径参数名错(`${id}` vs `{accountId}`)、DTO 字段名拼错
+- **P2 优化**:`params: opts` 类无法静态分析的情况
+
+**与 CLAUDE.md 关系**:见 `CLAUDE.md` "API 一致性扫描" 小节(详细用法 + 报告路径)。详细使用指南:`docs/api/FRONTEND-API-SCANNER.md`。
 
 ### 3.2 各阶段角色分工
 

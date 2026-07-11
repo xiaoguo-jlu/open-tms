@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Open-TMS {模块名} UX 原型</title>
+  <!-- Element Plus + Vue 3(CDN,零构建) — jsDelivr 显式版本,UMD 暴露 window.ElementPlus -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-plus@2.14.3/dist/index.css">
+  <script src="https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/element-plus@2.14.3/dist/index.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/index.iife.min.js"></script>
+  <style>
+    /* === Open-TMS UX 报告 统一样式(与 fx-trading-prototype.html 保持一致) === */
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f7fa; color: #303133; }
+    .op-header { background: #1f2d3d; color: #fff; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,.1); }
+    .op-header .brand { font-size: 18px; font-weight: 600; }
+    .op-header .meta { font-size: 12px; opacity: .75; }
+    .op-main { max-width: 1280px; margin: 0 auto; padding: 24px; }
+    .op-card { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.04); padding: 20px; margin-bottom: 16px; }
+    .op-card h2 { margin: 0 0 12px; font-size: 18px; font-weight: 600; color: #1f2d3d; }
+    .op-card h3 { margin: 16px 0 8px; font-size: 15px; font-weight: 600; color: #303133; }
+    .op-card p { line-height: 1.7; color: #606266; }
+    .op-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-right: 6px; }
+    .op-tag.mod { background: #ecf5ff; color: #409eff; }
+    .op-tag.path { background: #f0f9eb; color: #67c23a; font-family: 'JetBrains Mono', monospace; }
+    .op-tag.required { background: #fef0f0; color: #f56c6c; }
+    .op-meta-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    .op-meta-cell { background: #fafbfc; border-radius: 8px; padding: 10px 12px; }
+    .op-meta-cell .label { font-size: 12px; color: #909399; }
+    .op-meta-cell .value { font-size: 14px; color: #303133; font-weight: 600; margin-top: 2px; }
+    table.op-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    table.op-table th, table.op-table td { border: 1px solid #ebeef5; padding: 8px 10px; text-align: left; vertical-align: top; }
+    table.op-table th { background: #fafbfc; color: #606266; font-weight: 600; }
+    table.op-table tr:nth-child(even) td { background: #fafbfc; }
+    .op-tree { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.8; background: #fafbfc; padding: 12px 16px; border-radius: 8px; }
+    .op-footer { text-align: center; color: #909399; font-size: 12px; padding: 16px; }
+    .op-screen { border: 1px dashed #dcdfe6; border-radius: 8px; padding: 12px; margin: 12px 0; background: #fafbfc; }
+    .op-screen .op-screen-title { font-size: 12px; color: #909399; margin-bottom: 8px; }
+    code { background: #f0f2f5; padding: 2px 6px; border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- 顶栏 -->
+    <header class="op-header">
+      <div class="brand">Open-TMS · {模块名} UX 原型</div>
+      <div class="meta">{模块名} · v1.0 · {日期} · UX Designer</div>
+    </header>
+
+    <main class="op-main">
+      <!-- 1. 元信息 -->
+      <section class="op-card">
+        <h2>📋 文档元信息</h2>
+        <div class="op-meta-row">
+          <div class="op-meta-cell"><div class="label">模块</div><div class="value">M{x} {模块名}</div></div>
+          <div class="op-meta-cell"><div class="label">版本</div><div class="value">v1.0</div></div>
+          <div class="op-meta-cell"><div class="label">日期</div><div class="value">{YYYY-MM-DD}</div></div>
+          <div class="op-meta-cell"><div class="label">角色</div><div class="value">UX Designer</div></div>
+        </div>
+      </section>
+
+      <!-- 2. 业界对标 -->
+      <section class="op-card">
+        <h2>🌍 业界对标</h2>
+        <table class="op-table">
+          <thead><tr><th>特性</th><th>FIS Quantum</th><th>SAP TRM</th><th>Murex MX.3</th><th>Open-TMS 设计</th></tr></thead>
+          <tbody>
+            <tr><td>{特性1}</td><td>{FIS 描述}</td><td>{SAP 描述}</td><td>{Murex 描述}</td><td><strong>{OT 描述}</strong></td></tr>
+            <tr><td>{特性2}</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 3. 模块导航结构 -->
+      <section class="op-card">
+        <h2>🧭 模块导航结构</h2>
+        <pre class="op-tree">{模块名}
+├── {子功能1}
+│   ├── {页面1}
+│   └── {页面2}
+└── {子功能2}
+    └── {页面3}</pre>
+      </section>
+
+      <!-- 4. 页面清单 -->
+      <section class="op-card">
+        <h2>📑 页面清单</h2>
+        <table class="op-table">
+          <thead><tr><th>序号</th><th>页面</th><th>路径</th><th>类型</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>{页面1}</td><td><span class="op-tag path">/path/to/page</span></td><td><span class="op-tag mod">列表页</span></td></tr>
+            <tr><td>2</td><td>{页面2}</td><td><span class="op-tag path">/path/to/page/edit/:id</span></td><td><span class="op-tag mod">编辑页</span></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 5. 页面原型详述(可复制多段) -->
+      <section class="op-card">
+        <h2>🎨 页面原型详述</h2>
+        <h3>5.1 {页面1}</h3>
+        <div class="op-screen">
+          <div class="op-screen-title">📸 布局示意(交互区域用 el-card 占位,实际由设计图替换)</div>
+          <el-card shadow="hover">
+            <template #header><strong>{页面标题}</strong></template>
+            <el-form :inline="true" :model="demoForm">
+              <el-form-item label="搜索"><el-input v-model="demoForm.keyword" placeholder="编码/名称" clearable /></el-form-item>
+              <el-form-item label="状态">
+                <el-select v-model="demoForm.status" placeholder="全部" clearable>
+                  <el-option label="启用" value="Active" />
+                  <el-option label="停用" value="Inactive" />
+                </el-select>
+              </el-form-item>
+              <el-form-item><el-button type="primary">🔍 查询</el-button></el-form-item>
+            </el-form>
+            <el-table :data="demoRows" stripe border style="margin-top: 12px">
+              <el-table-column prop="code" label="编码" width="160" />
+              <el-table-column prop="name" label="名称" />
+              <el-table-column prop="status" label="状态" width="100" align="center">
+                <template #default="{ row }"><el-tag :type="row.status === 'Active' ? 'success' : 'info'">{{ row.status }}</el-tag></template>
+              </el-table-column>
+            </el-table>
+          </el-card>
+        </div>
+
+        <h4>交互规范</h4>
+        <table class="op-table">
+          <thead><tr><th>元素</th><th>规范</th></tr></thead>
+          <tbody>
+            <tr><td>搜索</td><td>支持按编码/名称模糊搜索,Enter 触发</td></tr>
+            <tr><td>状态筛选</td><td>全部 / 启用 / 停用,默认全部</td></tr>
+            <tr><td>表格操作</td><td>勾选 → 批量操作(启用/停用/删除)</td></tr>
+          </tbody>
+        </table>
+
+        <h4>字段规范</h4>
+        <table class="op-table">
+          <thead><tr><th>字段</th><th>类型</th><th>必填</th><th>规范</th></tr></thead>
+          <tbody>
+            <tr><td>{字段1}</td><td>input</td><td><span class="op-tag required">Y</span></td><td>最大 200 字符</td></tr>
+            <tr><td>{字段2}</td><td>select</td><td><span class="op-tag required">Y</span></td><td>下拉选择,filterable</td></tr>
+          </tbody>
+        </table>
+
+        <h4>业务流程</h4>
+        <p>用户进入页面 → 顶部筛选 → 表格浏览 → 勾选后批量操作 / 单行操作 → 弹窗确认 → 操作反馈 toast。</p>
+      </section>
+
+      <!-- 6. 组件状态说明 -->
+      <section class="op-card">
+        <h2>🔄 组件状态说明</h2>
+        <table class="op-table">
+          <thead><tr><th>状态</th><th>触发条件</th><th>UI 表现</th></tr></thead>
+          <tbody>
+            <tr><td>加载中</td><td>API 请求中</td><td>表格 v-loading 蒙层 + 骨架屏</td></tr>
+            <tr><td>空数据</td><td>records.length === 0</td><td>表格内插 el-empty,文案"暂无数据"</td></tr>
+            <tr><td>错误</td><td>API 返回非 200</td><td>ElMessage.error 顶部 toast + 表格内重试按钮</td></tr>
+            <tr><td>网络异常</td><td>fetch reject</td><td>ElMessage.error + 全屏占位重试</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+
+    <footer class="op-footer">Open-TMS UX 原型 · 由 opentms-ux-design 自动生成 · 数据为模拟,与生产无关</footer>
+  </div>
+
+  <script>
+    const { createApp, reactive } = Vue
+    const app = createApp({
+      setup() {
+        const demoForm = reactive({ keyword: '', status: '' })
+        const demoRows = [
+          { code: 'DEMO-001', name: '示例数据 1', status: 'Active' },
+          { code: 'DEMO-002', name: '示例数据 2', status: 'Inactive' },
+          { code: 'DEMO-003', name: '示例数据 3', status: 'Active' }
+        ]
+        return { demoForm, demoRows }
+      }
+    })
+    app.use(ElementPlus)
+    for (const [key, comp] of Object.entries(ElementPlusIconsVue)) app.component(key, comp)
+    app.mount('#app')
+  </script>
+</body>
+</html>

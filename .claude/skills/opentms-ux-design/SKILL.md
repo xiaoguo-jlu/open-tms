@@ -40,9 +40,13 @@ description: Use when designing Open-TMS UI/UX prototypes and interaction design
 
 ### 3.1 交付件输出标准
 
+> 📦 **PM-Lead v2026-07-10 决定**:UX 类产物统一以 **HTML** 格式输出(.md 不再作为主交付物,仅做归档索引)。HTML 模板可双击在浏览器打开,内置 Element Plus + Vue 3 CDN,直接呈现交互与样式。
+
 每个原型文档必须包含: 模块导航结构、页面清单（含路径）、页面原型详述（交互规范 + 字段规范 + 业务流程）、组件状态说明。
 
-完整模板见 `references/prototype-template.md`。
+**模板**:`references/prototype-template.html` — 直接复制该文件,按变量替换生成。
+
+**存放路径**:`docs/原型/M{x}-{模块名}UX原型.html`(M3 之前的旧 .md 文件保留作为归档,可继续引用)。
 
 ### 3.2 设计标注规范
 
@@ -60,6 +64,8 @@ docs/原型/
 ├── M4-风险管理/docs/              # M4模块原型
 └── M5-分析报表/docs/              # M5模块原型
 ```
+
+> 所有新增原型文件后缀为 `.html`;`SUMMARY.md` 例外(仍是 markdown 索引)。
 
 ### 3.4 设计摘要标准
 
@@ -88,7 +94,7 @@ docs/原型/
 1. 根据PRD功能清单设计页面结构
 2. 遵循设计系统规范（配色、字体、间距、组件规格）
 3. 设计交互流程（列表页操作、表单录入、状态变化和反馈）
-4. 输出界面原型文档，文件命名格式: `M{x}-{模块名}UX原型.md`
+4. 输出界面原型文档，文件命名格式: `M{x}-{模块名}UX原型.html`(2026-07-10 起统一 HTML)
 
 设计系统速查见 `references/design-system-cheatsheet.md`。
 

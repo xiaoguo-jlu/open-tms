@@ -130,6 +130,32 @@ npm run build
 | 组件未注册 | component not registered | 忘记 import 或命名错误 |
 | API 路径错误 | 404 | URL 与后端不一致 |
 
+### 步骤7.5: API 一致性扫描(2026-07-11 新增)
+
+完成 API 封装 + 页面开发后,必须跑前端 API 一致性扫描,确保与后端 OpenAPI 契约一致:
+
+```bash
+python scripts/api_scanner.py
+```
+
+**要求**:
+- 评级 **A**(无问题)或 **B**(仅 P2)才能进 QA
+- 评级 **C**(有 P1):修复后复审
+- 评级 **D**(有 P0):**禁止提交**,先改 API 封装代码
+
+**详细检查项**:
+- 路径错(P0):`url:` 与 OpenAPI paths 不匹配
+- 路径参数名错(P1):`${id}` 与 `{accountId}` 不一致
+- 必传 query 缺失(P0):OpenAPI 要求 `?managementEntityId=` 但前端没传
+- body 字段错(P0):DTO 字段名拼错 / 缺失 / 多余
+- 无法静态分析(P2):`params: opts` 类变量传递,人工复核
+
+**报告路径**:`docs/api/frontend-api-consistency.html`(评级 + P0/P1/P2 三段问题清单)。
+
+**CI 模式**:`python scripts/api_scanner.py --ci`(P0 存在 exit 1)。
+
+**与 CLAUDE.md 关系**:见 `CLAUDE.md` "API 一致性扫描" 小节。
+
 ### 步骤8: 问题分析与 Skill 优化 (仅编译失败时)
 
 1. 定位错误文件/行号
