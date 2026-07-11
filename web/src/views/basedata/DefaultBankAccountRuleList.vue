@@ -293,11 +293,15 @@ const editRules = {
   priority: [{ required: true, type: 'number', min: 0, max: 9999, message: '范围 0-9999', trigger: 'blur' }]
 }
 
+// ★ 基础数据加载缓存:打开弹框前若未加载,按需补打(避免 onMounted 因后端 down 全空)
+const baseDataLoaded = ref(false)
+const baseDataLoading = ref(false)
+
 // ============= Computed =============
 const filteredBankAccounts = computed(() => {
   if (!editForm.managementEntityId) return bankAccountList.value
-  // BankAccount 字段已对齐 DB:businessUnitId(原 managementEntityId)
-  return bankAccountList.value.filter(a => a.businessUnitId === editForm.managementEntityId)
+  // /bank-accounts/page 实测字段为 managementEntityId(2026-07-10 修复)
+  return bankAccountList.value.filter(a => a.managementEntityId === editForm.managementEntityId)
 })
 
 // ============= Methods =============
@@ -333,24 +337,54 @@ const handleReset = () => {
   handleQuery()
 }
 
-const loadBaseData = async () => {
+/**
+ * 加载 4 个基础数据(管理主体 / 对手方 / 金融产品 / 银行账户)
+ * ★ 修复弹框下拉为空:4 个请求独立 try/catch,任一失败不影响其他;
+ *   外部 catch 避免 Promise.all 一个失败就整体 reject 导致 4 个 ref 全空。
+ */
+const loadBaseData = async ({ silent = false } = {}) => {
+  if (baseDataLoading.value) return
+  baseDataLoading.value = true
+  const errors = []
+  // 1) 管理主体
   try {
-    const [mgmt, cp, ins, ba] = await Promise.all([
-      listManagementEntity({ pageSize: 1000 }),
-      listCounterparty({ pageSize: 1000 }),
-      listInstrument({ pageSize: 1000 }),
-      listBankAccount({ pageSize: 1000 })
-    ])
-    managementEntityList.value = mgmt.data?.records || []
-    counterpartyList.value = cp.data?.records || []
-    instrumentList.value = ins.data?.records || []
-    bankAccountList.value = ba.data?.records || []
+    const res = await listManagementEntity({ pageSize: 1000 })
+    managementEntityList.value = res?.data?.records || []
   } catch (e) {
-    console.warn('基础数据加载失败:', e.message)
+    errors.push(`主体:${e?.message || e}`)
+  }
+  // 2) 对手方
+  try {
+    const res = await listCounterparty({ pageSize: 1000 })
+    counterpartyList.value = res?.data?.records || []
+  } catch (e) {
+    errors.push(`对手方:${e?.message || e}`)
+  }
+  // 3) 金融产品
+  try {
+    const res = await listInstrument({ pageSize: 1000 })
+    instrumentList.value = res?.data?.records || []
+  } catch (e) {
+    errors.push(`金融产品:${e?.message || e}`)
+  }
+  // 4) 银行账户
+  try {
+    const res = await listBankAccount({ pageSize: 1000 })
+    bankAccountList.value = res?.data?.records || []
+  } catch (e) {
+    errors.push(`银行账户:${e?.message || e}`)
+  }
+  baseDataLoaded.value = managementEntityList.value.length > 0
+  baseDataLoading.value = false
+  if (errors.length) {
+    console.warn('[DefaultBankAccountRule] 基础数据部分加载失败:', errors)
+    if (!silent) {
+      ElMessage.warning(`基础数据加载失败 (${errors.join(' / ')}),下拉可能为空`)
+    }
   }
 }
 
-const handleAdd = () => {
+const handleAdd = async () => {
   Object.assign(editForm, {
     id: null,
     lockToken: null,
@@ -368,11 +402,18 @@ const handleAdd = () => {
     remark: '',
     version: 0
   })
+  // ★ 按需补打基础数据,避免弹框打开时下拉为空
+  if (!baseDataLoaded.value) {
+    await loadBaseData()
+  }
   editDialogVisible.value = true
 }
 
 const handleEdit = async (row) => {
   try {
+    if (!baseDataLoaded.value) {
+      await loadBaseData({ silent: true })
+    }
     const res = await getDefaultBankAccountRule(row.id)
     if (res.code === 200 && res.data) {
       Object.assign(editForm, res.data)
@@ -385,6 +426,9 @@ const handleEdit = async (row) => {
 
 const handleCopy = async (row) => {
   try {
+    if (!baseDataLoaded.value) {
+      await loadBaseData({ silent: true })
+    }
     const res = await getDefaultBankAccountRule(row.id)
     if (res.code === 200 && res.data) {
       Object.assign(editForm, res.data, {
@@ -504,7 +548,8 @@ const handleAuditLog = async (row) => {
 
 // ============= Lifecycle =============
 onMounted(() => {
-  loadBaseData()
+  // 页面顶部过滤器也要这些下拉,后台预热即可(失败静默)
+  loadBaseData({ silent: true })
 })
 </script>
 

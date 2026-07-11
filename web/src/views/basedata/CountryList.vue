@@ -134,7 +134,7 @@ const fetchData = async () => {
     }
     const res = await listCountry(params)
     // MyBatis-Plus returns: { records: [], total: number, current: number, size: number }
-    tableData.value = res.data.records || res.data.list || []
+    tableData.value = res.data.records || []
     pagination.total = res.data.total || 0
   } catch (error) {
     console.error('Failed to fetch data:', error)

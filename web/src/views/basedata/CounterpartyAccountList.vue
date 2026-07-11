@@ -162,7 +162,7 @@ const getTypeLabel = (type) => {
 const fetchCounterpartyList = async () => {
   try {
     const res = await listCounterparty({ pageSize: 1000 })
-    counterpartyList.value = res.data.list || []
+    counterpartyList.value = res.data.records || []
   } catch (error) {
     console.error('Failed to fetch counterparties:', error)
   }
@@ -172,7 +172,7 @@ const fetchCounterpartyList = async () => {
 const fetchCurrencyList = async () => {
   try {
     const res = await listCurrency({ pageSize: 1000 })
-    currencyList.value = res.data.list || []
+    currencyList.value = res.data.records || []
   } catch (error) {
     console.error('Failed to fetch currencies:', error)
   }
@@ -188,7 +188,7 @@ const fetchData = async () => {
       pageSize: pagination.pageSize
     }
     const res = await listCounterpartyAccount(params)
-    tableData.value = res.data.list || []
+    tableData.value = res.data.records || []
     pagination.total = res.data.total || 0
   } catch (error) {
     console.error('Failed to fetch data:', error)

@@ -126,7 +126,7 @@ const isEdit = computed(() => !!formData.id)
 const fetchCountryList = async () => {
   try {
     const res = await listCountry({ pageSize: 1000 })
-    countryList.value = res.data.records || res.data.list || []
+    countryList.value = res.data.records || []
   } catch (error) {
     console.error('Failed to fetch countries:', error)
   }
@@ -142,7 +142,7 @@ const fetchData = async () => {
       pageSize: pagination.pageSize
     }
     const res = await listHoliday(params)
-    tableData.value = res.data.records || res.data.list || []
+    tableData.value = res.data.records || []
     pagination.total = res.data.total || 0
   } catch (error) {
     console.error('Failed to fetch data:', error)

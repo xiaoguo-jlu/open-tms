@@ -161,7 +161,7 @@ const fetchData = async () => {
   try {
     const params = { ...queryForm, pageNum: pagination.pageNum, pageSize: pagination.pageSize }
     const res = await listInstrument(params)
-    tableData.value = res.data.records || res.data.list || []
+    tableData.value = res.data.records || []
     pagination.total = res.data.total || 0
   } catch (e) { console.error(e) }
   finally { loading.value = false }

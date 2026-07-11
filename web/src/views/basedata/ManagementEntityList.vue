@@ -190,7 +190,7 @@ const fetchData = async () => {
       pageSize: pagination.pageSize
     }
     const res = await listManagementEntity(params)
-    tableData.value = res.data.records || res.data.list || []
+    tableData.value = res.data.records || []
     pagination.total = res.data.total || 0
   } catch (error) {
     console.error('Failed to fetch data:', error)

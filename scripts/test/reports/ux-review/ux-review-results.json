@@ -1,0 +1,521 @@
+[
+  {
+    "name": "ac-list",
+    "url": "/dealing/ac-deal",
+    "is_404": false,
+    "body_excerpt": "Open-TMS\n管理驾驶舱\n基础数据\n交易管理\nAC 交易 (单边收付)\nAT 转账 (双边划转)\nFX 外汇交易\nAction 待办\n审批管理\n风险管理\n报表管理\n资金管理系统\n管理员\n交易编号\n方向\n请选择\n状态\n请选择\n管理主体\n查询\n重置\n新建 AC 交易\n基于 v2.0：创建后自动生成 DealMap(ActualCashflow) + Cashflow；修改软删旧 DealMap +",
+    "buttons": [
+      "查询",
+      "重置",
+      "新建 AC 交易",
+      "复制",
+      "详情",
+      "复制",
+      "详情",
+      "复制",
+      "详情",
+      "复制",
+      "详情",
+      "复制",
+      "详情",
+      "复制",
+      "详情",
+      "复制",
+      "详情",
+      "复制",
+      "详情",
+      "复制",
+      "详情",
+      "复制",
+      "详情"
+    ],
+    "inputs": [
+      "placeholder='请输入交易编号' value=''",
+      "placeholder='管理主体编码' value=''",
+      "placeholder='' value='1'"
+    ],
+    "table": {
+      "row_count": 10,
+      "headers": [
+        "序号",
+        "交易编号",
+        "管理主体",
+        "方向",
+        "金额",
+        "币种",
+        "起息日",
+        "支付方式",
+        "最新Action",
+        "状态",
+        "操作"
+      ],
+      "first_row": [
+        "1",
+        "AC202607050001",
+        "BU_TEST_NEW",
+        "流出",
+        "3,132.00 USD",
+        "USD",
+        "2026-07-04",
+        "TRANSFER",
+        "ACT202607050005",
+        "新建",
+        "复制\n详情"
+      ]
+    },
+    "status_tags": [
+      "流出",
+      "新建",
+      "流出",
+      "已删除",
+      "流出",
+      "新建",
+      "流出",
+      "已删除",
+      "流出",
+      "已删除",
+      "流出",
+      "已删除",
+      "流出",
+      "已删除",
+      "流出"
+    ],
+    "console_msgs": [],
+    "network_errors": [],
+    "errors": []
+  },
+  {
+    "name": "ac-detail",
+    "url": "/dealing/ac-deal/detail/AC20260101001",
+    "is_404": false,
+    "body_excerpt": "Open-TMS\n管理驾驶舱\n基础数据\n交易管理\n审批管理\n风险管理\n报表管理\n资金管理系统\n管理员\n返回\nAC 交易详情 - 复制\n复制\n编辑\n删除\n交易编号\n-\n流出\n金额\n-\n交易要素\n管理主体\t-\t交易员\t-\n交易对手\t-\t金融工具\t-\n本方账户\t-\t对手方账户\t-\n描述\t-\n金额 & 日期\n金额\n-\n方向\n流出\n交易日期\t-\t起息日\t-\n支付方式\t-\t最新 Action\t-\n审计信息\nD",
+    "buttons": [
+      "返回",
+      "复制",
+      "编辑",
+      "删除",
+      "展开全部"
+    ],
+    "inputs": [],
+    "table": {
+      "row_count": 0
+    },
+    "status_tags": [
+      "流出",
+      "",
+      "流出"
+    ],
+    "console_msgs": [],
+    "network_errors": [],
+    "errors": []
+  },
+  {
+    "name": "ac-edit",
+    "url": "/dealing/ac-deal/detail/AC20260101001?mode=edit",
+    "is_404": false,
+    "body_excerpt": "Open-TMS\n管理驾驶舱\n基础数据\n交易管理\n审批管理\n风险管理\n报表管理\n资金管理系统\n管理员\n返回\nAC 交易详情 - 复制\n复制\n编辑\n删除\n交易编号\n-\n流出\n金额\n-\n交易要素\n管理主体\t-\t交易员\t-\n交易对手\t-\t金融工具\t-\n本方账户\t-\t对手方账户\t-\n描述\t-\n金额 & 日期\n金额\n-\n方向\n流出\n交易日期\t-\t起息日\t-\n支付方式\t-\t最新 Action\t-\n审计信息\nD",
+    "buttons": [
+      "返回",
+      "复制",
+      "编辑",
+      "删除",
+      "展开全部"
+    ],
+    "inputs": [],
+    "table": {
+      "row_count": 0
+    },
+    "status_tags": [
+      "流出",
+      "",
+      "流出"
+    ],
+    "console_msgs": [],
+    "network_errors": [],
+    "errors": []
+  },
+  {
+    "name": "at-list",
+    "url": "/dealing/at-deal",
+    "is_404": false,
+    "body_excerpt": "Open-TMS\n管理驾驶舱\n基础数据\n交易管理\nAC 交易 (单边收付)\nAT 转账 (双边划转)\nFX 外汇交易\nAction 待办\n审批管理\n风险管理\n报表管理\n资金管理系统\n管理员\n交易编号\n转账类型\n请选择\n状态\n请选择\n查询\n重置\n新建 AT 交易\n序号\n\t\n交易编号\n\t\n转账类型\n\t\n源账户\n\t\n目标账户\n\t\n源金额\n\t\n目标金额\n\t\n汇率\n\t\n起息日\n\t\n支付方式\n\t\n状态\n\t\n操",
+    "buttons": [
+      "查询",
+      "重置",
+      "新建 AT 交易",
+      "复制",
+      "查看",
+      "复制",
+      "查看",
+      "复制",
+      "查看"
+    ],
+    "inputs": [
+      "placeholder='请输入交易编号' value=''",
+      "placeholder='' value='1'"
+    ],
+    "table": {
+      "row_count": 3,
+      "headers": [
+        "序号",
+        "交易编号",
+        "转账类型",
+        "源账户",
+        "目标账户",
+        "源金额",
+        "目标金额",
+        "汇率",
+        "起息日",
+        "支付方式",
+        "状态",
+        "操作"
+      ],
+      "first_row": [
+        "1",
+        "AT202607050003",
+        "同公司",
+        "5",
+        "6",
+        "1,000.00 CNY",
+        "1,000.00 CNY",
+        "1",
+        "2026-07-05",
+        "内部转账",
+        "新建",
+        "复制\n查看"
+      ]
+    },
+    "status_tags": [
+      "同公司",
+      "新建",
+      "同公司",
+      "新建",
+      "同公司",
+      "新建"
+    ],
+    "console_msgs": [],
+    "network_errors": [],
+    "errors": []
+  },
+  {
+    "name": "at-detail",
+    "url": "/dealing/at-deal/detail",
+    "is_404": false,
+    "body_excerpt": "Open-TMS\n管理驾驶舱\n基础数据\n交易管理\n审批管理\n风险管理\n报表管理\n资金管理系统\n管理员\n返回\nAT 交易详情 - 复制\n复制\n交易编号\n-\n转账金额\n-\n交易要素\n管理主体\t-\t转账类型\t\n付出方账户\t-\t收入方账户\t-\n支付方式\t\t操作人\t-\n资金用途\t-\n金额 & 日期\n转账金额\n-\n目标金额\n-\n汇率\n1.00000000\n起息日\t-\t支付方式\t\n审计信息\nDealMap (0",
+    "buttons": [
+      "返回",
+      "复制",
+      "展开全部"
+    ],
+    "inputs": [],
+    "table": {
+      "row_count": 0
+    },
+    "status_tags": [
+      "",
+      ""
+    ],
+    "console_msgs": [],
+    "network_errors": [],
+    "errors": []
+  },
+  {
+    "name": "at-edit",
+    "url": "/dealing/at-deal/detail?mode=edit",
+    "is_404": false,
+    "body_excerpt": "Open-TMS\n管理驾驶舱\n基础数据\n交易管理\n审批管理\n风险管理\n报表管理\n资金管理系统\n管理员\n返回\nAT 交易详情 - 复制\n复制\n交易编号\n-\n转账金额\n-\n交易要素\n管理主体\t-\t转账类型\t\n付出方账户\t-\t收入方账户\t-\n支付方式\t\t操作人\t-\n资金用途\t-\n金额 & 日期\n转账金额\n-\n目标金额\n-\n汇率\n1.00000000\n起息日\t-\t支付方式\t\n审计信息\nDealMap (0",
+    "buttons": [
+      "返回",
+      "复制",
+      "展开全部"
+    ],
+    "inputs": [],
+    "table": {
+      "row_count": 0
+    },
+    "status_tags": [
+      "",
+      ""
+    ],
+    "console_msgs": [],
+    "network_errors": [],
+    "errors": []
+  },
+  {
+    "name": "fx-list",
+    "url": "/dealing/fx-deal",
+    "is_404": false,
+    "body_excerpt": "Open-TMS\n管理驾驶舱\n基础数据\n交易管理\nAC 交易 (单边收付)\nAT 转账 (双边划转)\nFX 外汇交易\nAction 待办\n审批管理\n风险管理\n报表管理\n资金管理系统\n管理员\n管理主体\n对手方\n产品类型\n全部\n状态\n全部\n日期\n至\n查询\n重置\n新建 FX 交易\nv3.2: DX 创建即生成 3 DealMap + 0/2 Cashflow(NDF 等 RATE_FIX);后端 cal",
+    "buttons": [
+      "查询",
+      "重置",
+      "新建 FX 交易",
+      "详情",
+      "复制",
+      "详情",
+      "复制",
+      "详情",
+      "复制",
+      "详情",
+      "复制",
+      "详情",
+      "复制",
+      "详情",
+      "复制",
+      "详情",
+      "复制",
+      "详情",
+      "复制",
+      "详情",
+      "复制",
+      "详情",
+      "复制"
+    ],
+    "inputs": [
+      "placeholder='ID' value=''",
+      "placeholder='ID' value=''",
+      "placeholder='开始' value=''",
+      "placeholder='结束' value=''",
+      "placeholder='' value='1'"
+    ],
+    "table": {
+      "row_count": 10,
+      "headers": [
+        "序号",
+        "交易编号",
+        "产品类型",
+        "卖出",
+        "买入",
+        "成交汇率",
+        "交易日",
+        "交割日",
+        "状态",
+        "操作"
+      ],
+      "first_row": [
+        "1",
+        "FX202607100001",
+        "NDF",
+        "200,000.00EUR",
+        "218,000.00USD",
+        "1.0900",
+        "2026-07-04",
+        "2026-10-04",
+        "活跃",
+        "详情\n复制"
+      ]
+    },
+    "status_tags": [
+      "NDF",
+      "活跃",
+      "NDF",
+      "活跃",
+      "SPOT",
+      "Rejected",
+      "SPOT",
+      "活跃",
+      "SPOT",
+      "活跃",
+      "SPOT",
+      "活跃",
+      "SPOT",
+      "新建",
+      "SPOT"
+    ],
+    "console_msgs": [],
+    "network_errors": [],
+    "errors": []
+  },
+  {
+    "name": "fx-detail",
+    "url": "/dealing/fx-deal/detail",
+    "is_404": false,
+    "body_excerpt": "Open-TMS\n管理驾驶舱\n基础数据\n交易管理\n审批管理\n风险管理\n报表管理\n资金管理系统\n管理员\n返回\nFX 交易详情 - 复制\n复制\n编辑\n删除\n交易编号\n-\n-\n总金额\n-\n交易要素\n管理主体\t-\t交易对手\t-\n交易员\t-\t金融工具\t-\n币种对\t-\t操作人\t-\n描述\t-\n金额 & 日期\n卖出\n-\n买入\n-\n成交汇率\t-\t市场汇率\t-\n点差(bp)\t-\t期限(天)\t-\n交易日\t-\t交割日\t-",
+    "buttons": [
+      "返回",
+      "复制",
+      "编辑",
+      "删除"
+    ],
+    "inputs": [],
+    "table": {
+      "row_count": 0
+    },
+    "status_tags": [
+      "-",
+      ""
+    ],
+    "console_msgs": [],
+    "network_errors": [],
+    "errors": []
+  },
+  {
+    "name": "fx-edit",
+    "url": "/dealing/fx-deal/detail?mode=edit",
+    "is_404": false,
+    "body_excerpt": "Open-TMS\n管理驾驶舱\n基础数据\n交易管理\n审批管理\n风险管理\n报表管理\n资金管理系统\n管理员\n返回\nFX 交易详情 - 复制\n复制\n编辑\n删除\n交易编号\n-\n-\n总金额\n-\n交易要素\n管理主体\t-\t交易对手\t-\n交易员\t-\t金融工具\t-\n币种对\t-\t操作人\t-\n描述\t-\n金额 & 日期\n卖出\n-\n买入\n-\n成交汇率\t-\t市场汇率\t-\n点差(bp)\t-\t期限(天)\t-\n交易日\t-\t交割日\t-",
+    "buttons": [
+      "返回",
+      "复制",
+      "编辑",
+      "删除"
+    ],
+    "inputs": [],
+    "table": {
+      "row_count": 0
+    },
+    "status_tags": [
+      "-",
+      ""
+    ],
+    "console_msgs": [],
+    "network_errors": [],
+    "errors": []
+  },
+  {
+    "name": "mgmt-entity",
+    "url": "/basedata/management-entity",
+    "is_404": false,
+    "body_excerpt": "Open-TMS\n管理驾驶舱\n基础数据\n子公司管理\n资金管理主体\n交易员管理\n币种管理\n国家/地区管理\n节假日管理\n交易对手管理\n对手方银行账户\n币种对管理\n金融工具管理\n银行账户管理\n默认银行账户规则\n交易管理\n审批管理\n风险管理\n报表管理\n资金管理系统\n管理员\n关键字\n实体类型\n请选择\n状态\n请选择\n查询\n重置\n新增\n\t\n序号\n\t\n主体编码\n\t\n名称\n\t\n英文名称\n\t\n实体类型\n\t\n法人代表\n",
+    "buttons": [
+      "查询",
+      "重置",
+      "新增",
+      "编辑",
+      "删除",
+      "编辑",
+      "删除",
+      "编辑",
+      "删除",
+      "编辑",
+      "删除",
+      "编辑",
+      "删除",
+      "编辑",
+      "删除",
+      "编辑",
+      "删除",
+      "编辑",
+      "删除"
+    ],
+    "inputs": [
+      "placeholder='编码/名称' value=''",
+      "placeholder='' value='1'"
+    ],
+    "table": {
+      "row_count": 8,
+      "headers": [
+        "",
+        "序号",
+        "主体编码",
+        "名称",
+        "英文名称",
+        "实体类型",
+        "法人代表",
+        "注册地址",
+        "状态",
+        "创建时间",
+        "操作"
+      ],
+      "first_row": [
+        "",
+        "1",
+        "SZ_BRANCH",
+        "深圳分公司",
+        "",
+        "SUBSIDIARY",
+        "",
+        "",
+        "启用",
+        "2026-07-04T22:53:35.532651",
+        "编辑\n删除"
+      ]
+    },
+    "status_tags": [
+      "启用",
+      "启用",
+      "启用",
+      "启用",
+      "启用",
+      "启用",
+      "启用",
+      "启用"
+    ],
+    "console_msgs": [],
+    "network_errors": [],
+    "errors": []
+  },
+  {
+    "name": "instrument",
+    "url": "/basedata/instrument",
+    "is_404": false,
+    "body_excerpt": "Open-TMS\n管理驾驶舱\n基础数据\n子公司管理\n资金管理主体\n交易员管理\n币种管理\n国家/地区管理\n节假日管理\n交易对手管理\n对手方银行账户\n币种对管理\n金融工具管理\n银行账户管理\n默认银行账户规则\n交易管理\n审批管理\n风险管理\n报表管理\n资金管理系统\n管理员\n关键字\n金融工具类型\n请选择\n状态\n请选择\n查询\n重置\n新增\n\t\n序号\n\t\n工具编码\n\t\n工具名称\n\t\n英文名称\n\t\n类型\n\t\n标的资",
+    "buttons": [
+      "查询",
+      "重置",
+      "新增",
+      "编辑",
+      "删除",
+      "编辑",
+      "删除",
+      "编辑",
+      "删除",
+      "编辑",
+      "删除",
+      "编辑",
+      "删除"
+    ],
+    "inputs": [
+      "placeholder='编码/名称' value=''",
+      "placeholder='' value='1'"
+    ],
+    "table": {
+      "row_count": 5,
+      "headers": [
+        "",
+        "序号",
+        "工具编码",
+        "工具名称",
+        "英文名称",
+        "类型",
+        "标的资产",
+        "交易所",
+        "币种",
+        "描述",
+        "状态",
+        "创建时间",
+        "操作"
+      ],
+      "first_row": [
+        "",
+        "1",
+        "FX_NDF_01",
+        "FX-NDF",
+        "",
+        "FX",
+        "",
+        "",
+        "USD",
+        "",
+        "启用",
+        "2026-07-04 23:01:33",
+        "编辑\n删除"
+      ]
+    },
+    "status_tags": [
+      "FX",
+      "启用",
+      "FX",
+      "启用",
+      "FX",
+      "启用",
+      "FX",
+      "启用",
+      "股票",
+      "启用"
+    ],
+    "console_msgs": [],
+    "network_errors": [],
+    "errors": []
+  }
+]

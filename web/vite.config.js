@@ -99,6 +99,20 @@ export default defineConfig({
       '/api/v1/reports': {
         target: 'http://localhost:8097',
         changeOrigin: true
+      },
+      // OpenAPI / Swagger UI 端点
+      '/v3/api-docs': {
+        target: 'http://localhost:8082',
+        changeOrigin: true
+      },
+      '/swagger-ui': {
+        target: 'http://localhost:8082',
+        changeOrigin: true
+      },
+      // 基于数据模块的 CXF OpenAPI 端点(由 Spring MVC controller 暴露)
+      '/api/v1/openapi/cxf': {
+        target: 'http://localhost:8081',
+        changeOrigin: true
       }
     }
   }

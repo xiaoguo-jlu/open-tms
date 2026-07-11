@@ -40,6 +40,10 @@
           <template #title><el-icon><DataLine /></el-icon><span>报表管理</span></template>
           <el-menu-item index="/report/list">报表查询</el-menu-item>
         </el-sub-menu>
+        <el-sub-menu index="system">
+          <template #title><el-icon><Document /></el-icon><span>系统管理</span></template>
+          <el-menu-item index="/system/api-docs">接口文档 (Swagger UI)</el-menu-item>
+        </el-sub-menu>
       </el-menu>
     </el-aside>
     <el-container>
@@ -58,7 +62,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { DataAnalysis, Grid, Wallet, CircleCheck, Switch, Money, Warning, DataLine } from '@element-plus/icons-vue'
+import { DataAnalysis, Grid, Wallet, CircleCheck, Switch, Money, Warning, DataLine, Document } from '@element-plus/icons-vue'
 const route = useRoute()
 const activeMenu = computed(() => route.path)
 </script>

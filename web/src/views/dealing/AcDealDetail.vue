@@ -12,6 +12,7 @@
           <el-button type="success" size="small" :icon="CopyDocument" @click="enterCopy">复制</el-button>
           <el-button v-if="detail.status !== 'Canceled'" type="primary" size="small" :icon="Edit" @click="enterEdit">编辑</el-button>
           <el-button v-if="detail.status === 'New'" type="primary" size="small" :icon="Check" @click="handleApprove">审批</el-button>
+          <el-button size="small" :icon="Histogram" @click="auditDialogVisible = true">📜 审计历史</el-button>
           <el-button v-if="detail.status !== 'Canceled'" type="danger" size="small" :icon="Delete" @click="handleDelete">删除</el-button>
         </template>
         <template v-else>
@@ -322,6 +323,9 @@
     <!-- 审批弹窗 -->
     <ActionApprovalDialog v-model="approvalVisible" :deal="detail" :actions="actionList" @approved="onApproved" />
 
+    <!-- 审计历史弹窗 (v1.0) -->
+    <AuditHistoryDialog v-model:visible="auditDialogVisible" :deal-number="dealNumber" @select="onAuditSelect" />
+
     <!-- 展开全部 Dialog -->
     <el-dialog v-model="fullDialogVisible" :title="fullDialogTitle" width="80%" top="5vh" destroy-on-close>
       <el-table :data="fullDialogData" stripe size="small" max-height="70vh">
@@ -342,9 +346,10 @@
 import { ref, computed, onMounted, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { ArrowLeft, Check, CopyDocument, Delete, DocumentCopy, Edit, Plus } from '@element-plus/icons-vue'
+import { ArrowLeft, Check, CopyDocument, Delete, DocumentCopy, Edit, Histogram, Plus } from '@element-plus/icons-vue'
 import { getAcDealByNumber, createAcDeal, updateAcDeal, deleteAcDeal, copyAcDeal } from '@/api/dealing/acDeal'
 import ActionApprovalDialog from './ActionApprovalDialog.vue'
+import AuditHistoryDialog from './AuditHistoryDialog.vue'
 import BaseDataPicker from '@/components/picker/BaseDataPicker.vue'
 import ModeBadge from '@/components/common/ModeBadge.vue'
 
@@ -365,7 +370,9 @@ const actionList = ref([])
 const activeTab = ref('dealmap')
 const loadingDetail = ref(false)
 const approvalVisible = ref(false)
+const auditDialogVisible = ref(false)
 const errorMessage = ref('')
+const dealNumber = computed(() => detail.value?.dealNumber || route.query.dealNumber || route.params.dealNumber || '')
 
 const fullDialogVisible = ref(false)
 const fullDialogTitle = ref('')
@@ -636,6 +643,10 @@ const onApproved = async () => {
   approvalVisible.value = false
   ElMessage.success('审批成功')
   await loadData(detail.value.dealNumber)
+}
+
+const onAuditSelect = (version) => {
+  router.push(`/dealing/ac-deal/audit-history?dealNumber=${encodeURIComponent(detail.value.dealNumber)}&version=${version}`)
 }
 
 const expectedGlEntryCount = computed(() => {

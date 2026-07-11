@@ -14,3 +14,12 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: auto
+
+# SpringDoc OpenAPI
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+  packages-to-scan: com.opentms.dealing
+  default-produces-media-type: application/json

@@ -130,7 +130,7 @@ const fetchData = async () => {
     console.log('Fetching currency with params:', params)
     const res = await listCurrency(params)
     console.log('Currency response:', res)
-    tableData.value = res.data.records || res.data.list || []
+    tableData.value = res.data.records || []
     pagination.total = res.data.total || 0
   } catch (error) {
     console.error('Failed to fetch data:', error)
