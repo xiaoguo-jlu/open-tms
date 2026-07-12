@@ -75,7 +75,9 @@
           </el-select>
         </el-form-item>
         <el-form-item label="开户银行" prop="bankId">
-          <el-input v-model="formData.bankId" placeholder="请输入开户银行ID" />
+          <el-select v-model="formData.bankId" placeholder="请选择银行账户" style="width: 100%;" filterable clearable>
+            <el-option v-for="b in bankAccountList" :key="b.id" :label="`${b.accountName} (${b.currency} · bankId=${b.id})`" :value="b.id" />
+          </el-select>
         </el-form-item>
         <el-form-item label="账户名称" prop="accountName">
           <el-input v-model="formData.accountName" placeholder="账户户名" />
@@ -115,7 +117,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { listCounterpartyAccount, saveCounterpartyAccount, updateCounterpartyAccount, deleteCounterpartyAccount, listCounterparty, listCurrency } from '@/api/basedata'
+import { listCounterpartyAccount, saveCounterpartyAccount, updateCounterpartyAccount, deleteCounterpartyAccount, listCounterparty, listCurrency, listBankAccount } from '@/api/basedata'
 
 const route = useRoute()
 const loading = ref(false)
@@ -125,6 +127,7 @@ const formRef = ref(null)
 const tableData = ref([])
 const counterpartyList = ref([])
 const currencyList = ref([])
+const bankAccountList = ref([])
 
 const queryForm = reactive({ counterpartyId: route.query.counterpartyId || '', status: '' })
 const pagination = reactive({ pageNum: 1, pageSize: 10, total: 0 })
@@ -175,6 +178,16 @@ const fetchCurrencyList = async () => {
     currencyList.value = res.data.records || []
   } catch (error) {
     console.error('Failed to fetch currencies:', error)
+  }
+}
+
+const fetchBankAccountList = async () => {
+  try {
+    // 用 listBankAccount 作为"开户银行"下拉数据源(原 tms_banks 表不存在)
+    const res = await listBankAccount({ pageSize: 1000 })
+    bankAccountList.value = res.data.records || []
+  } catch (error) {
+    console.error('Failed to fetch bank accounts:', error)
   }
 }
 
@@ -265,6 +278,7 @@ const handleSubmit = async () => {
 onMounted(() => {
   fetchCounterpartyList()
   fetchCurrencyList()
+  fetchBankAccountList()
   fetchData()
 })
 </script>
