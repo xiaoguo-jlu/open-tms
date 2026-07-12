@@ -19,9 +19,9 @@ public class Subsidiary extends BasedataEntity {
     private String parentCode;
 
     /**
-     * 归属业务单元代码(tms_subsidiary_t.business_unit_code)
+     * 归属管理主体 ID(tms_subsidiary_t.management_entity_id)
      */
-    @TableField("business_unit_code")
+    @TableField("management_entity_id")
     private String managementEntityCode;
 
     private String legalPerson;

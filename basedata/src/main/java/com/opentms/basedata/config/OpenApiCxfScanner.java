@@ -261,7 +261,7 @@ public class OpenApiCxfScanner {
         }
         if (ann.required()) p.setRequired(true);
         if (ann.deprecated()) p.setDeprecated(true);
-        if (ann.hidden()) p.setHidden(true);
+        // hidden 仅在 Operation 级别支持;Parameter 不支持 setHidden() — 跳过
     }
 
     private void scanRequestBody(Method method, Operation operation) {
