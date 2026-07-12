@@ -68,6 +68,10 @@ export default defineConfig({
         target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true
       },
+      '/api/v1/deal-approval-rules': {
+        target: 'http://localhost:8081/opentms/basedata',
+        changeOrigin: true
+      },
       '/api/v1/instruments': {
         target: 'http://localhost:8081/opentms/basedata',
         changeOrigin: true

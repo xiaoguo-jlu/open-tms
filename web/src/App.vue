@@ -18,13 +18,14 @@
           <el-menu-item index="/basedata/instrument">金融工具管理</el-menu-item>
           <el-menu-item index="/basedata/bank-account">银行账户管理</el-menu-item>
           <el-menu-item index="/basedata/default-bank-account-rule">默认银行账户规则</el-menu-item>
+          <el-menu-item index="/basedata/deal-approval-rule">交易审批规则</el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="dealing">
           <template #title><el-icon><Wallet /></el-icon><span>交易管理</span></template>
           <el-menu-item index="/dealing/ac-deal">AC 交易 (单边收付)</el-menu-item>
           <el-menu-item index="/dealing/at-deal">AT 转账 (双边划转)</el-menu-item>
           <el-menu-item index="/dealing/fx-deal">FX 外汇交易</el-menu-item>
-          <el-menu-item index="/dealing/action">Action 待办</el-menu-item>
+          <el-menu-item index="/dealing/action">交易审批</el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="approval">
           <template #title><el-icon><CircleCheck /></el-icon><span>审批管理</span></template>

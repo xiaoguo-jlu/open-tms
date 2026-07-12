@@ -55,6 +55,26 @@
         style="margin-bottom: 8px"
       />
 
+      <section v-if="mode === 'readonly'" class="approval-rule-card" v-loading="approvalRuleLoading">
+        <h3 class="section-title-sm">📜 审批规则</h3>
+        <el-alert
+          v-if="approvalRuleInfo && !approvalRuleInfo.matched"
+          type="warning"
+          :closable="false"
+          title="未命中新交易审批规则，后端将按降级策略处理"
+          style="margin-bottom: 8px"
+        />
+        <el-descriptions :column="5" :size="'small'" border class="summary-grid">
+          <el-descriptions-item label="规则编号">{{ approvalRuleInfo?.matchedRule?.ruleNumber || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="审批层级">
+            <el-tag :type="getApprovalLevelTag(approvalRuleInfo?.approvalLevel)" size="small">{{ getApprovalLevelLabel(approvalRuleInfo?.approvalLevel) }}</el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="L1 角色">{{ formatRoles(approvalRuleInfo?.level1Roles) }}</el-descriptions-item>
+          <el-descriptions-item label="L2 角色">{{ formatRoles(approvalRuleInfo?.level2Roles) }}</el-descriptions-item>
+          <el-descriptions-item label="创建时间">{{ formatDateTime(approvalRuleInfo?.matchedRule?.createdAt || approvalRuleInfo?.matchedRule?.createdTime) }}</el-descriptions-item>
+        </el-descriptions>
+      </section>
+
       <!-- 主信息区: readonly 摘要 -->
       <section v-if="mode === 'readonly'" class="main-info-area">
         <!-- 左列: 交易要素 -->
@@ -410,6 +430,7 @@ import {
   deleteFxDeal, copyFxDeal, approveFxAction, rejectFxAction
 } from '@/api/dealing/fxDeal'
 import { listActionsByDeal } from '@/api/dealing/acDeal'
+import { matchDealApprovalRule } from '@/api/basedata/dealApprovalRule'
 import { getManagementEntity } from '@/api/basedata/managementEntity'
 import { getCounterparty } from '@/api/basedata/counterparty'
 import { getTrader } from '@/api/basedata/trader'
@@ -433,6 +454,8 @@ const detail = ref({})
 const dealMapList = ref([])
 const cashflowList = ref([])
 const actionList = ref([])
+const approvalRuleInfo = ref(null)
+const approvalRuleLoading = ref(false)
 const activeTab = ref('basic')
 const loadingDetail = ref(false)
 const errorMessage = ref('')
@@ -630,6 +653,19 @@ const getStatusType = (s) => ({ New: 'info', Active: 'success', Canceled: 'dange
 const getProductTypeTag = (t) => ({ SPOT: 'success', FWD: 'warning', NDF: 'info' }[t] || 'info')
 const getActionTypeLabel = (t) => ({ DEAL: '创建', UPDATE: '修改', DELETE: '删除', RATE_FIX: 'Fixing' }[t] || t)
 const getActionTypeTag = (t) => ({ DEAL: 'success', UPDATE: 'warning', DELETE: 'danger', RATE_FIX: 'info' }[t] || 'info')
+const getApprovalLevelLabel = (level) => ({ LEVEL_0: '无需审批', LEVEL_1: '一层审批', LEVEL_2: '二层审批' }[level] || level || '-')
+const getApprovalLevelTag = (level) => ({ LEVEL_0: 'success', LEVEL_1: 'warning', LEVEL_2: 'danger' }[level] || 'info')
+const formatRoles = (roles) => Array.isArray(roles) && roles.length ? roles.join(', ') : '-'
+const formatDateTime = (val) => {
+  if (!val) return '-'
+  if (typeof val === 'string') return val.replace('T', ' ').substring(0, 19)
+  return String(val)
+}
+const toNumberParam = (value) => {
+  if (value === null || value === undefined || value === '') return undefined
+  const n = Number(value)
+  return Number.isFinite(n) ? n : undefined
+}
 const getDealmapTypeTag = (t) => {
   if (!t) return 'info'
   if (t.startsWith('FX_BUY')) return 'success'
@@ -913,6 +949,29 @@ const openFullDialog = (tabName) => {
   fullDialogVisible.value = true
 }
 
+const loadApprovalRule = async (d) => {
+  approvalRuleInfo.value = null
+  if (!d) return
+  approvalRuleLoading.value = true
+  try {
+    const params = {
+      managementEntityId: toNumberParam(d.managementEntityId),
+      counterpartyId: toNumberParam(d.counterpartyId),
+      instrumentId: toNumberParam(d.instrumentId),
+      dealerId: toNumberParam(d.dealerId || d.traderId),
+      actionType: 'SUBMIT'
+    }
+    Object.keys(params).forEach(key => params[key] === undefined && delete params[key])
+    const res = await matchDealApprovalRule(params)
+    approvalRuleInfo.value = res.data || null
+  } catch (e) {
+    console.warn('[FX] 审批规则匹配失败:', e?.message || e)
+    approvalRuleInfo.value = null
+  } finally {
+    approvalRuleLoading.value = false
+  }
+}
+
 const loadData = async (dealNumber) => {
   if (!dealNumber) return
   loadingDetail.value = true
@@ -923,6 +982,7 @@ const loadData = async (dealNumber) => {
     dealMapList.value = d.dealMapList || []
     cashflowList.value = d.cashflowList || []
     actionList.value = d.actionList || []
+    await loadApprovalRule(d)
     resolveEntityNames(d)
   } catch (e) {
     ElMessage.error(e?.message || '加载失败:请重试')
@@ -1037,6 +1097,7 @@ onMounted(init)
 
 /* === 主信息区 === */
 .detail-card { margin-top: 4px; }
+.approval-rule-card { margin-bottom: 10px; }
 .main-info-area {
   display: grid;
   grid-template-columns: 1fr 1fr;

@@ -11,6 +11,7 @@ const routes = [
       { path: 'holiday', name: 'Holiday', component: () => import('@/views/basedata/HolidayList.vue') },
       { path: 'bank-account', name: 'BankAccount', component: () => import('@/views/basedata/BankAccountList.vue') },
       { path: 'default-bank-account-rule', name: 'DefaultBankAccountRule', component: () => import('@/views/basedata/DefaultBankAccountRuleList.vue') },
+      { path: 'deal-approval-rule', name: 'DealApprovalRule', component: () => import('@/views/basedata/DealApprovalRuleList.vue') },
       { path: 'counterparty', name: 'Counterparty', component: () => import('@/views/basedata/CounterpartyList.vue') },
       { path: 'counterparty-account', name: 'CounterpartyAccount', component: () => import('@/views/basedata/CounterpartyAccountList.vue') },
       { path: 'currency-pair', name: 'CurrencyPair', component: () => import('@/views/basedata/CurrencyPairList.vue') },
