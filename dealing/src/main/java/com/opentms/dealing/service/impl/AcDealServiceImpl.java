@@ -7,6 +7,7 @@ import com.opentms.dealing.dto.AcDealDTO;
 import com.opentms.dealing.dto.AcDealDetailVO;
 import com.opentms.dealing.entity.*;
 import com.opentms.dealing.mapper.*;
+import com.opentms.dealing.integration.BasedataMatchClient;
 import com.opentms.dealing.service.AcDealService;
 import com.opentms.dealing.service.CashflowService;
 import com.opentms.dealing.service.DealMapService;
@@ -73,6 +74,10 @@ public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements 
      * 跨模块关联实体名称查询 (用于 copy 端点补全名称字段, 2026-07-05)
      */
     private final EntityNameLookup entityNameLookup;
+    /**
+     * ★ Phase 5: 交易审批规则 match 客户端(2026-07-12)
+     */
+    private final BasedataMatchClient matchClient;
 
     public AcDealServiceImpl(AcDealMapper acDealMapper,
                              ActionMapper actionMapper,
@@ -82,7 +87,8 @@ public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements 
                              @Lazy DealMapService dealMapService,
                              @Lazy CashflowService cashflowService,
                              @Lazy com.opentms.dealing.service.CashflowImageService cashflowImageService,
-                             EntityNameLookup entityNameLookup) {
+                             EntityNameLookup entityNameLookup,
+                             BasedataMatchClient matchClient) {
         this.acDealMapper = acDealMapper;
         this.actionMapper = actionMapper;
         this.dealImageMapper = dealImageMapper;
@@ -92,6 +98,7 @@ public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements 
         this.cashflowService = cashflowService;
         this.cashflowImageService = cashflowImageService;
         this.entityNameLookup = entityNameLookup;
+        this.matchClient = matchClient;
     }
 
     // ==================== Query ====================
@@ -231,14 +238,15 @@ public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements 
         action.setDealNumber(dealNumber);
         action.setDealType(DEAL_TYPE_AC);
         action.setActionType(ACTION_TYPE_CREATE);
-        action.setActionStatus(APPROVAL_STATUS_PENDING);
         action.setOperator(dto.getOperator());
         action.setOperateAt(now);
-        action.setApprovalStatus1(APPROVAL_STATUS_PENDING);
-        action.setApprovalStatus2(APPROVAL_STATUS_PENDING);
+        action.setRemark(dto.getRemark());
         action.setCreatedBy(dto.getOperator());
         action.setCreatedAt(now);
         action.setVersion(1);
+        // ★ Phase 5 (2026-07-12): 调用 match 拿规则决策 Action 状态
+        applyApprovalRule(action, dto.getManagementEntity(), dto.getCounterpartyId(),
+                dto.getInstrumentId(), dto.getTraderId(), ACTION_TYPE_CREATE, dto.getOperator());
         actionMapper.insert(action);
 
         // ② INSERT Deal
@@ -935,5 +943,77 @@ public class AcDealServiceImpl extends ServiceImpl<DealMapper, Deal> implements 
             }
         }
         return prefix + String.format("%04d", seq);
+    }
+
+    // ==================== ★ Phase 5 (2026-07-12): 交易审批规则联动 ====================
+
+    /**
+     * 根据交易审批规则 match 结果,设置 Action 的审批状态与角色。
+     * <ul>
+     *   <li>LEVEL_0 → 直接 Approved(沿用 d08181e 修复,FX 风格)</li>
+     *   <li>LEVEL_1 → Submitted,approver1 = level1Roles[0]</li>
+     *   <li>LEVEL_2 → Submitted,记录 L1/L2 角色</li>
+     *   <li>未命中/失败 → 降级为默认 Pending(沿用旧逻辑,不阻断交易)</li>
+     * </ul>
+     */
+    private void applyApprovalRule(Action action, String managementEntityCode,
+                                   Long counterpartyId, Long instrumentId, Long dealerId,
+                                   String actionType, String operator) {
+        Long managementEntityId = null;
+        if (StringUtils.hasText(managementEntityCode)) {
+            try {
+                Map<String, Object> me = entityNameLookup.findManagementEntityByCode(managementEntityCode);
+                if (me != null && me.get("id") != null) {
+                    managementEntityId = Long.valueOf(me.get("id").toString());
+                }
+            } catch (Exception ignore) {
+            }
+        }
+        if (managementEntityId == null && counterpartyId == null
+                && instrumentId == null && dealerId == null) {
+            setDefaultPending(action);
+            return;
+        }
+        BasedataMatchClient.DealApprovalRuleSummary match = null;
+        try {
+            match = matchClient.matchDealApprovalRule(
+                    managementEntityId, counterpartyId, instrumentId, dealerId, actionType);
+        } catch (Exception e) {
+            log.warn("[AC] match call failed, fallback to Pending: {}", e.getMessage());
+        }
+        if (match == null || !Boolean.TRUE.equals(match.getMatched())) {
+            setDefaultPending(action);
+            return;
+        }
+        String level = match.getApprovalLevel();
+        if ("LEVEL_0".equals(level)) {
+            action.setActionStatus(APPROVAL_STATUS_APPROVED);
+            action.setApprovalStatus1(APPROVAL_STATUS_APPROVED);
+            action.setApprovalStatus2(APPROVAL_STATUS_APPROVED);
+            log.info("[AC] Approval rule LEVEL_0 → Action 直接 Approved: ruleNumber={}",
+                    match.getRuleNumber());
+        } else if ("LEVEL_1".equals(level)) {
+            setDefaultPending(action);
+            String l1 = match.getLevel1Roles() != null && !match.getLevel1Roles().isEmpty()
+                    ? match.getLevel1Roles().get(0) : null;
+            if (l1 != null) action.setApprover1(l1);
+            log.info("[AC] Approval rule LEVEL_1 → Action Pending L1={}: ruleNumber={}",
+                    l1, match.getRuleNumber());
+        } else if ("LEVEL_2".equals(level)) {
+            setDefaultPending(action);
+            String l1 = match.getLevel1Roles() != null && !match.getLevel1Roles().isEmpty()
+                    ? match.getLevel1Roles().get(0) : null;
+            if (l1 != null) action.setApprover1(l1);
+            log.info("[AC] Approval rule LEVEL_2 → Action Pending L1={}, L2={}: ruleNumber={}",
+                    l1, match.getLevel2Roles(), match.getRuleNumber());
+        } else {
+            setDefaultPending(action);
+        }
+    }
+
+    private void setDefaultPending(Action action) {
+        action.setActionStatus(APPROVAL_STATUS_PENDING);
+        action.setApprovalStatus1(APPROVAL_STATUS_PENDING);
+        action.setApprovalStatus2(APPROVAL_STATUS_PENDING);
     }
 }

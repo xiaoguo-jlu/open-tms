@@ -27,7 +27,7 @@ public class CashflowImageVO {
 
     private String dealmapNumber;
 
-    private String businessUnit;
+    private String managementEntity;
 
     private String bankAccount;
 

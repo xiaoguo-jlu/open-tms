@@ -51,7 +51,12 @@ public class BasedataMatchClient {
             RestTemplate restTemplate,
             @Value("${basedata.base-url:http://localhost:8081}") String baseUrl) {
         this.restTemplate = restTemplate;
-        this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+        // 基于 CXF 配置 path: /opentms/basedata  (见 application.yml)
+        String normalized = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+        if (!normalized.endsWith("/opentms/basedata")) {
+            normalized = normalized + "/opentms/basedata";
+        }
+        this.baseUrl = normalized;
     }
 
     /**
@@ -124,6 +129,167 @@ public class BasedataMatchClient {
     /** 当前缓存大小（监控/测试用） */
     public int cacheSize() {
         return cache.size();
+    }
+
+    // ============================================================
+    // ★ 交易审批规则 (Deal Approval Rule) match — Phase 5
+    // ============================================================
+
+    private static final Duration DAR_CACHE_TTL = Duration.ofMinutes(5);
+    private static final Duration DAR_CACHE_SWEEP_INTERVAL = Duration.ofMinutes(1);
+
+    /** DAR match 缓存: key = "mgmt|cp|instr|dealer|actionType" */
+    private final ConcurrentHashMap<String, DarCacheEntry> darCache = new ConcurrentHashMap<>();
+    private volatile Instant darLastSweep = Instant.now();
+
+    /**
+     * 调用 /api/v1/deal-approval-rules/match,返回 hit 或 null(失败/超时降级)
+     */
+    public DealApprovalRuleSummary matchDealApprovalRule(Long managementEntityId, Long counterpartyId,
+                                                        Long instrumentId, Long dealerId, String actionType) {
+        String key = darCacheKey(managementEntityId, counterpartyId, instrumentId, dealerId, actionType);
+        sweepDarCacheIfStale();
+
+        DarCacheEntry entry = darCache.get(key);
+        Instant now = Instant.now();
+        if (entry != null && entry.expiresAt.isAfter(now)) {
+            log.debug("[BasedataMatchClient:DAR] cache hit key={}", key);
+            return entry.result;
+        }
+
+        StringBuilder url = new StringBuilder(baseUrl)
+                .append("/api/v1/deal-approval-rules/match")
+                .append("?managementEntityId=").append(safeParam(managementEntityId))
+                .append("&counterpartyId=").append(safeParam(counterpartyId))
+                .append("&instrumentId=").append(safeParam(instrumentId))
+                .append("&dealerId=").append(safeParam(dealerId))
+                .append("&actionType=").append(safeParam(actionType));
+
+        DealApprovalRuleSummary result = null;
+        try {
+            Result<?> resp = restTemplate.getForObject(url.toString(), Result.class);
+            if (resp != null && resp.getCode() == 200 && resp.getData() != null) {
+                result = parseDarResult(resp.getData());
+            } else if (resp != null) {
+                log.info("[BasedataMatchClient:DAR] non-200: code={}, message={}", resp.getCode(), resp.getMessage());
+            }
+        } catch (RestClientException e) {
+            log.warn("[BasedataMatchClient:DAR] rest call failed (degrade to null): {}", e.getMessage());
+        } catch (RuntimeException e) {
+            log.warn("[BasedataMatchClient:DAR] unexpected error (degrade to null): {}", e.getMessage());
+        }
+
+        darCache.put(key, new DarCacheEntry(result, now.plus(DAR_CACHE_TTL)));
+        log.info("[BasedataMatchClient:DAR] match key={} result={}", key,
+                result != null ? result.toShortString() : "null");
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    private DealApprovalRuleSummary parseDarResult(Object data) {
+        if (!(data instanceof java.util.Map<?, ?>)) return null;
+        java.util.Map<String, Object> map = (java.util.Map<String, Object>) data;
+        DealApprovalRuleSummary s = new DealApprovalRuleSummary();
+        s.setMatched(asBoolean(map.get("matched")));
+        s.setApprovalLevel(asString(map.get("approvalLevel")));
+        s.setLevel1Roles(asStringList(map.get("level1Roles")));
+        s.setLevel2Roles(asStringList(map.get("level2Roles")));
+
+        Object mr = map.get("matchedRule");
+        if (mr instanceof java.util.Map<?, ?>) {
+            java.util.Map<String, Object> mrMap = (java.util.Map<String, Object>) mr;
+            s.setRuleNumber(asString(mrMap.get("ruleNumber")));
+            s.setSpecificityScore(asInt(mrMap.get("specificityScore")));
+        }
+        return s;
+    }
+
+    private void sweepDarCacheIfStale() {
+        Instant now = Instant.now();
+        if (Duration.between(darLastSweep, now).compareTo(DAR_CACHE_SWEEP_INTERVAL) < 0) return;
+        darLastSweep = now;
+        darCache.entrySet().removeIf(e -> e.getValue().expiresAt.isBefore(now));
+    }
+
+    private static String darCacheKey(Long me, Long cp, Long instr, Long dealer, String action) {
+        return safeParam(me) + "|" + safeParam(cp) + "|" + safeParam(instr) + "|"
+                + safeParam(dealer) + "|" + safeParam(action);
+    }
+
+    private static Boolean asBoolean(Object o) {
+        if (o == null) return null;
+        if (o instanceof Boolean b) return b;
+        return Boolean.valueOf(o.toString());
+    }
+
+    private static Integer asInt(Object o) {
+        if (o == null) return null;
+        if (o instanceof Number n) return n.intValue();
+        try {
+            return Integer.parseInt(o.toString());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private static String asString(Object o) {
+        return o == null ? null : o.toString();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static java.util.List<String> asStringList(Object o) {
+        if (o == null) return new java.util.ArrayList<>();
+        if (o instanceof java.util.List<?>) {
+            java.util.List<String> result = new java.util.ArrayList<>();
+            for (Object item : (java.util.List<Object>) o) {
+                if (item != null) result.add(item.toString());
+            }
+            return result;
+        }
+        return new java.util.ArrayList<>();
+    }
+
+    /** DAR match 缓存条目 */
+    private static final class DarCacheEntry {
+        final DealApprovalRuleSummary result;
+        final Instant expiresAt;
+
+        DarCacheEntry(DealApprovalRuleSummary result, Instant expiresAt) {
+            this.result = result;
+            this.expiresAt = expiresAt;
+        }
+    }
+
+    /** DAR match 结果轻量 DTO(避免依赖 basedata VO 形成循环依赖) */
+    public static final class DealApprovalRuleSummary {
+        private Boolean matched;
+        private String approvalLevel;
+        private java.util.List<String> level1Roles = new java.util.ArrayList<>();
+        private java.util.List<String> level2Roles = new java.util.ArrayList<>();
+        private String ruleNumber;
+        private Integer specificityScore;
+
+        public Boolean getMatched() { return matched; }
+        public void setMatched(Boolean matched) { this.matched = matched; }
+        public String getApprovalLevel() { return approvalLevel; }
+        public void setApprovalLevel(String approvalLevel) { this.approvalLevel = approvalLevel; }
+        public java.util.List<String> getLevel1Roles() { return level1Roles; }
+        public void setLevel1Roles(java.util.List<String> level1Roles) {
+            this.level1Roles = level1Roles == null ? new java.util.ArrayList<>() : level1Roles;
+        }
+        public java.util.List<String> getLevel2Roles() { return level2Roles; }
+        public void setLevel2Roles(java.util.List<String> level2Roles) {
+            this.level2Roles = level2Roles == null ? new java.util.ArrayList<>() : level2Roles;
+        }
+        public String getRuleNumber() { return ruleNumber; }
+        public void setRuleNumber(String ruleNumber) { this.ruleNumber = ruleNumber; }
+        public Integer getSpecificityScore() { return specificityScore; }
+        public void setSpecificityScore(Integer specificityScore) { this.specificityScore = specificityScore; }
+
+        public String toShortString() {
+            return "matched=" + matched + ",level=" + approvalLevel
+                    + ",L1=" + level1Roles + ",L2=" + level2Roles;
+        }
     }
 
     private void sweepIfStale() {

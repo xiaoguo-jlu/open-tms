@@ -29,7 +29,7 @@ public class Cashflow {
     @TableField("dealmap_number")
     private String dealmapNumber;
 
-    @TableField("business_unit")
+    @TableField("management_entity_id")
     private String managementEntity;
 
     @TableField("bank_account")

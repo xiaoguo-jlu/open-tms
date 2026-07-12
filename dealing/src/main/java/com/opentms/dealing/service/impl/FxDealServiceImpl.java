@@ -17,6 +17,7 @@ import com.opentms.dealing.mapper.CashflowMapper;
 import com.opentms.dealing.mapper.DealMapMapper;
 import com.opentms.dealing.mapper.DealMapper;
 import com.opentms.dealing.mapper.FxDealMapper;
+import com.opentms.dealing.integration.BasedataMatchClient;
 import com.opentms.dealing.service.EntityNameLookup;
 import com.opentms.dealing.service.FxDealService;
 import com.opentms.dealing.vo.ActionVO;
@@ -71,6 +72,10 @@ public class FxDealServiceImpl implements FxDealService {
      * 跨模块关联实体名称查询 (用于 copy 端点补全名称字段, 2026-07-05)
      */
     private final EntityNameLookup entityNameLookup;
+    /**
+     * ★ Phase 5 (2026-07-12): 交易审批规则 match 客户端
+     */
+    private final BasedataMatchClient matchClient;
 
     // ====== 常量 ======
     private static final String DEAL_TYPE = "FX";
@@ -118,7 +123,8 @@ public class FxDealServiceImpl implements FxDealService {
                              DealMapMapper dealMapMapper,
                              CashflowMapper cashflowMapper,
                              com.opentms.dealing.service.CashflowImageService cashflowImageService,
-                             EntityNameLookup entityNameLookup) {
+                             EntityNameLookup entityNameLookup,
+                             BasedataMatchClient matchClient) {
         this.dealMapper = dealMapper;
         this.fxDealMapper = fxDealMapper;
         this.actionMapper = actionMapper;
@@ -126,6 +132,7 @@ public class FxDealServiceImpl implements FxDealService {
         this.cashflowMapper = cashflowMapper;
         this.cashflowImageService = cashflowImageService;
         this.entityNameLookup = entityNameLookup;
+        this.matchClient = matchClient;
     }
 
     // ======================== Calculate ========================
@@ -582,16 +589,17 @@ public class FxDealServiceImpl implements FxDealService {
         action.setDealNumber(dealNumber);
         action.setDealType(DEAL_TYPE);
         action.setActionType(ACTION_TYPE_DEAL);
-        action.setActionStatus(ACTION_STATUS_APPROVED); // FX 无审批流,直接 Approved
+        // ★ Phase 5 (2026-07-12): FX 默认直 Approved(沿用 d08181e 修复),但若新规则命中
+        //   LEVEL_1/LEVEL_2 时,改为走审批流(规则 > 写死)
         action.setOperator(operator);
         action.setOperateAt(now);
         action.setRemark(dto.getRemark());
-        action.setApprovalStatus1(ACTION_STATUS_APPROVED);
-        action.setApprovalStatus2(ACTION_STATUS_APPROVED);
         action.setCreatedBy(operator);
         action.setCreatedAt(now);
         action.setVersion(0);
         action.setDeleted(NOT_DELETED);
+        applyFxApprovalRule(action, dto.getManagementEntityId(), dto.getCounterpartyId(),
+                dto.getInstrumentId(), dto.getTraderId(), ACTION_TYPE_DEAL, operator);
         actionMapper.insert(action);
 
         // 4. INSERT 3 DealMap (BUY/SELL/RATE)
@@ -1289,4 +1297,60 @@ public class FxDealServiceImpl implements FxDealService {
         BeanUtils.copyProperties(a, vo);
         return vo;
     }
+
+    // ======================== ★ Phase 5 (2026-07-12): 交易审批规则联动 ========================
+
+    /**
+     * FX 默认直 Approved(沿用 d08181e 修复),但若新规则命中 LEVEL_1/LEVEL_2,改为走审批流。
+     * <p>规则匹配失败/降级 → 默认 Approved(保留旧行为)。</p>
+     */
+    private void applyFxApprovalRule(Action action, Long managementEntityId, Long counterpartyId,
+                                     Long instrumentId, Long dealerId, String actionType, String operator) {
+        // 默认:FX 直接 Approved
+        action.setActionStatus(ACTION_STATUS_APPROVED);
+        action.setApprovalStatus1(ACTION_STATUS_APPROVED);
+        action.setApprovalStatus2(ACTION_STATUS_APPROVED);
+
+        if (managementEntityId == null && counterpartyId == null
+                && instrumentId == null && dealerId == null) {
+            return; // 没维度信息,默认走 Approved
+        }
+        BasedataMatchClient.DealApprovalRuleSummary match = null;
+        try {
+            match = matchClient.matchDealApprovalRule(
+                    managementEntityId, counterpartyId, instrumentId, dealerId, actionType);
+        } catch (Exception e) {
+            log.warn("[FX] match call failed, fallback to Approved: {}", e.getMessage());
+        }
+        if (match == null || !Boolean.TRUE.equals(match.getMatched())) {
+            return; // 未命中规则,默认 Approved
+        }
+        String level = match.getApprovalLevel();
+        if ("LEVEL_1".equals(level)) {
+            action.setActionStatus(APPROVAL_STATUS_PENDING);
+            action.setApprovalStatus1(APPROVAL_STATUS_PENDING);
+            action.setApprovalStatus2(APPROVAL_STATUS_PENDING);
+            String l1 = match.getLevel1Roles() != null && !match.getLevel1Roles().isEmpty()
+                    ? match.getLevel1Roles().get(0) : null;
+            if (l1 != null) action.setApprover1(l1);
+            log.info("[FX] Approval rule LEVEL_1 → Action Pending L1={}: ruleNumber={}",
+                    l1, match.getRuleNumber());
+        } else if ("LEVEL_2".equals(level)) {
+            action.setActionStatus(APPROVAL_STATUS_PENDING);
+            action.setApprovalStatus1(APPROVAL_STATUS_PENDING);
+            action.setApprovalStatus2(APPROVAL_STATUS_PENDING);
+            String l1 = match.getLevel1Roles() != null && !match.getLevel1Roles().isEmpty()
+                    ? match.getLevel1Roles().get(0) : null;
+            if (l1 != null) action.setApprover1(l1);
+            log.info("[FX] Approval rule LEVEL_2 → Action Pending L1={}, L2={}: ruleNumber={}",
+                    l1, match.getLevel2Roles(), match.getRuleNumber());
+        }
+        // LEVEL_0 → 保持默认 Approved
+        else if ("LEVEL_0".equals(level)) {
+            log.info("[FX] Approval rule LEVEL_0 → Action 直接 Approved: ruleNumber={}",
+                    match.getRuleNumber());
+        }
+    }
+
+    private static final String APPROVAL_STATUS_PENDING = "Pending";
 }

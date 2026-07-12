@@ -48,8 +48,8 @@ public class CashflowImage {
     @TableField("dealmap_number")
     private String dealmapNumber;
 
-    @TableField("business_unit")
-    private String businessUnit;
+    @TableField("management_entity_id")
+    private String managementEntity;
 
     @TableField("bank_account")
     private String bankAccount;

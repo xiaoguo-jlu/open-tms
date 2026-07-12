@@ -16,6 +16,7 @@ import com.opentms.dealing.mapper.AtDealMapper;
 import com.opentms.dealing.mapper.CashflowMapper;
 import com.opentms.dealing.mapper.DealMapMapper;
 import com.opentms.dealing.mapper.DealMapper;
+import com.opentms.dealing.integration.BasedataMatchClient;
 import com.opentms.dealing.service.AtDealService;
 import com.opentms.dealing.service.BankAccountLookup;
 import com.opentms.dealing.service.EntityNameLookup;
@@ -67,6 +68,10 @@ public class AtDealServiceImpl implements AtDealService {
      * 跨模块关联实体名称查询 (用于详情响应补全名称, 2026-07-05)
      */
     private final EntityNameLookup entityNameLookup;
+    /**
+     * ★ Phase 5 (2026-07-12): 交易审批规则 match 客户端
+     */
+    private final BasedataMatchClient matchClient;
 
     private static final String DEAL_TYPE = "AT";
     private static final String DEAL_STATUS_NEW = "New";
@@ -106,7 +111,8 @@ public class AtDealServiceImpl implements AtDealService {
                              CashflowMapper cashflowMapper,
                              BankAccountLookup bankAccountLookup,
                              com.opentms.dealing.service.CashflowImageService cashflowImageService,
-                             EntityNameLookup entityNameLookup) {
+                             EntityNameLookup entityNameLookup,
+                             BasedataMatchClient matchClient) {
         this.dealMapper = dealMapper;
         this.atDealMapper = atDealMapper;
         this.atDealImageMapper = atDealImageMapper;
@@ -116,6 +122,7 @@ public class AtDealServiceImpl implements AtDealService {
         this.cashflowMapper = cashflowMapper;
         this.cashflowImageService = cashflowImageService;
         this.entityNameLookup = entityNameLookup;
+        this.matchClient = matchClient;
     }
 
     // ======================== Page / Query ========================
@@ -259,16 +266,15 @@ public class AtDealServiceImpl implements AtDealService {
         action.setDealNumber(dealNumber);
         action.setDealType(DEAL_TYPE);
         action.setActionType(ACTION_TYPE_CREATE);
-        action.setActionStatus(APPROVAL_STATUS_PENDING);
         action.setOperator(operator);
         action.setOperateAt(now);
-        action.setApprovalStatus1(APPROVAL_STATUS_PENDING);
-        action.setApprovalStatus2(APPROVAL_STATUS_PENDING);
         action.setRemark(dto.getRemark());
         action.setCreatedBy(operator);
         action.setCreatedAt(now);
         action.setVersion(0);
         action.setDeleted(DEALMAP_NOT_DELETED);
+        // ★ Phase 5 (2026-07-12): 调 match 拿审批规则(AT 不传 counterpartyId/instrumentId/dealerId)
+        applyAtApprovalRule(action, dto.getManagementEntity(), 0L, 0L, 0L, ACTION_TYPE_CREATE, operator);
         actionMapper.insert(action);
 
         // 5. INSERT 4 DealMap（2 AccountTransfer + 2 ActualCashflow）
@@ -1081,5 +1087,63 @@ public class AtDealServiceImpl implements AtDealService {
         AtDealImageVO vo = new AtDealImageVO();
         BeanUtils.copyProperties(img, vo);
         return vo;
+    }
+
+    // ======================== ★ Phase 5 (2026-07-12): 交易审批规则联动 ========================
+
+    /**
+     * AT 默认走一层审批(Pending);若新规则命中 LEVEL_0 → Approved,LEVEL_2 → 仍 Pending 但记录 L2。
+     */
+    private void applyAtApprovalRule(Action action, String managementEntityCode,
+                                     Long counterpartyId, Long instrumentId, Long dealerId,
+                                     String actionType, String operator) {
+        // 默认 Pending
+        action.setActionStatus(APPROVAL_STATUS_PENDING);
+        action.setApprovalStatus1(APPROVAL_STATUS_PENDING);
+        action.setApprovalStatus2(APPROVAL_STATUS_PENDING);
+
+        Long managementEntityId = null;
+        if (StringUtils.hasText(managementEntityCode)) {
+            try {
+                Map<String, Object> me = entityNameLookup.findManagementEntityByCode(managementEntityCode);
+                if (me != null && me.get("id") != null) {
+                    managementEntityId = Long.valueOf(me.get("id").toString());
+                }
+            } catch (Exception ignore) {
+            }
+        }
+        if (managementEntityId == null) {
+            return;
+        }
+        BasedataMatchClient.DealApprovalRuleSummary match = null;
+        try {
+            match = matchClient.matchDealApprovalRule(
+                    managementEntityId, counterpartyId, instrumentId, dealerId, actionType);
+        } catch (Exception e) {
+            log.warn("[AT] match call failed, fallback to Pending: {}", e.getMessage());
+        }
+        if (match == null || !Boolean.TRUE.equals(match.getMatched())) {
+            return;
+        }
+        String level = match.getApprovalLevel();
+        if ("LEVEL_0".equals(level)) {
+            action.setActionStatus(APPROVAL_STATUS_APPROVED);
+            action.setApprovalStatus1(APPROVAL_STATUS_APPROVED);
+            action.setApprovalStatus2(APPROVAL_STATUS_APPROVED);
+            log.info("[AT] Approval rule LEVEL_0 → Action 直接 Approved: ruleNumber={}",
+                    match.getRuleNumber());
+        } else if ("LEVEL_1".equals(level)) {
+            String l1 = match.getLevel1Roles() != null && !match.getLevel1Roles().isEmpty()
+                    ? match.getLevel1Roles().get(0) : null;
+            if (l1 != null) action.setApprover1(l1);
+            log.info("[AT] Approval rule LEVEL_1 → Action Pending L1={}: ruleNumber={}",
+                    l1, match.getRuleNumber());
+        } else if ("LEVEL_2".equals(level)) {
+            String l1 = match.getLevel1Roles() != null && !match.getLevel1Roles().isEmpty()
+                    ? match.getLevel1Roles().get(0) : null;
+            if (l1 != null) action.setApprover1(l1);
+            log.info("[AT] Approval rule LEVEL_2 → Action Pending L1={}, L2={}: ruleNumber={}",
+                    l1, match.getLevel2Roles(), match.getRuleNumber());
+        }
     }
 }
