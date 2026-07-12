@@ -1,24 +1,30 @@
 {
   "feature": "AT交易 (Account Transfer)",
   "version": "v2.0",
-  "start_time": "2026-06-21 17:25:07",
+  "start_time": "2026-07-12 14:53:56",
   "total": 18,
-  "passed": 1,
-  "failed": 9,
+  "passed": 5,
+  "failed": 5,
   "skipped": 8,
   "results": [
     {
       "id": "TC-AT-001",
       "name": "创建同公司同币种 AT",
       "status": "failed",
-      "note": "创建失败: None",
-      "expected": "code=200"
+      "note": "创建失败: {'code': 400, 'message': 'AT 不支持跨管理主体转账 (源账户主体=33, 目标账户主体=32)', 'data': None, 'timestamp': 1783839247254}",
+      "expected": "code=200",
+      "actual": {
+        "code": 400,
+        "message": "AT 不支持跨管理主体转账 (源账户主体=33, 目标账户主体=32)",
+        "data": null,
+        "timestamp": 1783839247254
+      }
     },
     {
       "id": "TC-AT-002",
       "name": "查询 AT 列表",
       "status": "passed",
-      "note": "total=0, count=0",
+      "note": "total=3, count=3",
       "expected": "code=200",
       "actual": 200
     },
@@ -38,8 +44,14 @@
       "id": "TC-AT-005",
       "name": "创建跨币种 AT",
       "status": "failed",
-      "note": "响应: None",
-      "expected": "code=200"
+      "note": "响应: {'code': 400, 'message': 'AT 不支持跨币种转账 (源账户币种=CNY, 目标账户币种=USD),请使用 FX 交易', 'data': None, 'timestamp': 1783839247846}",
+      "expected": "code=200",
+      "actual": {
+        "code": 400,
+        "message": "AT 不支持跨币种转账 (源账户币种=CNY, 目标账户币种=USD),请使用 FX 交易",
+        "data": null,
+        "timestamp": 1783839247846
+      }
     },
     {
       "id": "TC-AT-006",
@@ -51,22 +63,40 @@
       "id": "TC-AT-007",
       "name": "创建跨公司 AT",
       "status": "failed",
-      "note": "响应: None",
-      "expected": "code=200"
+      "note": "响应: {'code': 400, 'message': 'AT 不支持跨管理主体转账 (源账户主体=33, 目标账户主体=32)', 'data': None, 'timestamp': 1783839247856}",
+      "expected": "code=200",
+      "actual": {
+        "code": 400,
+        "message": "AT 不支持跨管理主体转账 (源账户主体=33, 目标账户主体=32)",
+        "data": null,
+        "timestamp": 1783839247856
+      }
     },
     {
       "id": "TC-AT-008",
       "name": "创建跨公司跨币种 AT",
       "status": "failed",
-      "note": "响应: None",
-      "expected": "code=200"
+      "note": "响应: {'code': 400, 'message': 'AT 不支持跨币种转账 (源账户币种=USD, 目标账户币种=CNY),请使用 FX 交易', 'data': None, 'timestamp': 1783839247866}",
+      "expected": "code=200",
+      "actual": {
+        "code": 400,
+        "message": "AT 不支持跨币种转账 (源账户币种=USD, 目标账户币种=CNY),请使用 FX 交易",
+        "data": null,
+        "timestamp": 1783839247866
+      }
     },
     {
       "id": "TC-AT-009",
       "name": "创建跨境 AT",
       "status": "failed",
-      "note": "响应: None",
-      "expected": "code=200"
+      "note": "响应: {'code': 400, 'message': 'AT 不支持跨币种转账 (源账户币种=USD, 目标账户币种=CNY),请使用 FX 交易', 'data': None, 'timestamp': 1783839247874}",
+      "expected": "code=200",
+      "actual": {
+        "code": 400,
+        "message": "AT 不支持跨币种转账 (源账户币种=USD, 目标账户币种=CNY),请使用 FX 交易",
+        "data": null,
+        "timestamp": 1783839247874
+      }
     },
     {
       "id": "TC-AT-010",
@@ -89,30 +119,26 @@
     {
       "id": "TC-AT-013",
       "name": "双账户相同校验",
-      "status": "failed",
-      "note": "未拒绝: None",
-      "expected": "code=400"
+      "status": "passed",
+      "note": "已拒绝（code=400, msg=源账户和目标账户不能相同）"
     },
     {
       "id": "TC-AT-014",
       "name": "跨币种未填汇率",
-      "status": "failed",
-      "note": "服务端未拒绝未填汇率的跨币种 AT",
-      "expected": "code=400"
+      "status": "passed",
+      "note": "已拒绝 code=400"
     },
     {
       "id": "TC-AT-015",
       "name": "source_amount=0",
-      "status": "failed",
-      "note": "服务端未拒绝 source_amount=0",
-      "expected": "code=400"
+      "status": "passed",
+      "note": "已拒绝 code=400"
     },
     {
       "id": "TC-AT-016",
       "name": "dest_amount=0",
-      "status": "failed",
-      "note": "服务端未拒绝 dest_amount=0",
-      "expected": "code=400"
+      "status": "passed",
+      "note": "已拒绝 code=400"
     },
     {
       "id": "TC-AT-017",
@@ -140,5 +166,5 @@
     "approval_does_not_change_cashflow_status": null,
     "action_many_to_one": null
   },
-  "end_time": "2026-06-21 17:29:48"
+  "end_time": "2026-07-12 14:54:09"
 }
